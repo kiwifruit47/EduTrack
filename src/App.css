@@ -31,7 +31,7 @@ small {
 
 input {
     height: 2.5rem;
-    width: 25vw;
+    width: 100%;
     text-indent: 0.8rem;
     color: #8aa8bf;
     border-color: #8aa8bf;
