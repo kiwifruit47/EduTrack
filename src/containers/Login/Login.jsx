@@ -10,7 +10,7 @@ export const Login = (props) => {
     }
  
     return (
-        <div className="auth-form-container">
+        <div role="form" className="auth-form-container">
             <h1>Login</h1>
             <form className="login-form">
                 <label htmlFor="username">Username</label>
