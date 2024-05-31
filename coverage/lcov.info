@@ -9,6 +9,15 @@ BRF:0
 BRH:0
 end_of_record
 TN:
+SF:src/components/Sidebar.jsx
+FNF:0
+FNH:0
+LF:0
+LH:0
+BRF:0
+BRH:0
+end_of_record
+TN:
 SF:src/containers/App/App.jsx
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
