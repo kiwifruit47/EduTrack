@@ -1,6 +1,7 @@
 import React, { useState} from "react";
 import { Login } from "../Login/Login";
 import { Register } from "../Register/Register";
+import Container from "../../components/Container/Container";
 import './App.css'
 
 
@@ -13,7 +14,8 @@ const App = () => {
   return (
     <div className="App">
       {
-        currentForm == 'login' ? <Login onFormSwitch = {toggleForm}/> : <Register onFormSwitch = {toggleForm}/>
+        // currentForm == 'login' ? <Login onFormSwitch = {toggleForm}/> : <Register onFormSwitch = {toggleForm}/>
+        <Container />
       }
     </div>
   )

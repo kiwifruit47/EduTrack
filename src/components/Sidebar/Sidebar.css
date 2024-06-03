@@ -1,0 +1,42 @@
+img {
+    height: 3.2rem;
+}
+
+.logo--bcg {
+    margin: 2rem 0 4rem 0;
+    height: 3.2rem;
+    width: 100%;
+    background-color: #53A9CB;
+}
+
+a {
+    text-decoration: none;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.menu--list {
+    width: 11vw;
+    display: flex;
+    flex-direction: column;
+    gap: 7vh;
+    margin-left: 3rem;
+}
+
+.menu--list .menu--item {
+    display: flex;
+    width: 10vw;
+    align-items: center;
+    gap: 1vw;
+    font-size: 1.2rem;
+    color: #F6F9FE;
+    font-weight: 500;
+}
+
+.menu--list .menu--item:hover {
+    font-weight: 800;
+}
