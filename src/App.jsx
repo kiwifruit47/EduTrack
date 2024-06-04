@@ -1,7 +1,7 @@
 import React, { useState} from "react";
-import { Login } from "../Login/Login";
-import { Register } from "../Register/Register";
-import Container from "../../components/Container/Container";
+import { Login } from "./pages/Login/Login";
+import { Register } from "./pages/Register/Register";
+import Dashboard from "./pages/(logged-in)/Dashboard/Dashboard";
 import './App.css'
 
 
@@ -15,7 +15,7 @@ const App = () => {
     <div className="App">
       {
         // currentForm == 'login' ? <Login onFormSwitch = {toggleForm}/> : <Register onFormSwitch = {toggleForm}/>
-        <Container />
+        <Dashboard />
       }
     </div>
   )
