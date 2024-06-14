@@ -2,8 +2,7 @@ import React from "react";
 import { BiHome, BiLogOut } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { FaRegStar } from "react-icons/fa";
-import { FaRegCalendar } from "react-icons/fa6";
-import { IoSettingsOutline } from "react-icons/io5";
+import { FaRegCalendar, FaCheck } from "react-icons/fa6";
 
 import "./Sidebar.css";
 
@@ -30,12 +29,12 @@ const Sidebar = () => {
                 Grades
             </a>
             <a href="" className="menu--item">
-                <FaRegCalendar />
+                <FaCheck />
                 Attendance
             </a>
             <a href="" className="menu--item">
-                <IoSettingsOutline />
-                Settings
+                <FaRegCalendar />
+                Schedule
             </a>
             <a href="" className="menu--item">
                 <BiLogOut />

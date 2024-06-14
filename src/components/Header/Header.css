@@ -1,0 +1,19 @@
+header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: #013B67;
+    line-height: 3rem;
+}
+
+.headerDiv {
+    padding: 1.7em 3em;
+}
+
+.headerDiv h2 {
+    font-size: 2em;
+}
+.headerDiv h3 {
+    font-size: 1.5em;
+}
