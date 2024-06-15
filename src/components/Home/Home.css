@@ -1,0 +1,31 @@
+.homeComponentsContainer {
+    height: 70%;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 2.5em;
+    grid-row-gap: 2.5em;
+    padding: 0 3em;
+    
+}
+
+.homeComponent {
+    background-color: #F5F5F5;
+    border-radius: 30px;
+}
+
+.homeComponent:hover {
+    cursor: pointer;
+}
+
+.div1 { grid-area: 1 / 1 / 4 / 2; }
+.div2 { grid-area: 1 / 2 / 2 / 3; }
+.div3 { grid-area: 2 / 2 / 3 / 3; }
+.div4 { grid-area: 3 / 2 / 4 / 3; }
+
+.homeComponent h3 {
+    color: #013B67;
+    font-weight: 400;
+    font-size: 1.5em;
+    padding: 1em 1em;
+}
