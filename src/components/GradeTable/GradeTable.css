@@ -1,0 +1,56 @@
+.gradeTable {
+    border: 2px solid;
+    color: #013B67;
+    border-collapse: collapse;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #F6F9FE;
+}
+
+.gradeTableHeader {
+    border: 2px solid #013B67;
+    padding: 2em;
+    text-align: center;
+    background-color: #3EA0C7;
+    color: #F6F9FE;
+}
+
+.gradeTableCells {
+    border: 2px solid;
+    padding: 1em;
+}
+
+.gradesCell {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .gradeItem {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    color: #F6F9FE;
+    width: 1.2em;
+    height: 1.5em;
+    text-align: center;
+  }
+
+  .grade-6 {
+    background-color: #26C281;
+  }
+  
+  .grade-5 {
+    background-color: #3572EF;
+  }
+  
+  .grade-4 {
+    background-color: #F7CA17;
+  }
+  
+  .grade-3 {
+    background-color: #E88D67;
+  }
+  
+  .grade-2 {
+    background-color: #DD5746;
+  }

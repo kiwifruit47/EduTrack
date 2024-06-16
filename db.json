@@ -1,0 +1,40 @@
+{
+  "grades": [
+    {
+      "subject": "Math",
+      "term1": [
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" }
+      ],
+      "term2": [
+        { "value": 4, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" }
+      ],
+      "year": 5
+    },
+    {
+      "subject": "Science",
+      "term1": [
+        { "value": 2, "gradedByTeacher": "Mrs. Johnson" },
+        { "value": 3, "gradedByTeacher": "Mrs. Johnson" }
+      ],
+      "term2": [
+        { "value": 5, "gradedByTeacher": "Mrs. Johnson" },
+        { "value": 6, "gradedByTeacher": "Mrs. Johnson" }
+      ],
+      "year": 5
+    },
+    {
+      "subject": "English",
+      "term1": [
+        { "value": 6, "gradedByTeacher": "Mr. Brown" },
+        { "value": 5, "gradedByTeacher": "Mr. Brown" }
+      ],
+      "term2": [
+        { "value": 6, "gradedByTeacher": "Mr. Brown" },
+        { "value": 6, "gradedByTeacher": "Mr. Brown" }
+      ],
+      "year": 6
+    }
+  ]
+}

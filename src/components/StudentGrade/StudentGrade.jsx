@@ -1,8 +1,15 @@
-import React from 'react'
+import React from 'react';
+import './StudentGrade.css';
+import GradeTable from '../GradeTable/GradeTable';
 
 const StudentGrade = () => {
   return (
-    <div>StudentGrade</div>
+    <>
+        <header className='gradeHeader'>
+            <h3>Grades</h3>
+        </header>
+        <GradeTable/>
+    </>
   )
 }
 
