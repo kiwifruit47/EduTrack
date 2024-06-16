@@ -1,12 +1,12 @@
 import React from 'react';
-import { GoPerson } from "react-icons/go";
+import { IoPersonCircle } from "react-icons/io5";
 
-const style = { color: "#013B67", fontSize: "5em" }
+const style = { color: "#013B67", fontSize: "7em" }
 
 const Profile = () => {
   return (
     <div>
-        <GoPerson style={style}/>
+        <IoPersonCircle style={style}/>
     </div>
   )
 }
