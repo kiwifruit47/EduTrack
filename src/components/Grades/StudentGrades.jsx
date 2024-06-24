@@ -1,9 +1,9 @@
 import React, { useEffect,  useState, useMemo } from 'react';
 import { useTable } from 'react-table';
 import axios from 'axios';
-import './GradeTable.css'
+import './StudentGrades.css'
 
-const GradeTable = () => {
+const StudentGrades = () => {
     const [data, setData] = useState([]);
     const [averages, setAverages] = useState({ term1: 0, term2: 0, year: 0 });
 
@@ -80,56 +80,61 @@ const GradeTable = () => {
       } = useTable({ columns, data });
 
   return (
-    <table {...getTableProps()} className='gradeTable'>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()} className='gradeTableHeader'>
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map(row => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => (
-                <td {...cell.getCellProps()} className='gradeTableCells'>
-                  {cell.render('Cell')}
-                </td>
+    <>
+      <header className='gradeHeader'>
+        <h1>Grades</h1>
+      </header>
+      <table {...getTableProps()} className='gradeTable'>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()} className='gradeTableHeader'>
+                  {column.render('Header')}
+                </th>
               ))}
             </tr>
-          );
-        })}
-        <tr>
-          <td className='gradeTableCells'>Average</td>
-          <td className='gradeTableCells'>
-            <div className="gradesCell">
-              <div>
-                {averages.term1.toFixed(2)}
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map(row => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => (
+                  <td {...cell.getCellProps()} className='gradeTableCells'>
+                    {cell.render('Cell')}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          <tr>
+            <td className='gradeTableCells'>Average</td>
+            <td className='gradeTableCells'>
+              <div className="gradesCell">
+                <div>
+                  {averages.term1.toFixed(2)}
+                </div>
               </div>
-            </div>
-          </td>
-          <td className='gradeTableCells'>
-            <div className="gradesCell">
-              <div>
-                {averages.term2.toFixed(2)}
+            </td>
+            <td className='gradeTableCells'>
+              <div className="gradesCell">
+                <div>
+                  {averages.term2.toFixed(2)}
+                </div>
               </div>
-            </div>
-          </td>
-          <td className='gradeTableCells'>
-            <div>
-              {averages.year.toFixed(2)}
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td className='gradeTableCells'>
+              <div>
+                {averages.year.toFixed(2)}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
   );
 };
 
-export default GradeTable
+export default StudentGrades

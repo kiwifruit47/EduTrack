@@ -4,10 +4,19 @@
       "subject": "Math",
       "term1": [
         { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
         { "value": 5, "gradedByTeacher": "Mr. Smith" }
       ],
       "term2": [
         { "value": 4, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
+        { "value": 5, "gradedByTeacher": "Mr. Smith" },
         { "value": 5, "gradedByTeacher": "Mr. Smith" }
       ],
       "year": 5
@@ -36,5 +45,79 @@
       ],
       "year": 6
     }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "roleType": "student",
+      "studentId": 1
+    },
+    {
+      "id": 2,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "roleType": "parent",
+      "studentId": 1
+    },
+    {
+      "id": 3,
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "roleType": "teacher",
+      "teacherId": 1
+    },
+    {
+      "id": 4,
+      "firstName": "Bob",
+      "lastName": "Brown",
+      "roleType": "headmaster",
+      "headmasterId": 1
+    }
+  ],
+  "students": [
+    {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "className": "5A",
+      "parentId": 2
+    }
+  ],
+  "parents": [
+    {
+      "id": 2,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "phoneNumber": "123-456-7890"
+    }
+  ],
+  "teachers": [
+    {
+      "id": 1,
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "subjects": [
+        {"name": "Math"},
+        {"name": "Science"}
+      ],
+      "school": {"name": "Central High"}
+    }
+  ],
+  "headmasters": [
+    {
+      "id": 1,
+      "firstName": "Bob",
+      "lastName": "Brown",
+      "school": {"name": "Central High"}
+    }
+  ],
+  "schools": [
+    {
+      "id": 1,
+      "name": "Greenwood High School"
+    }
   ]
 }
+

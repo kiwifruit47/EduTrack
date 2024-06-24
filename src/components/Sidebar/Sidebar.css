@@ -11,6 +11,7 @@ img {
 
 a {
     text-decoration: none;
+    color: #F6F9FE;
 }
 
 .menu {
@@ -33,8 +34,8 @@ a {
     align-items: center;
     gap: 1vw;
     font-size: 1.2rem;
-    color: #F6F9FE;
     font-weight: 500;
+    text-decoration: none;
 }
 
 .menu--list .menu--item:hover {

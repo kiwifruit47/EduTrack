@@ -4,10 +4,14 @@ export const Login = (props) => {
     const [username, setUsername] = useState('');
     const [pass, setPass] = useState('');
 
-    const handleSubmit = (e) => {
-        e.preventDefaut();
-        console.log(username);
-    }
+    // const handleSubmit = (e) => {
+    //     e.preventDefaut();
+    //     console.log(username);
+    // }
+    const handleSubmit = () => {
+        // Perform authentication logic here
+        setIsAuthenticated(true);
+      }
  
     return (
         <div role="form" className="auth-form-container">
@@ -29,9 +33,9 @@ export const Login = (props) => {
                 name="password" 
                 placeholder="**********" 
                 id="password"/>
-                <button className="btn-main">Login</button>
+                <button onClick={handleSubmit} className="btn-main">Login</button>
             </form>
-            <button onClick={() => props.onFormSwitch('register')}>Don't have an account? Register</button>
+            <span style={{marginTop: "1.5rem"}}>Don't have an accout? Contact school administration.</span>
         </div>
     )
 }

@@ -1,9 +1,17 @@
-.main--container {
+.main-container {
     display: flex;
     flex-direction: row;
     text-align: left;
     height: 95vh;
     width: 90vw;
     background-color: #1D97C1;
+    border-radius: 30px;
+}
+
+.page-content-container {
+    background-color: #E1EDF6;
+    height: 91vh;
+    width: 73.5vw;
+    margin-top: 1rem;
     border-radius: 30px;
 }

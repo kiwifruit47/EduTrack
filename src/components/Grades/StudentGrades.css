@@ -1,3 +1,10 @@
+.gradeHeader {
+  color:#013B67;
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.5rem;
+}
+
 .gradeTable {
     border: 2px solid;
     color: #013B67;
