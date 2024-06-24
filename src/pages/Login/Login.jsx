@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-export const Login = (props) => {
+const Login = (props) => {
     const [username, setUsername] = useState('');
     const [pass, setPass] = useState('');
 
@@ -9,7 +9,6 @@ export const Login = (props) => {
     //     console.log(username);
     // }
     const handleSubmit = () => {
-        // Perform authentication logic here
         setIsAuthenticated(true);
       }
  
@@ -39,3 +38,5 @@ export const Login = (props) => {
         </div>
     )
 }
+
+export default Login
