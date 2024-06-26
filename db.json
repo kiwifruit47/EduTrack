@@ -1,56 +1,11 @@
 {
-  "grades": [
-    {
-      "subject": "Math",
-      "term1": [
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" }
-      ],
-      "term2": [
-        { "value": 4, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" },
-        { "value": 5, "gradedByTeacher": "Mr. Smith" }
-      ],
-      "year": 5
-    },
-    {
-      "subject": "Science",
-      "term1": [
-        { "value": 2, "gradedByTeacher": "Mrs. Johnson" },
-        { "value": 3, "gradedByTeacher": "Mrs. Johnson" }
-      ],
-      "term2": [
-        { "value": 5, "gradedByTeacher": "Mrs. Johnson" },
-        { "value": 6, "gradedByTeacher": "Mrs. Johnson" }
-      ],
-      "year": 5
-    },
-    {
-      "subject": "English",
-      "term1": [
-        { "value": 6, "gradedByTeacher": "Mr. Brown" },
-        { "value": 5, "gradedByTeacher": "Mr. Brown" }
-      ],
-      "term2": [
-        { "value": 6, "gradedByTeacher": "Mr. Brown" },
-        { "value": 6, "gradedByTeacher": "Mr. Brown" }
-      ],
-      "year": 6
-    }
-  ],
   "users": [
     {
       "id": 1,
       "firstName": "John",
       "lastName": "Doe",
+      "username": "john_doe",
+      "password": "password123",
       "roleType": "student",
       "studentId": 1
     },
@@ -58,6 +13,8 @@
       "id": 2,
       "firstName": "Jane",
       "lastName": "Smith",
+      "username": "jane_smith",
+      "password": "password123",
       "roleType": "parent",
       "studentId": 1
     },
@@ -65,6 +22,8 @@
       "id": 3,
       "firstName": "Alice",
       "lastName": "Johnson",
+      "username": "alice_johnson",
+      "password": "password123",
       "roleType": "teacher",
       "teacherId": 1
     },
@@ -72,6 +31,8 @@
       "id": 4,
       "firstName": "Bob",
       "lastName": "Brown",
+      "username": "bob_brown",
+      "password": "password123",
       "roleType": "headmaster",
       "headmasterId": 1
     }
@@ -99,10 +60,11 @@
       "firstName": "Alice",
       "lastName": "Johnson",
       "subjects": [
-        {"name": "Math"},
-        {"name": "Science"}
+        {"id": 1, "name": "Math"},
+        {"id": 2, "name": "Science"}
       ],
-      "school": {"name": "Central High"}
+      "school": {"id": 1, "name": "Central High"},
+      "isHeadTeacher": false
     }
   ],
   "headmasters": [
@@ -110,14 +72,120 @@
       "id": 1,
       "firstName": "Bob",
       "lastName": "Brown",
-      "school": {"name": "Central High"}
+      "school": {"id": 1, "name": "Central High"}
     }
   ],
   "schools": [
     {
       "id": 1,
-      "name": "Greenwood High School"
+      "name": "Central High"
+    }
+  ],
+  "subjects": [
+    {
+      "id": 1,
+      "name": "Math"
+    },
+    {
+      "id": 2,
+      "name": "Science"
+    }
+  ],
+  "schoolClasses": [
+    {
+      "id": 1,
+      "name": "5A",
+      "headTeacher": {
+        "id": 1,
+        "firstName": "Alice",
+        "lastName": "Johnson"
+      },
+      "school": {
+        "id": 1,
+        "name": "Central High"
+      }
+    },
+    {
+      "id": 2,
+      "name": "6B",
+      "headTeacher": {
+        "id": 2,
+        "firstName": "Mark",
+        "lastName": "Taylor"
+      },
+      "school": {
+        "id": 1,
+        "name": "Central High"
+      }
+    }
+  ],
+  "schedules": [
+    {
+      "id": 1,
+      "day": "Monday",
+      "time": "09:00 AM",
+      "schoolClass": {
+        "id": 1,
+        "name": "5A"
+      },
+      "subject": {
+        "id": 1,
+        "name": "Math"
+      }
+    },
+    {
+      "id": 2,
+      "day": "Tuesday",
+      "time": "10:00 AM",
+      "schoolClass": {
+        "id": 2,
+        "name": "6B"
+      },
+      "subject": {
+        "id": 2,
+        "name": "Science"
+      }
+    }
+  ],
+  "grades": [
+    {
+      "id": 1,
+      "value": 4.5,
+      "subject": {
+        "id": 1,
+        "name": "Math"
+      },
+      "teacher": {
+        "id": 1,
+        "firstName": "Alice",
+        "lastName": "Johnson"
+      },
+      "student": {
+        "id": 1,
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    }
+  ],
+  "absences": [
+    {
+      "id": 1,
+      "date": "2024-06-30",
+      "justified": false,
+      "teacher": {
+        "id": 1,
+        "firstName": "Alice",
+        "lastName": "Johnson"
+      },
+      "student": {
+        "id": 1,
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "subject": {
+        "id": 1,
+        "name": "Math"
+      }
     }
   ]
 }
-
