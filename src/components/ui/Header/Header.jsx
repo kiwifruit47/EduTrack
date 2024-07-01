@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./Header.css";
+import { useUser } from "../../../contexts/UserContext";
 
 function useCurrentDate() {
   const [date, setDate] = useState(new Date());
@@ -19,7 +20,9 @@ function useCurrentDate() {
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const Header = ({ userFirstName }) => {
+const Header = () => {
+  // const { user } = useUser();
+
   const date = useCurrentDate();
 
   const time = date.getHours();
@@ -36,7 +39,7 @@ const Header = ({ userFirstName }) => {
     <header>
       <div className='headerDiv'>
       {/* will change later to actual user info */}
-        <h2>{greetingMessage}<br/> FirstName!</h2>
+        <h2>{greetingMessage}</h2>
       </div>
       <div className='headerDiv'>
         <h3>{day}, {dayOfMonth} {month}</h3>

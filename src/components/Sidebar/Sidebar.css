@@ -1,11 +1,12 @@
+/* Base styles */
 img {
-    height: 3.2rem;
+    width: 20vw;
+    height: auto;
 }
 
 .logo--bcg {
     margin: 2rem 0 4rem 0;
-    height: 3.2rem;
-    width: 100%;
+    height: 3rem;
     background-color: #53A9CB;
 }
 
@@ -14,14 +15,24 @@ a {
     color: #F6F9FE;
 }
 
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    position: relative;
+    width: 20vw;
+}
+
 .menu {
     display: flex;
     flex-direction: column;
     text-align: left;
+    width: 15vw;
+    transition: transform 0.3s ease-in-out;
 }
 
 .menu--list {
-    width: 11vw;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 7vh;
@@ -30,14 +41,73 @@ a {
 
 .menu--list .menu--item {
     display: flex;
-    width: 10vw;
     align-items: center;
     gap: 1vw;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
 }
 
 .menu--list .menu--item:hover {
     font-weight: 800;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1000px) {
+    .sidebar-container {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    .menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: #53A9CB;
+        transform: translateX(-100%);
+        z-index: 999;
+    }
+
+    .menu.show {
+        transform: translateX(0);
+    }
+
+    .hamburger-icon {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        font-size: 2rem;
+        color: #F6F9FE;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .logo--sidebar {
+        display: none;
+    }
+
+    .menu--list {
+        width: 100%;
+        align-items: center;
+        gap: 2rem;
+        margin-left: 0;
+        padding-top: 4rem;
+    }
+
+    .menu--item {
+        width: 100%;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+}
+
+@media (min-width: 1000px) {
+    .hamburger-icon {
+        display: none;
+    }
 }

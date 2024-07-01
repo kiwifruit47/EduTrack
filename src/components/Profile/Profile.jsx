@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '../../api';
 import { IoPersonCircle } from "react-icons/io5";
 import { Hourglass } from 'react-loader-spinner';
 import "./Profile.css";
+import axios from 'axios';
 
 const userId = 1;
 
@@ -11,11 +11,10 @@ const Profile = () => {
   const { data: userData, error, isLoading } = useQuery({
     queryKey: ["user", userId],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/users/${userId}`);
+      const res = await axios.get(`http://localhost:8080/users/${userId}`);
       return res.data;
     },
   });
-
   if (isLoading) {
     return (
       <div style={{ textAlign: "center", paddingTop: "20rem" }}>

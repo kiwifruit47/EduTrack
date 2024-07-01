@@ -17,3 +17,16 @@ header {
 .headerDiv h3 {
     font-size: 1.5em;
 }
+
+@media (max-width: 1000px) {
+    .headerDiv {
+        padding: 0.8em 0.8em;
+    }
+    
+    .headerDiv h2 {
+        font-size: 1.2em;
+    }
+    .headerDiv h3 {
+        font-size: 1em;
+    }
+}

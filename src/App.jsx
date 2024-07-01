@@ -18,7 +18,7 @@ const ProtectedRoute = ({ isAuthenticated }) => {
 const Root = () => {
   return (
     <>
-      <div>
+      <div style={{width: "0px"}}>
         <Link to="/">Home</Link>
       </div>
       <div><Outlet /></div>
@@ -28,7 +28,7 @@ const Root = () => {
 
 // Adding useState Hook for login auth
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
