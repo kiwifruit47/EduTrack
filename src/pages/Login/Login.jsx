@@ -1,20 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import DOMPurify from 'dompurify';
-// import axios from "../../api/axios";
-import axios from "axios";
+import { useNavigate, Link, useLocation } from "react-router-dom"; // Import useNavigate
+import axios from "../../api/axios";
 import useAuth from "../../hooks/useAuth";
+import "./Login.css";
 
-const Login = ({ setIsAuthenticated }) => { // Receive setIsAuthenticated as a prop
+const Login = () => {
     const { setAuth } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const from = location.state?.from?.pathname || "/home";
     const userRef = useRef();
     const errorRef = useRef();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    const [success, setSuccess] = useState(false);
 
-    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         userRef.current.focus();
@@ -28,10 +28,8 @@ const Login = ({ setIsAuthenticated }) => { // Receive setIsAuthenticated as a p
         e.preventDefault();
         try {
             console.log("Login attempt with username:", username);
-            const sanitizedUsername = DOMPurify.sanitize(username);
-            const sanitizedPassword = DOMPurify.sanitize(password);
-            const response = await axios.post("http://localhost:8080/auth/login", 
-                JSON.stringify({ username: sanitizedUsername, password: sanitizedPassword }),
+            const response = await axios.post("/auth/login", 
+                JSON.stringify({ username, password }),
                 {
                     headers: { "Content-Type": "application/json" },
                     withCredentials: true
@@ -39,13 +37,14 @@ const Login = ({ setIsAuthenticated }) => { // Receive setIsAuthenticated as a p
             );
             console.log("Response received:", response);
             console.log("Response data:", JSON.stringify(response?.data));
-            const { roleType } = response?.data; // Extract roleType
-            setAuth({ username: sanitizedUsername, password, role: roleType });
-            setIsAuthenticated(true); // Update authentication state
+            const accessToken = response?.data?.token
+            axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+            localStorage.setItem('tokenKey', accessToken)
+            const { role, id } = response?.data;
+            setAuth({ username, password, role, id, accessToken });
             setUsername("");
             setPassword("");
-            setSuccess(true);
-            navigate('/home'); // Redirect to home page
+            navigate(from, { replace: true });
         } catch (error) {
             console.error("Login error:", error);
             if (!error?.response) {
@@ -62,16 +61,6 @@ const Login = ({ setIsAuthenticated }) => { // Receive setIsAuthenticated as a p
     };
 
     return (
-        <>
-            {success ? (
-                <section>
-                    <h1>You are logged in!</h1>
-                    <br />
-                    <p>
-                        <a href="#">Go to Home</a>
-                    </p>
-                </section>
-            ) : (
                 <>
                     <p ref={errorRef} className={errorMsg ? "error-msg" : "offscreen"} aria-live="assertive">{errorMsg}</p>
                     <div role="form" className="auth-form-container">
@@ -104,9 +93,7 @@ const Login = ({ setIsAuthenticated }) => { // Receive setIsAuthenticated as a p
                         <span style={{ marginTop: "1.5rem" }}>Don't have an account? Contact school administration.</span>
                     </div>
                 </>
-            )}
-        </>
-    );
+    )
 };
 
 export default Login;
