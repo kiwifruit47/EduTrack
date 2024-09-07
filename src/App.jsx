@@ -30,7 +30,6 @@ const Root = () => {
 
 // Adding useState Hook for login auth
 const App = () => {
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const router = createBrowserRouter(
     createRoutesFromElements(

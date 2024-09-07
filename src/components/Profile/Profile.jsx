@@ -1,10 +1,10 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { IoPersonCircle } from "react-icons/io5";
-import { Hourglass } from 'react-loader-spinner';
 import "./Profile.css";
 import axios from '../../api/axios';
 import useAuth from '../../hooks/useAuth';
+import Loader from '../ui/Loader';
 
 
 const Profile = () => {
@@ -18,19 +18,7 @@ const Profile = () => {
     },
   });
   if (isLoading) {
-    return (
-      <div style={{ textAlign: "center", paddingTop: "20rem" }}>
-        <Hourglass
-          visible={true}
-          height="80"
-          width="80"
-          ariaLabel="hourglass-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-          colors={['#306cce', '#72a1ed']}
-        />
-      </div>
-    );
+    return <Loader/>;
   }
 
   if (error) {
@@ -47,16 +35,17 @@ const Profile = () => {
       </div>
       <section className='user-information'>
         <h2>User Information</h2>
-        <label htmlFor="firstName">First Name: </label>
-        <span>{userData?.firstName}</span><br />
-        <label htmlFor="lastName">Last Name: </label>
-        <span>{userData?.lastName}</span><br />
+        <label htmlFor="name">Name: </label>
+        <span>{`${userData?.firstName} ${userData?.lastName}`}</span><br />
         <label htmlFor="role">Role: </label>
         <span>{role.toLowerCase()}</span><br />
       </section>
       <section className='role-information'>
         <h2>{userRoleForHeadingElement} Information</h2>
-        
+        <label htmlFor="class">Class: </label>
+        <span>{userData?.className}</span><br />
+        <label htmlFor="class">Parent: </label>
+        <span>{`${userData?.parentFirstName} ${userData?.parentLastName}`}</span><br />
       </section>
     </div>
   );
