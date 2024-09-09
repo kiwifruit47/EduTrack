@@ -1,0 +1,37 @@
+  .heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #013B67;
+  }
+  
+  .scheduleTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tableHeader {
+    background-color: #3EA0C7;
+    color: white;
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  .tableRow:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .tableCell {
+    padding: 1.2rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .tableBody {
+    color:#013B67;
+  }
+
+  @media (max-width: 1000px) {
+    .tableCell {
+        padding: 0.5rem;
+    }
+  }
