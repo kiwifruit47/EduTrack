@@ -6,15 +6,19 @@ import axios from '../../api/axios';
 import useAuth from '../../hooks/useAuth';
 import Loader from '../ui/Loader';
 
-
 const Profile = () => {
   const { auth } = useAuth();
-  const { role, username } = auth;
+  const { role, username, id } = auth;
   const { data: userData, error, isLoading } = useQuery({
     queryKey: ["user", username],
     queryFn: async () => {
-      const res = await axios.get(`/${role.toLowerCase()}s/${username}`);
-      return res.data;
+      if(role==='STUDENT') {
+        const res = await axios.get(`/${role.toLowerCase()}s/${username}`);
+        return res.data;
+      } else if (role==='TEACHER') {
+        const res = await axios.get(`/${role.toLowerCase()}s/view/${id}`);
+        return res.data;
+      }
     },
   });
   if (isLoading) {
@@ -36,16 +40,23 @@ const Profile = () => {
       <section className='user-information'>
         <h2>User Information</h2>
         <label htmlFor="name">Name: </label>
-        <span>{`${userData?.firstName} ${userData?.lastName}`}</span><br />
+        <span>{`${role.toLowerCase()==='student' ? userData?.firstName : userData?.teacherFirstName} ${role==='STUDENT' ? userData?.lastName : userData?.teacherLastName}`}</span><br />
         <label htmlFor="role">Role: </label>
         <span>{role.toLowerCase()}</span><br />
       </section>
       <section className='role-information'>
         <h2>{userRoleForHeadingElement} Information</h2>
-        <label htmlFor="class">Class: </label>
-        <span>{userData?.className}</span><br />
-        <label htmlFor="class">Parent: </label>
-        <span>{`${userData?.parentFirstName} ${userData?.parentLastName}`}</span><br />
+        {role==='STUDENT' && <label htmlFor="class">Class: </label>}
+        {role==='STUDENT' && <span>{userData?.className}</span>}
+        {role==='TEACHER' && <label htmlFor="class">School: </label>}
+        {role==='TEACHER' && <span>{userData?.schoolName}</span>}
+        <br />
+        {role==='STUDENT' && <label htmlFor="parent">Parent: </label>}
+        {role==='STUDENT' && <span>{`${userData?.parentFirstName} ${userData?.parentLastName}`}</span>}
+        {role==='TEACHER' && <label htmlFor="class">Subjects: </label>}
+        {role==='TEACHER' && userData?.subjects.map((subject, index) => (
+          <span key={index}><br/>{subject.subjectType}</span>))}
+        <br />
       </section>
     </div>
   );

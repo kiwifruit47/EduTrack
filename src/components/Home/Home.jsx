@@ -1,6 +1,7 @@
 import React from 'react';
 import "./Home.css";
 import Header from "../ui/Header/Header";
+import DailyStudentSchedule from "../DailyStudentSchedule/DailyStudentSchedule"
 
 const Home = () => {
   return (
@@ -8,7 +9,7 @@ const Home = () => {
       <Header />
       <div className="homeComponentsContainer">
         <div className="homeComponent div1">
-          <h3>Schedule</h3>
+          <DailyStudentSchedule/>
         </div>
         <div className="homeComponent div2">
           <h3>Absences</h3>
