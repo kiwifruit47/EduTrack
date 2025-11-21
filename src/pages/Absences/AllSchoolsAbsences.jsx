@@ -1,0 +1,9 @@
+import React from 'react'
+// will display a list with all schools, showing their name and all absences for the school term/year, maybe display a count for all absences for the term/year on top
+function AllSchoolsAbsences() {
+  return (
+    <div>AllSchoolsAbsences</div>
+  )
+}
+
+export default AllSchoolsAbsences
