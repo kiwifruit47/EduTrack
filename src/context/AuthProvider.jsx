@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import api from "../api/axiosInstance";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext(null);
 
@@ -16,6 +16,7 @@ export function AuthProvider({ children }) {
       const token = res.data.accessToken;
 
       setAccessToken(token);
+      api.defaults.headers.Authorization = `Bearer ${token}`;
 
       const decoded = jwtDecode(token);
       setUser(decoded);
@@ -45,6 +46,8 @@ export function AuthProvider({ children }) {
       const token = res.data.accessToken;
 
       setAccessToken(token);
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+
       const decoded = jwtDecode(token);
       setUser(decoded);
 
@@ -52,10 +55,11 @@ export function AuthProvider({ children }) {
       console.error("Refresh token failed:", err);
       logout();
     }
-  }, []);
+  }, [logout]);
 
   // Refresh token every 15 min
   useEffect(() => {
+    if (!accessToken) return;
     const interval = setInterval(() => {
       refreshToken();
     }, REFRESH_INTERVAL);
