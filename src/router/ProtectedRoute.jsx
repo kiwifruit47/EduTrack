@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
+import useAuth from '../hooks/useAuth';
 
 function ProtectedRoute({children, roles}) {
     const { user, loading } = useAuth();
