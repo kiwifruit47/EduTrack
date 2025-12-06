@@ -15,6 +15,7 @@ import ViewStudents from '../pages/Headmaster/ViewStudents';
 import ViewTeachers from '../pages/Headmaster/ViewTeachers';
 
 import TeacherHome from '../pages/Teacher/TeacherHome';
+import TeacherSchedule from '../pages/Teacher/TeacherSchedule'
 
 import Schedule from '../pages/Schedule/Schedule';
 
