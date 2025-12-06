@@ -5,6 +5,7 @@ import RoleRedirect from './RoleRedirect';
 import Login from '../pages/Login/Login';
 import Unauthorized from '../pages/Unauthorized/Unauthorized';
 
+import AdminHome from '../pages/Admin/AdminHome'
 import AdminManageUsers from '../pages/Admin/ManageUsers';
 import ViewSchools from '../pages/Admin/ViewSchools';
 import ViewSubjects from '../pages/Admin/ViewSubjects';
@@ -26,13 +27,23 @@ import ClassAbsences from '../pages/Absences/ClassAbsences';
 import SchoolAbsences from '../pages/Absences/SchoolAbsences';
 import AllSchoolsAbsences from '../pages/Absences/AllSchoolsAbsences';
 
-import Complaints from '../pages/Complaints/Complaints';
-
 import StudentGrades from '../pages/Grades/StudentGrades';
 import ClassGrades from '../pages/Grades/ClassGrades';
 import SchoolGrades from '../pages/Grades/SchoolGrades';
 import AllSchoolsGrades from '../pages/Grades/AllSchoolsGrades';
 
+import SelectSchoolForStatistics from '../pages/Selection Pages/SelectSchoolForStatistics';
+import SelectTeacherForStatistics from '../pages/Selection Pages/SelectTeacherForStatistics';
+import SelectSubjectForStatistics from '../pages/Selection Pages/SelectSubjectForStatistics';
+import SelectClassForScheduleView from '../pages/Selection Pages/SelectClassForScheduleView';
+import SelectClassForGradesView from '../pages/Selection Pages/SelectClassForGradesView';
+import SelectClassForAbsencesView from '../pages/Selection Pages/SelectClassForAbsenceView';
+import SelectClassForComplaintsView from '../pages/Selection Pages/SelectClassForComplaintsView';
+
+import AllSchoolsComplaints from '../pages/Complaints/AllSchoolsCompaints';
+import SchoolComplaints from '../pages/Complaints/SchoolComplaints';
+import ClassComplaints from '../pages/Complaints/ClassComplaints';
+import StudentComplaints from '../pages/Complaints/StudentComplaints';
 
 
 function AppRouter() {
@@ -49,9 +60,18 @@ function AppRouter() {
 
       {/* Admin routes */}
       <Route
+        path="/admin"
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <AdminHome />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path='/admin/manageUsers' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["ADMIN"]}>
             <AdminManageUsers/>
           </ProtectedRoute>
         }
@@ -60,7 +80,7 @@ function AppRouter() {
       <Route
         path='/admin/viewSchools' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["ADMIN"]}>
             <ViewSchools/>
           </ProtectedRoute>
         }
@@ -69,7 +89,7 @@ function AppRouter() {
       <Route
         path='/admin/viewSubjects' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["ADMIN"]}>
             <ViewSubjects/>
           </ProtectedRoute>
         }
@@ -80,7 +100,7 @@ function AppRouter() {
       <Route
         path='/headmaster/viewParents' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["HEADMASTER"]}>
             <ViewParents/>
           </ProtectedRoute>
         }
@@ -89,7 +109,7 @@ function AppRouter() {
       <Route
         path='/headmaster/viewStudents' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["HEADMASTER"]}>
             <ViewStudents/>
           </ProtectedRoute>
         }
@@ -98,7 +118,7 @@ function AppRouter() {
       <Route
         path='/headmaster/viewTeachers' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["HEADMASTER"]}>
             <ViewTeachers/>
           </ProtectedRoute>
         }
@@ -108,8 +128,17 @@ function AppRouter() {
       <Route
         path='/teacher' 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["TEACHER"]}>
             <TeacherHome/>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/teacher/teacherSchedule/:teacherId' 
+        element={
+          <ProtectedRoute roles={["TEACHER"]}>
+            <TeacherSchedule/>
           </ProtectedRoute>
         }
       />
@@ -190,17 +219,45 @@ function AppRouter() {
 
       {/* Complaints route */}
       <Route
+        path='/complaints'
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <AllSchoolsComplaints />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path='/complaints/:schoolId'
+        element={
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
+            <SchoolComplaints />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* teachers can view only for classes they teach */}
+      <Route
+        path='/complaints/:classId'
+        element={
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
+            <ClassComplaints />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path='/complaints/:studentId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER", "PARENT", "STUDENT"]}>
-            <Complaints/>
+            <StudentComplaints />
           </ProtectedRoute>
         }
       />
 
       {/* Grades routes */}
       <Route
-        path='/grades/'
+        path='/grades'
         element={
           <ProtectedRoute roles={["ADMIN"]}>
             <AllSchoolsGrades/>
@@ -216,6 +273,8 @@ function AppRouter() {
           </ProtectedRoute>
         }
       /> 
+      
+      {/* teachers can view only for classes they teach */}
       <Route
         path='/grades/:classId'
         element={
@@ -233,6 +292,73 @@ function AppRouter() {
           </ProtectedRoute>
         }
       /> 
+
+      {/* Selection pages routes */}
+      {/* ony for admin, bc headmaster can't choose school, it will be automatically displayed */}
+      <Route 
+        path='/select/school/statistics'
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <SelectSchoolForStatistics />
+          </ProtectedRoute>
+        }
+      />
+      {/* admin can choose teacher in particular school - 2 fields, headmaster can choose only from teachers in their school */}
+      <Route 
+        path='/select/teacher/statistics'
+        element={
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
+            <SelectTeacherForStatistics />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path='/select/subject/statistics'
+        element={
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
+            <SelectSubjectForStatistics />
+          </ProtectedRoute>
+        }
+      />
+
+        {/* same as teacher statistics */}
+      <Route 
+        path='/select/class/schedule'
+        element={
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
+            <SelectClassForScheduleView />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* The admin sees table with all schools, the headmaster - table with all classes in their school, parent/student only for one student, teacher is the only one who needs to select the class to then get to the table with students in it. Same for grades, absences and complaints */}
+      <Route 
+        path='/select/class/grades'
+        element={
+          <ProtectedRoute roles={["ADMIN", "TEACHER"]}>
+            <SelectClassForGradesView />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path='/select/class/absences'
+        element={
+          <ProtectedRoute roles={["ADMIN", "TEACHER"]}>
+            <SelectClassForAbsencesView />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path='/select/class/complaints'
+        element={
+          <ProtectedRoute roles={["ADMIN", "TEACHER"]}>
+            <SelectClassForComplaintsView />
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
   )

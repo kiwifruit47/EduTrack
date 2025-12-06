@@ -41,6 +41,20 @@ const theme = createTheme({
                 },
             },
         },
+        MuiSvgIcon: {
+            styleOverrides: {
+                root: {
+                    color: '#F1F2EE',
+                }
+            }
+        },
+        MuiListItemText: {
+            styleOverrides: {
+                root: {
+                    color: '#F1F2EE',
+                }
+            }
+        }
     }
 });
 
