@@ -5,14 +5,20 @@ import App from './App.jsx'
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme.jsx';
+import { AuthProvider } from './context/AuthProvider.jsx';
+import { StudentProvider } from './context/StudentContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline/>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ThemeProvider>
+    <AuthProvider>
+      <StudentProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline/>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ThemeProvider>
+      </StudentProvider>
+    </AuthProvider>
   </StrictMode>,
 )
