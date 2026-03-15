@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 function Login() {
-  const { login } = useAuth();
+  //mockAdminLogin is TEMPORARY
+  const { login, mockAdminLogin } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -107,8 +108,24 @@ function Login() {
             </Typography>
           )}
 
-          <Button color='secondary' fullWidth variant='contained' sx={{ mt: 2 }}>
+          <Button 
+            type='submit'
+            color='secondary' 
+            fullWidth 
+            variant='contained' sx={{ mt: 2 }}
+          >
             Sign In
+          </Button>
+          {/* TEMPORARY */}
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => {
+              mockAdminLogin();
+              navigate("/"); // <<--- IMPORTANT
+            }}
+          >
+            Dev: Mock Admin Login
           </Button>
         </Box>
         

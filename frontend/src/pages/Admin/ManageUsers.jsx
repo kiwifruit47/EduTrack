@@ -2,7 +2,9 @@ import React from 'react'
 
 function ManageUsers() {
   return (
-    <div>ManageUsers</div>
+    <>
+      Manage Users
+    </>
   )
 }
 

@@ -41,6 +41,9 @@ export function AuthProvider({ children }) {
 
 // Refresh token
   const refreshToken = useCallback(async () => {
+    //TEMPORARY
+    if (accessToken === "fake.jwt.token") return;
+    
     try {
       const res = await api.post("/auth/refresh");
       const token = res.data.accessToken;
@@ -55,7 +58,7 @@ export function AuthProvider({ children }) {
       console.error("Refresh token failed:", err);
       logout();
     }
-  }, [logout]);
+  }, [accessToken, logout]);
 
   // Refresh token every 15 min
   useEffect(() => {
@@ -84,6 +87,24 @@ export function AuthProvider({ children }) {
     };
   }, [accessToken]);
 
+  //TEMPORARY
+  const mockAdminLogin = () => {
+    console.log("MOCK ADMIN LOGIN CLICKED");
+
+    const fakeToken =
+      "fake.jwt.token"; 
+  
+    const fakeUser = {
+      id: 1,
+      role: "ADMIN",
+      email: "admin@example.com",
+      name: "Dev Admin",
+    };
+  
+    setAccessToken(fakeToken);
+    setUser(fakeUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -91,6 +112,7 @@ export function AuthProvider({ children }) {
         accessToken,
         login,
         logout,
+        mockAdminLogin, //TEMPORARY
         isAuthenticated: !!accessToken,
       }}
     >
