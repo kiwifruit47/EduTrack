@@ -1,4 +1,4 @@
-import { Grid, Paper, TextField, Box, Button } from '@mui/material'
+import {Grid, Paper, TextField, Box, Button, Typography} from '@mui/material'
 import React from 'react'
 import logo from '../../../public/EduTrack_logo_positive.svg'
 import useAuth from '../../hooks/useAuth'
