@@ -6,6 +6,23 @@
 -- =============================================================
 
 -- -------------------------------------------------------------
+-- TRUNCATE all tables (reverse dependency order)
+-- -------------------------------------------------------------
+TRUNCATE TABLE
+    absences,
+    grades,
+    teacher_qualifications,
+    schedules,
+    parent_student,
+    students,
+    teachers,
+    classes,
+    schools,
+    users,
+    roles
+RESTART IDENTITY CASCADE;
+
+-- -------------------------------------------------------------
 -- 1. ROLES
 -- -------------------------------------------------------------
 INSERT INTO Roles (Id, Name) VALUES
@@ -18,45 +35,45 @@ INSERT INTO Roles (Id, Name) VALUES
 
 -- -------------------------------------------------------------
 -- 2. USERS
--- BCrypt(password) = $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+-- BCrypt(password) = $2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu
 -- -------------------------------------------------------------
 INSERT INTO Users (Id, Email, PasswordHash, FirstName, LastName, RoleId) VALUES
     -- Admin
-    (1,  'admin@edutrack.bg',          '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Иван',     'Петров',    1),
+    (1,  'admin@edutrack.bg',          '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Иван',     'Петров',    1),
 
     -- Headmasters
-    (2,  'm.georgieva@school1.bg',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Мария',    'Георгиева', 2),
-    (3,  'p.nikolov@school2.bg',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Петър',    'Николов',   2),
+    (2,  'm.georgieva@school1.bg',     '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Мария',    'Георгиева', 2),
+    (3,  'p.nikolov@school2.bg',       '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Петър',    'Николов',   2),
 
     -- Teachers (School 1)
-    (4,  's.dimitrov@school1.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Стефан',   'Димитров',  3),
-    (5,  'e.ivanova@school1.bg',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Елена',    'Иванова',   3),
+    (4,  's.dimitrov@school1.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Стефан',   'Димитров',  3),
+    (5,  'e.ivanova@school1.bg',       '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Елена',    'Иванова',   3),
 
     -- Teachers (School 2)
-    (6,  't.stoyanova@school2.bg',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Теодора',  'Стоянова',  3),
-    (7,  'h.hristov@school2.bg',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Христо',   'Христов',   3),
+    (6,  't.stoyanova@school2.bg',     '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Теодора',  'Стоянова',  3),
+    (7,  'h.hristov@school2.bg',       '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Христо',   'Христов',   3),
 
     -- Students (School 1 — 10А)
-    (8,  'a.angelov@students.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Ангел',    'Ангелов',   4),
-    (9,  'b.borisova@students.bg',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Борислава','Борисова',  4),
+    (8,  'a.angelov@students.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Ангел',    'Ангелов',   4),
+    (9,  'b.borisova@students.bg',     '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Борислава','Борисова',  4),
 
     -- Students (School 1 — 11Б)
-    (10, 'v.vasilev@students.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Виктор',   'Василев',   4),
-    (11, 'g.georgieva@students.bg',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Габриела', 'Георгиева', 4),
+    (10, 'v.vasilev@students.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Виктор',   'Василев',   4),
+    (11, 'g.georgieva@students.bg',    '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Габриела', 'Георгиева', 4),
 
     -- Students (School 2 — 9А)
-    (12, 'd.dimitrova@students.bg',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Диана',    'Димитрова', 4),
-    (13, 'e.enchev@students.bg',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Емил',     'Енчев',     4),
+    (12, 'd.dimitrova@students.bg',    '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Диана',    'Димитрова', 4),
+    (13, 'e.enchev@students.bg',       '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Емил',     'Енчев',     4),
 
     -- Students (School 2 — 10А)
-    (14, 'zh.zhelev@students.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Живко',    'Желев',     4),
-    (15, 'i.ivanova@students.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Ивелина',  'Иванова',   4),
+    (14, 'zh.zhelev@students.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Живко',    'Желев',     4),
+    (15, 'i.ivanova@students.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Ивелина',  'Иванова',   4),
 
     -- Parents
-    (16, 'n.angelova@parents.bg',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Надя',     'Ангелова',  5),  -- parent of 8, 9
-    (17, 'k.vasilev@parents.bg',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Калоян',   'Василев',   5),  -- parent of 10, 11
-    (18, 'l.dimitrova@parents.bg',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Лиляна',   'Димитрова', 5),  -- parent of 12, 13
-    (19, 'm.zhelev@parents.bg',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Методи',   'Желев',     5);  -- parent of 14, 15
+    (16, 'n.angelova@parents.bg',      '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Надя',     'Ангелова',  5),  -- parent of 8, 9
+    (17, 'k.vasilev@parents.bg',       '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Калоян',   'Василев',   5),  -- parent of 10, 11
+    (18, 'l.dimitrova@parents.bg',     '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Лиляна',   'Димитрова', 5),  -- parent of 12, 13
+    (19, 'm.zhelev@parents.bg',        '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Методи',   'Желев',     5);  -- parent of 14, 15
 
 
 -- -------------------------------------------------------------
