@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import '../../styles/login.css'
 
 function Login() {
   //mockAdminLogin is TEMPORARY
@@ -55,7 +56,7 @@ function Login() {
       }}
       >
       <Paper elevation={5} sx={paperStyle}>
-        <img src={logo} alt="logo" style={{height: "15vh", width: "auto", margin: "20px"}}/>
+        <img src={logo} alt="logo" className="login-logo" />
         
         <Box
           component="form"

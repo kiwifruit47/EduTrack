@@ -40,6 +40,7 @@ import { Link } from 'react-router-dom';
 import { useStudent } from '../context/StudentContext';
 import { useTranslation } from 'react-i18next';
 import { useSidebar } from '../context/SidebarContext';
+import '../styles/sidebar.css';
 
 const drawerWidth = 240;
 
@@ -159,7 +160,7 @@ const Sidebar = () => {
     <>
         {/* Header row: logo + close button */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
-            <img src={logo} alt="logo" style={{ height: "15vh", width: "auto", margin: "20px" }} />
+            <img src={logo} alt="logo" className="sidebar-logo" />
             <IconButton
                 onClick={() => setDesktopOpen(false)}
                 sx={{ display: { xs: 'none', md: 'flex' }, color: 'inherit' }}
