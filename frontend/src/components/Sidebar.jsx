@@ -88,39 +88,24 @@ const Sidebar = () => {
                     {key: "subjectStats", label: t('nav.subjectStatistics'), to: "/select/subject/statistics"}
                 ]
             },
+            {key: "schools", label: t('nav.schools'), icon: <SchoolIcon />, to: "/admin/viewSchools"},
             {key: "manageUsers", label: t('nav.manageUsers'), icon: <ManageAccounts />, to: "/admin/manageUsers"},
             {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "select/class/schedule"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
-            {key: "schools", label: t('nav.schools'), icon: <SchoolIcon />, to: "/admin/viewSchools"},
-            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades"},
-            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/"},
-            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         HEADMASTER : [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
-            {
-                key: "statistics",
-                label: t('nav.statistics'),
-                icon: <StatsIcon />,
-                submenu: [
-                    {key: "schoolStats", label: t('nav.schoolStatistics'), to: "/statistics/:schoolId"},
-                    {key: "teacherStats", label: t('nav.teacherStatistics'), to: "/statistics/:teacherId"},
-                    {key: "subjectStats", label: t('nav.subjectStatistics'), to: "/statistics/:subjectId"}
-                ]
-            },
             {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedules"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
             {key: "teachers", label: t('nav.teachers'), icon: <Teacher />, to: "/headmaster/viewTeachers"},
             {key: "parents", label: t('nav.parents'), icon: <ParentIcon />, to: "/headmaster/viewParents"},
             {key: "students", label: t('nav.students'), icon: <StudentIcon />, to: "/headmaster/viewStudents"},
-            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:schoolId"},
-            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:schoolId"},
-            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:schoolId"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         TEACHER : [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
+            {key: "mySchool", label: t('nav.mySchool'), icon: <SchoolIcon />, to: "/teacher/school"},
             {key: "schedule", label: t('nav.schedule'), icon: <ScheduleIcon />, to: "/teacher/teacherSchedule/:teacherId"},
             {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/select/class/grades"},
             {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/select/class/absences"},
