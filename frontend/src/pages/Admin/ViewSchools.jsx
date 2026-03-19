@@ -113,6 +113,8 @@ function ViewSchools() {
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             required
             fullWidth
+            InputProps={{ sx: { color: 'black' } }}
+            InputLabelProps={{ sx: { color: 'black' } }}
           />
           <TextField
             label={t('schools.address')}
@@ -121,6 +123,8 @@ function ViewSchools() {
             multiline
             rows={3}
             fullWidth
+            InputProps={{ sx: { color: 'black' } }}
+            InputLabelProps={{ sx: { color: 'black' } }}
           />
         </DialogContent>
         <DialogActions>
