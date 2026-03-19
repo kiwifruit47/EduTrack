@@ -39,6 +39,7 @@ import { useMediaQuery } from "@mui/material";
 import { Link } from 'react-router-dom';
 import { useStudent } from '../context/StudentContext';
 import { useTranslation } from 'react-i18next';
+import { useSidebar } from '../context/SidebarContext';
 
 const drawerWidth = 240;
 
@@ -47,9 +48,9 @@ const Sidebar = () => {
     const { t, i18n } = useTranslation();
 
     const { students, setSelectedStudent } = useStudent();
+    const { desktopOpen, setDesktopOpen } = useSidebar();
 
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [desktopOpen, setDesktopOpen] = useState(true);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
