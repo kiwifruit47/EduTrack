@@ -1,8 +1,13 @@
 import React from 'react'
+import Sidebar from '../../components/Sidebar'
+import WelcomeBanner from '../../components/WelcomeBanner'
 
 function ParentHome() {
   return (
-    <div>ParentHome</div>
+    <>
+      <Sidebar />
+      <WelcomeBanner />
+    </>
   )
 }
 

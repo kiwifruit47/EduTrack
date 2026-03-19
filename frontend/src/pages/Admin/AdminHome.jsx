@@ -1,13 +1,12 @@
 import React from 'react'
 import Sidebar from '../../components/Sidebar'
-import { useTranslation } from 'react-i18next'
+import WelcomeBanner from '../../components/WelcomeBanner'
 
 function AdminHome() {
-  const { t } = useTranslation();
   return (
     <>
-      <Sidebar/>
-        <h1>{t('common.welcome')}</h1>
+      <Sidebar />
+      <WelcomeBanner />
     </>
   )
 }

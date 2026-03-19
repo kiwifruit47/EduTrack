@@ -10,9 +10,13 @@ import AdminManageUsers from '../pages/Admin/ManageUsers';
 import ViewSchools from '../pages/Admin/ViewSchools';
 import ViewSubjects from '../pages/Admin/ViewSubjects';
 
+import HeadmasterHome from '../pages/Headmaster/HeadmasterHome';
 import ViewParents from '../pages/Headmaster/ViewParents';
 import ViewStudents from '../pages/Headmaster/ViewStudents';
 import ViewTeachers from '../pages/Headmaster/ViewTeachers';
+
+import ParentHome from '../pages/Parent/ParentHome';
+import StudentHome from '../pages/Student/StudentHome';
 
 import TeacherHome from '../pages/Teacher/TeacherHome';
 import TeacherSchedule from '../pages/Teacher/TeacherSchedule'
@@ -97,6 +101,14 @@ function AppRouter() {
       />
 
       {/* Headmaster routes */}
+      <Route
+        path='/headmaster'
+        element={
+          <ProtectedRoute roles={["HEADMASTER"]}>
+            <HeadmasterHome />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path='/headmaster/viewParents' 
@@ -125,9 +137,29 @@ function AppRouter() {
         }
       />
 
+      {/* Parent routes */}
+      <Route
+        path='/parent'
+        element={
+          <ProtectedRoute roles={["PARENT"]}>
+            <ParentHome />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Student routes */}
+      <Route
+        path='/student'
+        element={
+          <ProtectedRoute roles={["STUDENT"]}>
+            <StudentHome />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Teacher routes */}
       <Route
-        path='/teacher' 
+        path='/teacher'
         element={
           <ProtectedRoute roles={["TEACHER"]}>
             <TeacherHome/>

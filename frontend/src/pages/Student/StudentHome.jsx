@@ -1,8 +1,13 @@
 import React from 'react'
+import Sidebar from '../../components/Sidebar'
+import WelcomeBanner from '../../components/WelcomeBanner'
 
 function StudentHome() {
   return (
-    <div>StudentHome</div>
+    <>
+      <Sidebar />
+      <WelcomeBanner />
+    </>
   )
 }
 
