@@ -31,6 +31,7 @@ Work as Teacher,
 EscalatorWarning as ParentIcon,
 School as StudentIcon,
 ChevronLeft as ChevronLeftIcon,
+AccountCircle as ProfileIcon,
 } from '@mui/icons-material';
 
 import logo from '../../public/EduTrack_logo_positive.svg';
@@ -92,6 +93,7 @@ const Sidebar = () => {
             {key: "manageUsers", label: t('nav.manageUsers'), icon: <ManageAccounts />, to: "/admin/manageUsers"},
             {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "select/class/schedule"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
+            {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         HEADMASTER : [
@@ -101,6 +103,7 @@ const Sidebar = () => {
             {key: "teachers", label: t('nav.teachers'), icon: <Teacher />, to: "/headmaster/viewTeachers"},
             {key: "parents", label: t('nav.parents'), icon: <ParentIcon />, to: "/headmaster/viewParents"},
             {key: "students", label: t('nav.students'), icon: <StudentIcon />, to: "/headmaster/viewStudents"},
+            {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         TEACHER : [
@@ -110,6 +113,7 @@ const Sidebar = () => {
             {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/select/class/grades"},
             {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/select/class/absences"},
             {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/select/class/complaints"},
+            {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         PARENT: [
@@ -129,6 +133,7 @@ const Sidebar = () => {
                     onClick: () => setSelectedStudent(s)
                 }))
             },
+            {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         STUDENT: [
@@ -137,6 +142,7 @@ const Sidebar = () => {
             {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:studentId"},
             {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:studentId"},
             {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:studentId"},
+            {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ]
     };

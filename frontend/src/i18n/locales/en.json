@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Home",
+    "statistics": "Statistics",
+    "schoolStatistics": "School Statistics",
+    "teacherStatistics": "Teacher Statistics",
+    "subjectStatistics": "Subject Statistics",
+    "manageUsers": "Manage users",
+    "schedules": "Schedules",
+    "schedule": "Schedule",
+    "subjects": "Subjects",
+    "schools": "Schools",
+    "grades": "Grades",
+    "absences": "Absences",
+    "complaints": "Complaints",
+    "logout": "Log out",
+    "teachers": "Teachers",
+    "parents": "Parents",
+    "students": "Students",
+    "viewStudent": "View Student",
+    "mySchool": "My School",
+    "profile": "My Profile"
+  },
+  "login": {
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "signIn": "Sign In",
+    "devMockAdmin": "Dev: Mock Admin Login"
+  },
+  "common": {
+    "unauthorized": "Unauthorized",
+    "language": "Language",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete"
+  },
+  "profile": {
+    "title": "My Profile",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "changeSuccess": "Password changed successfully.",
+    "changeError": "Failed to change password.",
+    "passwordMismatch": "New passwords do not match."
+  },
+  "users": {
+    "title": "Manage Users",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "role": "Role",
+    "password": "Password",
+    "passwordOptional": "Password (leave blank to keep)",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "noUsers": "No users found.",
+    "fetchError": "Failed to load users.",
+    "createError": "Failed to create user.",
+    "updateError": "Failed to update user.",
+    "deleteError": "Failed to delete user.",
+    "deleteConfirmTitle": "Delete User",
+    "deleteConfirmMessage": "Are you sure you want to delete {{name}}? This cannot be undone."
+  },
+  "schools": {
+    "title": "Schools",
+    "name": "Name",
+    "address": "Address",
+    "headmaster": "Headmaster",
+    "actions": "Actions",
+    "addSchool": "Add School",
+    "noSchools": "No schools found.",
+    "fetchError": "Failed to load schools.",
+    "deleteError": "Failed to delete school.",
+    "createError": "Failed to create school.",
+    "editSchool": "Edit School",
+    "noHeadmaster": "None",
+    "updateError": "Failed to update school.",
+    "deleteConfirmTitle": "Delete School",
+    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+  },
+  "welcome": {
+    "ADMIN": "Welcome, Admin, {{name}}!",
+    "HEADMASTER": "Welcome, Headmaster, {{name}}!",
+    "TEACHER": "Welcome, Teacher, {{name}}!",
+    "PARENT": "Welcome, Parent, {{name}}!",
+    "STUDENT": "Welcome, Student, {{name}}!"
+  }
+}

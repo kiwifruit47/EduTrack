@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Начало",
+    "statistics": "Статистика",
+    "schoolStatistics": "Статистика на училища",
+    "teacherStatistics": "Статистика на учители",
+    "subjectStatistics": "Статистика на предмети",
+    "manageUsers": "Управление на потребители",
+    "schedules": "Разписания",
+    "schedule": "Разписание",
+    "subjects": "Предмети",
+    "schools": "Училища",
+    "grades": "Оценки",
+    "absences": "Отсъствия",
+    "complaints": "Забележки",
+    "logout": "Изход",
+    "teachers": "Учители",
+    "parents": "Родители",
+    "students": "Ученици",
+    "viewStudent": "Преглед на ученик",
+    "mySchool": "Моето училище",
+    "profile": "Моят профил"
+  },
+  "login": {
+    "emailAddress": "Имейл адрес",
+    "password": "Парола",
+    "signIn": "Вход",
+    "devMockAdmin": "Dev: Тестов вход като администратор"
+  },
+  "common": {
+    "unauthorized": "Неоторизиран достъп",
+    "language": "Език",
+    "cancel": "Отказ",
+    "save": "Запази",
+    "delete": "Изтрий"
+  },
+  "profile": {
+    "title": "Моят профил",
+    "changePassword": "Смяна на парола",
+    "currentPassword": "Текуща парола",
+    "newPassword": "Нова парола",
+    "confirmPassword": "Потвърди новата парола",
+    "changeSuccess": "Паролата е сменена успешно.",
+    "changeError": "Грешка при смяна на паролата.",
+    "passwordMismatch": "Новите пароли не съвпадат."
+  },
+  "users": {
+    "title": "Управление на потребители",
+    "firstName": "Име",
+    "lastName": "Фамилия",
+    "email": "Имейл",
+    "role": "Роля",
+    "password": "Парола",
+    "passwordOptional": "Парола (остави празно за запазване)",
+    "addUser": "Добави потребител",
+    "editUser": "Редактиране на потребител",
+    "noUsers": "Няма намерени потребители.",
+    "fetchError": "Грешка при зареждане на потребителите.",
+    "createError": "Грешка при създаване на потребител.",
+    "updateError": "Грешка при обновяване на потребител.",
+    "deleteError": "Грешка при изтриване на потребител.",
+    "deleteConfirmTitle": "Изтриване на потребител",
+    "deleteConfirmMessage": "Сигурни ли сте, че искате да изтриете {{name}}? Това действие е необратимо."
+  },
+  "schools": {
+    "title": "Училища",
+    "name": "Наименование",
+    "address": "Адрес",
+    "headmaster": "Директор",
+    "actions": "Действия",
+    "addSchool": "Добави училище",
+    "noSchools": "Няма намерени училища.",
+    "fetchError": "Грешка при зареждане на училищата.",
+    "deleteError": "Грешка при изтриване на училище.",
+    "createError": "Грешка при създаване на училище.",
+    "editSchool": "Редактиране на училище",
+    "noHeadmaster": "Няма",
+    "updateError": "Грешка при обновяване на училище.",
+    "deleteConfirmTitle": "Изтриване на училище",
+    "deleteConfirmMessage": "Сигурни ли сте, че искате да изтриете \"{{name}}\"? Това действие е необратимо."
+  },
+  "welcome": {
+    "ADMIN": "Добре дошъл, Администратор, {{name}}!",
+    "HEADMASTER": "Добре дошъл, Директор, {{name}}!",
+    "TEACHER": "Добре дошъл, Учителю, {{name}}!",
+    "PARENT": "Добре дошъл, Родителю, {{name}}!",
+    "STUDENT": "Добре дошъл, Ученику, {{name}}!"
+  }
+}

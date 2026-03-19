@@ -6,6 +6,7 @@ import RoleRedirect from './RoleRedirect';
 import Login from '../pages/Login/Login';
 import Unauthorized from '../pages/Unauthorized/Unauthorized';
 
+import Profile from '../pages/Profile/Profile';
 import AdminHome from '../pages/Admin/AdminHome'
 import AdminManageUsers from '../pages/Admin/ManageUsers';
 import ViewSchools from '../pages/Admin/ViewSchools';
@@ -63,6 +64,16 @@ function AppRouter() {
 
       {/* Route to unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorized/>} />
+
+      {/* Profile — all authenticated roles */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute roles={["ADMIN","HEADMASTER","TEACHER","PARENT","STUDENT"]}>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Admin routes */}
       <Route

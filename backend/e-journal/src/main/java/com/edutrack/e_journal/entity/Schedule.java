@@ -1,0 +1,44 @@
+package com.edutrack.e_journal.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+/**
+ * A Schedule entry binds a Class, Subject, and Teacher together for a given Term.
+ * Grades and Absences are recorded against Schedule entries.
+ * Term values: 1 = first term, 2 = second term.
+ */
+@Entity
+@Table(name = "schedules")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Schedule {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schoolid", nullable = false)
+    private School school;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classid", nullable = false)
+    private SchoolClass schoolClass;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subjectid", nullable = false)
+    private Subject subject;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacherid", nullable = false)
+    private Teacher teacher;
+
+    @Min(1) @Max(2)
+    @Column(nullable = false, columnDefinition = "INTEGER CHECK (term IN (1, 2))")
+    private Integer term;
+}
