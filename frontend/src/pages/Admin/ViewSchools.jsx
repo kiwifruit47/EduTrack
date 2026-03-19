@@ -16,9 +16,11 @@ function ViewSchools() {
   const [schools, setSchools]     = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm]           = useState({ name: '', address: '' });
-  const [saving, setSaving]       = useState(false);
+  const [dialogOpen, setDialogOpen]         = useState(false);
+  const [form, setForm]                     = useState({ name: '', address: '' });
+  const [saving, setSaving]                 = useState(false);
+  const [confirmId, setConfirmId]           = useState(null);
+  const [confirmName, setConfirmName]       = useState('');
 
   const fetchSchools = () => {
     setLoading(true);
@@ -31,10 +33,16 @@ function ViewSchools() {
 
   useEffect(() => { fetchSchools(); }, []);
 
-  const handleDelete = (id) => {
-    api.delete(`/api/schools/${id}`)
-      .then(() => setSchools(prev => prev.filter(s => s.id !== id)))
-      .catch(() => setError(t('schools.deleteError')));
+  const handleDeleteConfirm = () => {
+    api.delete(`/api/schools/${confirmId}`)
+      .then(() => {
+        setSchools(prev => prev.filter(s => s.id !== confirmId));
+        setConfirmId(null);
+      })
+      .catch(() => {
+        setError(t('schools.deleteError'));
+        setConfirmId(null);
+      });
   };
 
   const handleCreate = () => {
@@ -73,7 +81,7 @@ function ViewSchools() {
                   <TableCell>ID</TableCell>
                   <TableCell>{t('schools.name')}</TableCell>
                   <TableCell>{t('schools.address')}</TableCell>
-                  <TableCell>{t('schools.director')}</TableCell>
+                  <TableCell>{t('schools.headmaster')}</TableCell>
                   <TableCell align="center">{t('schools.actions')}</TableCell>
                 </TableRow>
               </TableHead>
@@ -90,7 +98,7 @@ function ViewSchools() {
                       <TableCell>{school.address || '—'}</TableCell>
                       <TableCell>{school.directorName || '—'}</TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" onClick={() => handleDelete(school.id)}>
+                        <IconButton color="error" onClick={() => { setConfirmId(school.id); setConfirmName(school.name); }}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -124,7 +132,17 @@ function ViewSchools() {
             rows={3}
             fullWidth
             InputProps={{ sx: { color: 'black' } }}
-            InputLabelProps={{ sx: { color: 'black' } }}
+            InputLabelProps={{sx: { color: 'black' } }}
+          />
+          <TextField
+              label={t('schools.headmaster')}
+              value={form.address}
+              onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+              multiline
+              rows={3}
+              fullWidth
+              InputProps={{ sx: { color: 'black' } }}
+              InputLabelProps={{sx: { color: 'black' } }}
           />
         </DialogContent>
         <DialogActions>
@@ -135,6 +153,19 @@ function ViewSchools() {
             disabled={!form.name.trim() || saving}
           >
             {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={confirmId !== null} onClose={() => setConfirmId(null)}>
+        <DialogTitle>{t('schools.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography>{t('schools.deleteConfirmMessage', { name: confirmName })}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmId(null)}>{t('common.cancel')}</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteConfirm}>
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
