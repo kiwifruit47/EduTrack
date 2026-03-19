@@ -17,7 +17,7 @@ function ViewSchools() {
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
   const [dialogOpen, setDialogOpen]         = useState(false);
-  const [form, setForm]                     = useState({ name: '', address: '' });
+  const [form, setForm]                     = useState({ name: '', address: '', headmasterId: '' });
   const [saving, setSaving]                 = useState(false);
   const [confirmId, setConfirmId]           = useState(null);
   const [confirmName, setConfirmName]       = useState('');
@@ -47,11 +47,16 @@ function ViewSchools() {
 
   const handleCreate = () => {
     setSaving(true);
-    api.post('/api/schools', form)
+    const payload = {
+      name: form.name,
+      address: form.address,
+      headmasterId: form.headmasterId ? Number(form.headmasterId) : null,
+    };
+    api.post('/api/schools', payload)
       .then(res => {
         setSchools(prev => [...prev, res.data]);
         setDialogOpen(false);
-        setForm({ name: '', address: '' });
+        setForm({ name: '', address: '', headmasterId: '' });
       })
       .catch(() => setError(t('schools.createError')))
       .finally(() => setSaving(false));
@@ -96,10 +101,10 @@ function ViewSchools() {
                       <TableCell>{school.id}</TableCell>
                       <TableCell>{school.name}</TableCell>
                       <TableCell>{school.address || '—'}</TableCell>
-                      <TableCell>{school.directorName || '—'}</TableCell>
+                      <TableCell>{school.headmasterName || '—'}</TableCell>
                       <TableCell align="center">
-                        <IconButton color="error" onClick={() => { setConfirmId(school.id); setConfirmName(school.name); }}>
-                          <DeleteIcon />
+                        <IconButton onClick={() => { setConfirmId(school.id); setConfirmName(school.name); }}>
+                          <DeleteIcon sx={{ color: 'red' }} />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -132,17 +137,16 @@ function ViewSchools() {
             rows={3}
             fullWidth
             InputProps={{ sx: { color: 'black' } }}
-            InputLabelProps={{sx: { color: 'black' } }}
+            InputLabelProps={{ sx: { color: 'black' } }}
           />
           <TextField
-              label={t('schools.headmaster')}
-              value={form.address}
-              onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-              multiline
-              rows={3}
-              fullWidth
-              InputProps={{ sx: { color: 'black' } }}
-              InputLabelProps={{sx: { color: 'black' } }}
+            label={t('schools.headmaster') + ' ID'}
+            value={form.headmasterId}
+            onChange={e => setForm(f => ({ ...f, headmasterId: e.target.value }))}
+            type="number"
+            fullWidth
+            InputProps={{ sx: { color: 'black' } }}
+            InputLabelProps={{ shrink: true, sx: { color: 'black' } }}
           />
         </DialogContent>
         <DialogActions>
