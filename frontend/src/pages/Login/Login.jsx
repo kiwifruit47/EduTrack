@@ -119,20 +119,7 @@ function Login() {
           >
             {t('login.signIn')}
           </Button>
-          {/* TEMPORARY */}
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => {
-              mockAdminLogin();
-              navigate("/"); // <<--- IMPORTANT
-            }}
-          >
-            {t('login.devMockAdmin')}
-          </Button>
         </Box>
-        
-
       </Paper>
     </Grid>
   )

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  IconButton, Paper, Table, TableBody, TableCell, TableContainer,
+  IconButton, MenuItem, Paper, Select, InputLabel, FormControl,
+  Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, TextField, Typography, CircularProgress, Alert,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -10,17 +11,74 @@ import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
 
+const emptyForm = { name: '', address: '', headmasterId: '' };
+
+const fieldProps = {
+  InputProps: { sx: { color: 'black' } },
+  InputLabelProps: { shrink: true, sx: { color: 'black' } },
+};
+
+function SchoolFormFields({ form, setForm, t, headmasters }) {
+  return (
+    <>
+      <TextField
+        label={t('schools.name')}
+        value={form.name}
+        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+        required
+        fullWidth
+        {...fieldProps}
+      />
+      <TextField
+        label={t('schools.address')}
+        value={form.address}
+        onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+        multiline
+        rows={3}
+        fullWidth
+        {...fieldProps}
+      />
+      <FormControl fullWidth>
+        <InputLabel sx={{ color: 'black' }}>{t('schools.headmaster')}</InputLabel>
+        <Select
+          value={form.headmasterId}
+          onChange={e => setForm(f => ({ ...f, headmasterId: e.target.value }))}
+          label={t('schools.headmaster')}
+          sx={{ color: 'black' }}
+        >
+          <MenuItem value=""><em>{t('schools.noHeadmaster')}</em></MenuItem>
+          {headmasters.map(h => (
+            <MenuItem key={h.id} value={h.id}>{h.name}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </>
+  );
+}
+
 function ViewSchools() {
   const { t } = useTranslation();
 
-  const [schools, setSchools]     = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState(null);
-  const [dialogOpen, setDialogOpen]         = useState(false);
-  const [form, setForm]                     = useState({ name: '', address: '', headmasterId: '' });
-  const [saving, setSaving]                 = useState(false);
-  const [confirmId, setConfirmId]           = useState(null);
-  const [confirmName, setConfirmName]       = useState('');
+  const [schools, setSchools]         = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState(null);
+  const [saving, setSaving]           = useState(false);
+
+  // Add dialog
+  const [addOpen, setAddOpen]         = useState(false);
+  const [addForm, setAddForm]         = useState(emptyForm);
+
+  // Edit dialog
+  const [editOpen, setEditOpen]       = useState(false);
+  const [editId, setEditId]           = useState(null);
+  const [editForm, setEditForm]       = useState(emptyForm);
+
+  // Headmasters list for dropdown
+  const [headmasters, setHeadmasters] = useState([]);
+
+  // Delete confirm
+  const [confirmId, setConfirmId]     = useState(null);
+  const [confirmName, setConfirmName] = useState('');
 
   const fetchSchools = () => {
     setLoading(true);
@@ -31,7 +89,50 @@ function ViewSchools() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchSchools(); }, []);
+  useEffect(() => {
+    fetchSchools();
+    api.get('/api/users/headmasters').then(res => setHeadmasters(res.data)).catch(() => {});
+  }, []);
+
+  const toPayload = form => ({
+    name: form.name,
+    address: form.address,
+    headmasterId: form.headmasterId ? Number(form.headmasterId) : null,
+  });
+
+  const handleCreate = () => {
+    setSaving(true);
+    api.post('/api/schools', toPayload(addForm))
+      .then(res => {
+        setSchools(prev => [...prev, res.data]);
+        setAddOpen(false);
+        setAddForm(emptyForm);
+      })
+      .catch(() => setError(t('schools.createError')))
+      .finally(() => setSaving(false));
+  };
+
+  const handleRowClick = (school) => {
+    setEditId(school.id);
+    const match = headmasters.find(h => h.name === school.headmasterName);
+    setEditForm({
+      name: school.name || '',
+      address: school.address || '',
+      headmasterId: match ? match.id : '',
+    });
+    setEditOpen(true);
+  };
+
+  const handleUpdate = () => {
+    setSaving(true);
+    api.put(`/api/schools/${editId}`, toPayload(editForm))
+      .then(res => {
+        setSchools(prev => prev.map(s => s.id === editId ? res.data : s));
+        setEditOpen(false);
+      })
+      .catch(() => setError(t('schools.updateError')))
+      .finally(() => setSaving(false));
+  };
 
   const handleDeleteConfirm = () => {
     api.delete(`/api/schools/${confirmId}`)
@@ -45,29 +146,12 @@ function ViewSchools() {
       });
   };
 
-  const handleCreate = () => {
-    setSaving(true);
-    const payload = {
-      name: form.name,
-      address: form.address,
-      headmasterId: form.headmasterId ? Number(form.headmasterId) : null,
-    };
-    api.post('/api/schools', payload)
-      .then(res => {
-        setSchools(prev => [...prev, res.data]);
-        setDialogOpen(false);
-        setForm({ name: '', address: '', headmasterId: '' });
-      })
-      .catch(() => setError(t('schools.createError')))
-      .finally(() => setSaving(false));
-  };
-
   return (
     <Layout>
       <Box sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h5">{t('schools.title')}</Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
             {t('schools.addSchool')}
           </Button>
         </Box>
@@ -97,13 +181,18 @@ function ViewSchools() {
                   </TableRow>
                 ) : (
                   schools.map(school => (
-                    <TableRow key={school.id} hover>
+                    <TableRow
+                      key={school.id}
+                      hover
+                      onClick={() => handleRowClick(school)}
+                      sx={{ cursor: 'pointer' }}
+                    >
                       <TableCell>{school.id}</TableCell>
                       <TableCell>{school.name}</TableCell>
                       <TableCell>{school.address || '—'}</TableCell>
                       <TableCell>{school.headmasterName || '—'}</TableCell>
                       <TableCell align="center">
-                        <IconButton onClick={() => { setConfirmId(school.id); setConfirmName(school.name); }}>
+                        <IconButton onClick={e => { e.stopPropagation(); setConfirmId(school.id); setConfirmName(school.name); }}>
                           <DeleteIcon sx={{ color: 'red' }} />
                         </IconButton>
                       </TableCell>
@@ -117,49 +206,33 @@ function ViewSchools() {
       </Box>
 
       {/* Add School Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm">
+      <Dialog open={addOpen} onClose={() => setAddOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{t('schools.addSchool')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-          <TextField
-            label={t('schools.name')}
-            value={form.name}
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            required
-            fullWidth
-            InputProps={{ sx: { color: 'black' } }}
-            InputLabelProps={{ sx: { color: 'black' } }}
-          />
-          <TextField
-            label={t('schools.address')}
-            value={form.address}
-            onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-            multiline
-            rows={3}
-            fullWidth
-            InputProps={{ sx: { color: 'black' } }}
-            InputLabelProps={{ sx: { color: 'black' } }}
-          />
-          <TextField
-            label={t('schools.headmaster') + ' ID'}
-            value={form.headmasterId}
-            onChange={e => setForm(f => ({ ...f, headmasterId: e.target.value }))}
-            type="number"
-            fullWidth
-            InputProps={{ sx: { color: 'black' } }}
-            InputLabelProps={{ shrink: true, sx: { color: 'black' } }}
-          />
+          <SchoolFormFields form={addForm} setForm={setAddForm} t={t} headmasters={headmasters} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button
-            variant="contained"
-            onClick={handleCreate}
-            disabled={!form.name.trim() || saving}
-          >
+          <Button onClick={() => setAddOpen(false)}>{t('common.cancel')}</Button>
+          <Button variant="contained" onClick={handleCreate} disabled={!addForm.name.trim() || saving}>
             {t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Edit School Dialog */}
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>{t('schools.editSchool')}</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+          <SchoolFormFields form={editForm} setForm={setEditForm} t={t} headmasters={headmasters} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditOpen(false)}>{t('common.cancel')}</Button>
+          <Button variant="contained" onClick={handleUpdate} disabled={!editForm.name.trim() || saving}>
+            {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={confirmId !== null} onClose={() => setConfirmId(null)}>
         <DialogTitle>{t('schools.deleteConfirmTitle')}</DialogTitle>
