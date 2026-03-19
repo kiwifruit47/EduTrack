@@ -34,6 +34,22 @@
     "save": "Save",
     "delete": "Delete"
   },
+  "schedule": {
+    "title": "Schedule",
+    "mySchedule": "My Schedule",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "class": "Class",
+    "school": "School",
+    "term": "Term",
+    "term1": "Term 1",
+    "term2": "Term 2",
+    "addEntry": "Add Entry",
+    "noEntries": "No entries.",
+    "fetchError": "Failed to load schedule.",
+    "createError": "Failed to add entry.",
+    "deleteError": "Failed to delete entry."
+  },
   "selectClass": {
     "title": "Select a Class",
     "fetchError": "Failed to load classes."
