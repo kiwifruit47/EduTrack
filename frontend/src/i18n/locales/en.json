@@ -34,6 +34,10 @@
     "save": "Save",
     "delete": "Delete"
   },
+  "selectClass": {
+    "title": "Select a Class",
+    "fetchError": "Failed to load classes."
+  },
   "profile": {
     "title": "My Profile",
     "changePassword": "Change Password",
@@ -77,6 +81,20 @@
     "noHeadmaster": "None",
     "updateError": "Failed to update school.",
     "deleteConfirmTitle": "Delete School",
+    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+  },
+  "subjects": {
+    "title": "Subjects",
+    "name": "Name",
+    "actions": "Actions",
+    "addSubject": "Add Subject",
+    "editSubject": "Edit Subject",
+    "noSubjects": "No subjects found.",
+    "fetchError": "Failed to load subjects.",
+    "createError": "Failed to create subject.",
+    "updateError": "Failed to update subject.",
+    "deleteError": "Failed to delete subject.",
+    "deleteConfirmTitle": "Delete Subject",
     "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
   },
   "welcome": {

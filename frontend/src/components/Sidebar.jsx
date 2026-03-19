@@ -91,7 +91,7 @@ const Sidebar = () => {
             },
             {key: "schools", label: t('nav.schools'), icon: <SchoolIcon />, to: "/admin/viewSchools"},
             {key: "manageUsers", label: t('nav.manageUsers'), icon: <ManageAccounts />, to: "/admin/manageUsers"},
-            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "select/class/schedule"},
+            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedule"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
             {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
