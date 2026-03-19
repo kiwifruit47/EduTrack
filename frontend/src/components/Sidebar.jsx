@@ -29,8 +29,8 @@ Report as ComplaintIcon,
 Logout,
 Work as Teacher,
 EscalatorWarning as ParentIcon,
-School as StudentIcon
-
+School as StudentIcon,
+ChevronLeft as ChevronLeftIcon,
 } from '@mui/icons-material';
 
 import logo from '../../public/EduTrack_logo_positive.svg';
@@ -44,33 +44,33 @@ const drawerWidth = 240;
 
 const Sidebar = () => {
     const { user } = useAuth();
-    const role = user?.role;
     const { t, i18n } = useTranslation();
 
-    const { students, setSelectedStudent, isParent } = useStudent();
+    const { students, setSelectedStudent } = useStudent();
 
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [desktopOpen, setDesktopOpen] = useState(true);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     const [openMenu, setOpenMenu] = useState(null);
 
-    const handleParentEnter = (label) => {
-        if (!isMobile) setOpenMenu(label);
+    const handleParentEnter = (key) => {
+        if (!isMobile) setOpenMenu(key);
     };
 
-    const handleParentLeave = (label) => {
+    const handleParentLeave = () => {
         if (!isMobile) setOpenMenu(null);
     };
 
-    const handleParentClick = (label, hasSubmenu) => {
+    const handleParentClick = (key, hasSubmenu) => {
         if (isMobile && hasSubmenu) {
-            setOpenMenu(openMenu === label ? null : label);
+            setOpenMenu(openMenu === key ? null : key);
         }
     };
 
     const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+        setMobileOpen(!mobileOpen);
     };
 
     const menuItems = {
@@ -152,17 +152,27 @@ const Sidebar = () => {
             {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:studentId"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ]
-    }
+    };
 
     const drawerContent = (
     <>
-        <img src={logo} alt="logo" style={{height: "15vh", width: "auto", margin: "20px"}}/>
+        {/* Header row: logo + close button */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+            <img src={logo} alt="logo" style={{ height: "15vh", width: "auto", margin: "20px" }} />
+            <IconButton
+                onClick={() => setDesktopOpen(false)}
+                sx={{ display: { xs: 'none', md: 'flex' }, color: 'inherit' }}
+            >
+                <ChevronLeftIcon />
+            </IconButton>
+        </Box>
+
         <List>
             {menuItems[user.role].map((item) => (
                 <Box
                     key={item.key}
                     onMouseEnter={() => handleParentEnter(item.key)}
-                    onMouseLeave={() => handleParentLeave(item.key)}
+                    onMouseLeave={() => handleParentLeave()}
                 >
                     <ListItem disablePadding>
                         <ListItemButton
@@ -172,9 +182,7 @@ const Sidebar = () => {
                                 if (item.submenu) {
                                     handleParentClick(item.key, true);
                                 } else {
-                                    if (isMobile) {
-                                        setMobileOpen(false);
-                                    }
+                                    if (isMobile) setMobileOpen(false);
                                 }
                             }}
                         >
@@ -203,11 +211,10 @@ const Sidebar = () => {
                                             <ListItemText primary={sub.label} />
                                         </ListItemButton>
                                     </ListItem>
-                    ))}
-        </List>
-    </Collapse>
-)}
-
+                                ))}
+                            </List>
+                        </Collapse>
+                    )}
                 </Box>
             ))}
         </List>
@@ -228,58 +235,91 @@ const Sidebar = () => {
 
     return (
     <Box sx={{ display: 'flex' }}>
+        {/* Mobile AppBar */}
         <AppBar
-        position="fixed"
-        sx={{
-            display: { xs: 'block', md: 'none' },
-            width: { md: `calc(100% - ${drawerWidth}px)` },
-            ml: { md: `${drawerWidth}px` },
-        }}
+            position="fixed"
+            sx={{
+                display: { xs: 'block', md: 'none' },
+                width: '100%',
+            }}
         >
-        <Toolbar>
-            <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
-            >
-            <MenuIcon />
-            </IconButton>
-        </Toolbar>
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    sx={{ mr: 2 }}
+                >
+                    <MenuIcon />
+                </IconButton>
+            </Toolbar>
         </AppBar>
 
-        {/* Mobile drawer (temporary) */}
-        <Box
-        component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        >
-        <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-            keepMounted: true,
-            }}
-            sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.main },
-            }}
-        >
-            {drawerContent}
-        </Drawer>
+        {/* Desktop reopen button — only visible when sidebar is closed */}
+        {!desktopOpen && (
+            <IconButton
+                onClick={() => setDesktopOpen(true)}
+                sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    position: 'fixed',
+                    top: 12,
+                    left: 12,
+                    zIndex: (t) => t.zIndex.drawer + 1,
+                    bgcolor: 'primary.main',
+                    color: 'secondary.contrastText',
+                    '&:hover': { bgcolor: 'primary.dark' },
+                }}
+            >
+                <MenuIcon />
+            </IconButton>
+        )}
 
-        {/* Desktop drawer (permanent) */}
-        <Drawer
-            variant="permanent"
-            sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.main, display: 'flex', flexDirection: 'column' },
-            }}
-            open
-        >
-            {drawerContent}
-        </Drawer>
+        <Box component="nav" sx={{ flexShrink: { md: 0 } }}>
+            {/* Mobile drawer (temporary) */}
+            <Drawer
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
+                ModalProps={{ keepMounted: true }}
+                sx={{
+                    display: { xs: 'block', md: 'none' },
+                    '& .MuiDrawer-paper': {
+                        boxSizing: 'border-box',
+                        width: drawerWidth,
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                    },
+                }}
+            >
+                {drawerContent}
+            </Drawer>
+
+            {/* Desktop drawer (permanent, collapsible via width animation) */}
+            <Drawer
+                variant="permanent"
+                sx={{
+                    display: { xs: 'none', md: 'block' },
+                    '& .MuiDrawer-paper': {
+                        boxSizing: 'border-box',
+                        width: desktopOpen ? drawerWidth : 0,
+                        transition: theme.transitions.create('width', {
+                            easing: theme.transitions.easing.sharp,
+                            duration: desktopOpen
+                                ? theme.transitions.duration.enteringScreen
+                                : theme.transitions.duration.leavingScreen,
+                        }),
+                        overflow: 'hidden',
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    },
+                }}
+                open
+            >
+                {drawerContent}
+            </Drawer>
         </Box>
     </Box>
     );
