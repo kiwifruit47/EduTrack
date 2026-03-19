@@ -1,0 +1,154 @@
+-- =============================================================
+-- EduTrack — Create Tables (PostgreSQL)
+-- =============================================================
+
+-- Drop in reverse dependency order
+DROP TABLE IF EXISTS Absences            CASCADE;
+DROP TABLE IF EXISTS Grades              CASCADE;
+DROP TABLE IF EXISTS Schedules           CASCADE;
+DROP TABLE IF EXISTS Teacher_Qualifications CASCADE;
+DROP TABLE IF EXISTS Subjects            CASCADE;
+DROP TABLE IF EXISTS Parent_Student      CASCADE;
+DROP TABLE IF EXISTS Students            CASCADE;
+DROP TABLE IF EXISTS Teachers            CASCADE;
+DROP TABLE IF EXISTS Classes             CASCADE;
+DROP TABLE IF EXISTS Schools             CASCADE;
+DROP TABLE IF EXISTS Users               CASCADE;
+DROP TABLE IF EXISTS Roles               CASCADE;
+
+-- -------------------------------------------------------------
+-- 1. Roles
+-- -------------------------------------------------------------
+CREATE TABLE Roles (
+    Id   SERIAL PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- -------------------------------------------------------------
+-- 2. Users
+-- -------------------------------------------------------------
+CREATE TABLE Users (
+    Id           SERIAL PRIMARY KEY,
+    Email        VARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL,
+    FirstName    VARCHAR(50)  NOT NULL,
+    LastName     VARCHAR(50)  NOT NULL,
+    RoleId       INT          NOT NULL,
+    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE RESTRICT
+);
+
+-- -------------------------------------------------------------
+-- 3. Schools
+-- -------------------------------------------------------------
+CREATE TABLE Schools (
+    Id         SERIAL PRIMARY KEY,
+    Name       VARCHAR(150) NOT NULL,
+    Address    TEXT,
+    DirectorId INT,
+    FOREIGN KEY (DirectorId) REFERENCES Users(Id) ON DELETE SET NULL
+);
+
+-- -------------------------------------------------------------
+-- 4. Classes
+-- -------------------------------------------------------------
+CREATE TABLE Classes (
+    Id         SERIAL PRIMARY KEY,
+    Name       VARCHAR(20) NOT NULL,
+    SchoolYear VARCHAR(9)  NOT NULL,
+    SchoolId   INT         NOT NULL,
+    FOREIGN KEY (SchoolId) REFERENCES Schools(Id) ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 5. Teachers
+-- -------------------------------------------------------------
+CREATE TABLE Teachers (
+    UserId   INT PRIMARY KEY,
+    SchoolId INT NOT NULL,
+    FOREIGN KEY (UserId)   REFERENCES Users(Id)   ON DELETE CASCADE,
+    FOREIGN KEY (SchoolId) REFERENCES Schools(Id)  ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 6. Students
+-- -------------------------------------------------------------
+CREATE TABLE Students (
+    UserId   INT PRIMARY KEY,
+    SchoolId INT NOT NULL,
+    ClassId  INT,
+    FOREIGN KEY (UserId)   REFERENCES Users(Id)    ON DELETE CASCADE,
+    FOREIGN KEY (SchoolId) REFERENCES Schools(Id)  ON DELETE CASCADE,
+    FOREIGN KEY (ClassId)  REFERENCES Classes(Id)  ON DELETE SET NULL
+);
+
+-- -------------------------------------------------------------
+-- 7. Parent_Student
+-- -------------------------------------------------------------
+CREATE TABLE Parent_Student (
+    ParentId  INT NOT NULL,
+    StudentId INT NOT NULL,
+    PRIMARY KEY (ParentId, StudentId),
+    FOREIGN KEY (ParentId)  REFERENCES Users(Id)         ON DELETE CASCADE,
+    FOREIGN KEY (StudentId) REFERENCES Students(UserId)  ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 8. Subjects
+-- -------------------------------------------------------------
+CREATE TABLE Subjects (
+    Id   SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- -------------------------------------------------------------
+-- 9. Teacher_Qualifications
+-- -------------------------------------------------------------
+CREATE TABLE Teacher_Qualifications (
+    TeacherId INT NOT NULL,
+    SubjectId INT NOT NULL,
+    PRIMARY KEY (TeacherId, SubjectId),
+    FOREIGN KEY (TeacherId) REFERENCES Teachers(UserId) ON DELETE CASCADE,
+    FOREIGN KEY (SubjectId) REFERENCES Subjects(Id)    ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 10. Schedules
+-- -------------------------------------------------------------
+CREATE TABLE Schedules (
+    Id        SERIAL PRIMARY KEY,
+    SchoolId  INT NOT NULL,
+    ClassId   INT NOT NULL,
+    SubjectId INT NOT NULL,
+    TeacherId INT NOT NULL,
+    Term      INT NOT NULL CHECK (Term IN (1, 2)),
+    FOREIGN KEY (SchoolId)  REFERENCES Schools(Id)       ON DELETE CASCADE,
+    FOREIGN KEY (ClassId)   REFERENCES Classes(Id)       ON DELETE CASCADE,
+    FOREIGN KEY (SubjectId) REFERENCES Subjects(Id)      ON DELETE CASCADE,
+    FOREIGN KEY (TeacherId) REFERENCES Teachers(UserId)  ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 11. Grades
+-- -------------------------------------------------------------
+CREATE TABLE Grades (
+    Id         SERIAL PRIMARY KEY,
+    StudentId  INT            NOT NULL,
+    ScheduleId INT            NOT NULL,
+    Value      DECIMAL(3, 2)  NOT NULL CHECK (Value >= 2 AND Value <= 6),
+    CreatedAt  TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (StudentId)  REFERENCES Students(UserId)  ON DELETE CASCADE,
+    FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id)     ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 12. Absences
+-- -------------------------------------------------------------
+CREATE TABLE Absences (
+    Id         SERIAL PRIMARY KEY,
+    StudentId  INT     NOT NULL,
+    ScheduleId INT     NOT NULL,
+    Date       DATE    NOT NULL,
+    IsExcused  BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (StudentId)  REFERENCES Students(UserId)  ON DELETE CASCADE,
+    FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id)     ON DELETE CASCADE
+);

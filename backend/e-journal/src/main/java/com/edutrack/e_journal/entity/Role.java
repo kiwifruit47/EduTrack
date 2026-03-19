@@ -1,9 +1,15 @@
 package com.edutrack.e_journal.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "roles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Role {
 
     @Id
@@ -11,6 +17,6 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     private RoleEnum name;
 }
