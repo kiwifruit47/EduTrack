@@ -11,7 +11,9 @@ ListItemButton,
 ListItemIcon,
 ListItemText,
 useTheme,
-Collapse
+Collapse,
+ToggleButtonGroup,
+ToggleButton,
 } from '@mui/material';
 import {
 Menu as MenuIcon,
@@ -36,12 +38,14 @@ import useAuth from '../hooks/useAuth';
 import { useMediaQuery } from "@mui/material";
 import { Link } from 'react-router-dom';
 import { useStudent } from '../context/StudentContext';
+import { useTranslation } from 'react-i18next';
 
 const drawerWidth = 240;
 
 const Sidebar = () => {
     const { user } = useAuth();
     const role = user?.role;
+    const { t, i18n } = useTranslation();
 
     const { students, setSelectedStudent, isParent } = useStudent();
 
@@ -71,62 +75,65 @@ const Sidebar = () => {
 
     const menuItems = {
         ADMIN : [
-            {label: "Home", icon: <HomeIcon />, to: "/"},
+            {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
             {
-                label: "Statistics", 
-                icon: <StatsIcon />, 
+                key: "statistics",
+                label: t('nav.statistics'),
+                icon: <StatsIcon />,
                 submenu: [
-                    {label: "School Statistics", to: "/select/school/statistics"},
-                    {label: "Teacher Statistics", to: "/select/teacher/statistics"},
-                    {label: "Subject Statistics", to: "/select/subject/statistics"}
+                    {key: "schoolStats", label: t('nav.schoolStatistics'), to: "/select/school/statistics"},
+                    {key: "teacherStats", label: t('nav.teacherStatistics'), to: "/select/teacher/statistics"},
+                    {key: "subjectStats", label: t('nav.subjectStatistics'), to: "/select/subject/statistics"}
                 ]
             },
-            {label: "Manage users", icon: <ManageAccounts />, to: "/admin/manageUsers"},
-            {label: "Schedules", icon: <ScheduleIcon />, to: "select/class/schedule"},
-            {label: "Subjects", icon: <SubjectIcon />, to: "/admin/viewSubjects"},
-            {label: "Schools", icon: <SchoolIcon />, to: "/admin/viewSchools"},
-            {label: "Grades", icon: <Grade />, to: "/grades"},
-            {label: "Absences", icon: <AbsenceIcon />, to: "/absences/"},
-            {label: "Complaints", icon: <ComplaintIcon />, to: "/complaints"},
-            {label: "Log out", icon: <Logout />, to: "/login"}
+            {key: "manageUsers", label: t('nav.manageUsers'), icon: <ManageAccounts />, to: "/admin/manageUsers"},
+            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "select/class/schedule"},
+            {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
+            {key: "schools", label: t('nav.schools'), icon: <SchoolIcon />, to: "/admin/viewSchools"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/"},
+            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints"},
+            {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         HEADMASTER : [
-            {label: "Home", icon: <HomeIcon />, to: "/"},
+            {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
             {
-                label: "Statistics", 
-                icon: <StatsIcon />, 
+                key: "statistics",
+                label: t('nav.statistics'),
+                icon: <StatsIcon />,
                 submenu: [
-                    {label: "School Statistics", to: "/statistics/:schoolId"},
-                    {label: "Teacher Statistics", to: "/statistics/:teacherId"},
-                    {label: "Subject Statistics", to: "/statistics/:subjectId"}
+                    {key: "schoolStats", label: t('nav.schoolStatistics'), to: "/statistics/:schoolId"},
+                    {key: "teacherStats", label: t('nav.teacherStatistics'), to: "/statistics/:teacherId"},
+                    {key: "subjectStats", label: t('nav.subjectStatistics'), to: "/statistics/:subjectId"}
                 ]
             },
-            {label: "Schedules", icon: <ScheduleIcon />, to: "/select/class/schedules"},
-            {label: "Subjects", icon: <SubjectIcon />, to: "/admin/viewSubjects"},
-            {label: "Teachers", icon: <Teacher />, to: "/headmaster/viewTeachers"},
-            {label: "Parents", icon: <ParentIcon />, to: "/headmaster/viewParents"},
-            {label: "Students", icon: <StudentIcon />, to: "/headmaster/viewStudents"},
-            {label: "Grades", icon: <Grade />, to: "/grades/:schoolId"},
-            {label: "Absences", icon: <AbsenceIcon />, to: "/absences/:schoolId"},
-            {label: "Complaints", icon: <ComplaintIcon />, to: "/complaints/:schoolId"},
-            {label: "Log out", icon: <Logout />, to: "/login"}
+            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedules"},
+            {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
+            {key: "teachers", label: t('nav.teachers'), icon: <Teacher />, to: "/headmaster/viewTeachers"},
+            {key: "parents", label: t('nav.parents'), icon: <ParentIcon />, to: "/headmaster/viewParents"},
+            {key: "students", label: t('nav.students'), icon: <StudentIcon />, to: "/headmaster/viewStudents"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:schoolId"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:schoolId"},
+            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:schoolId"},
+            {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         TEACHER : [
-            {label: "Home", icon: <HomeIcon />, to: "/"},
-            {label: "Schedule", icon: <ScheduleIcon />, to: "/teacher/teacherSchedule/:teacherId"},
-            {label: "Grades", icon: <Grade />, to: "/select/class/grades"},
-            {label: "Absences", icon: <AbsenceIcon />, to: "/select/class/absences"},
-            {label: "Complaints", icon: <ComplaintIcon />, to: "/select/class/complaints"},
-            {label: "Log out", icon: <Logout />, to: "/login"}
+            {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
+            {key: "schedule", label: t('nav.schedule'), icon: <ScheduleIcon />, to: "/teacher/teacherSchedule/:teacherId"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/select/class/grades"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/select/class/absences"},
+            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/select/class/complaints"},
+            {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ],
         PARENT: [
-            {label: "Home", icon: <HomeIcon />, to: "/"},
-            {label: "Schedule", icon: <ScheduleIcon />, to: "/schedule/:classId"},
-            {label: "Grades", icon: <Grade />, to: "/grades/:studentId"},
-            {label: "Absences", icon: <AbsenceIcon />, to: "/absences/:studentId"},
-            {label: "Complaints", icon: <ComplaintIcon />, to: "/complaints/:studentId"},
+            {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
+            {key: "schedule", label: t('nav.schedule'), icon: <ScheduleIcon />, to: "/schedule/:classId"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:studentId"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:studentId"},
+            {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:studentId"},
             {
-                label: "View Student",
+                key: "viewStudent",
+                label: t('nav.viewStudent'),
                 icon: <StudentIcon />,
                 submenu: students.map(s => ({
                     label: s.name,
@@ -135,7 +142,7 @@ const Sidebar = () => {
                     onClick: () => setSelectedStudent(s)
                 }))
             },
-            {label: "Log out", icon: <Logout />, to: "/login"}
+            {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}
         ]
     }
 
@@ -145,8 +152,9 @@ const Sidebar = () => {
         <List>
             {menuItems[user.role].map((item) => (
                 <Box
-                    onMouseEnter={() => handleParentEnter(item.label)}
-                    onMouseLeave={() => handleParentLeave(item.label)}
+                    key={item.key}
+                    onMouseEnter={() => handleParentEnter(item.key)}
+                    onMouseLeave={() => handleParentLeave(item.key)}
                 >
                     <ListItem disablePadding>
                         <ListItemButton
@@ -154,7 +162,7 @@ const Sidebar = () => {
                             to={item.submenu ? undefined : item.to}
                             onClick={() => {
                                 if (item.submenu) {
-                                    handleParentClick(item.label, true);
+                                    handleParentClick(item.key, true);
                                 } else {
                                     if (isMobile) {
                                         setMobileOpen(false);
@@ -166,10 +174,10 @@ const Sidebar = () => {
                             <ListItemText primary={item.label} />
                         </ListItemButton>
                     </ListItem>
-                
+
                     {/* SUBMENU */}
                     {item.submenu && (
-                        <Collapse in={openMenu === item.label} timeout="auto" unmountOnExit>
+                        <Collapse in={openMenu === item.key} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
                                 {item.submenu.map((sub) => (
                                     <ListItem key={sub.key || sub.label} disablePadding sx={{ pl: 4 }}>
@@ -192,9 +200,21 @@ const Sidebar = () => {
     </Collapse>
 )}
 
-                </Box>            
+                </Box>
             ))}
         </List>
+
+        <Box sx={{ mt: 'auto', mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <ToggleButtonGroup
+                value={i18n.language}
+                exclusive
+                size="small"
+                onChange={(_, lng) => { if (lng) i18n.changeLanguage(lng); }}
+            >
+                <ToggleButton value="en">EN</ToggleButton>
+                <ToggleButton value="bg">BG</ToggleButton>
+            </ToggleButtonGroup>
+        </Box>
     </>
     );
 
@@ -220,7 +240,7 @@ const Sidebar = () => {
             </IconButton>
         </Toolbar>
         </AppBar>
-        
+
         {/* Mobile drawer (temporary) */}
         <Box
         component="nav"
@@ -240,13 +260,13 @@ const Sidebar = () => {
         >
             {drawerContent}
         </Drawer>
-        
+
         {/* Desktop drawer (permanent) */}
         <Drawer
             variant="permanent"
             sx={{
             display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.main },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: theme.palette.primary.main, color: theme.palette.primary.main, display: 'flex', flexDirection: 'column' },
             }}
             open
         >

@@ -4,10 +4,12 @@ import logo from '../../../public/EduTrack_logo_positive.svg'
 import useAuth from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 function Login() {
   //mockAdminLogin is TEMPORARY
   const { login, mockAdminLogin } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -72,7 +74,7 @@ function Login() {
           <TextField
             required
             id="standard-required"
-            label="Email Address"
+            label={t('login.emailAddress')}
             variant="standard"
             type="email"
             fullWidth
@@ -88,7 +90,7 @@ function Login() {
           <TextField
           required
           id="standard-password-input"
-          label="Password"
+          label={t('login.password')}
           type="password"
           autoComplete="current-password"
           variant="standard"
@@ -114,7 +116,7 @@ function Login() {
             fullWidth 
             variant='contained' sx={{ mt: 2 }}
           >
-            Sign In
+            {t('login.signIn')}
           </Button>
           {/* TEMPORARY */}
           <Button
@@ -125,7 +127,7 @@ function Login() {
               navigate("/"); // <<--- IMPORTANT
             }}
           >
-            Dev: Mock Admin Login
+            {t('login.devMockAdmin')}
           </Button>
         </Box>
         
