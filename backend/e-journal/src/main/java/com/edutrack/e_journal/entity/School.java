@@ -25,6 +25,10 @@ public class School {
     @Column(columnDefinition = "TEXT")
     private String address;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 30)
+    private SchoolType type;
+
     /** The headmaster/director of this school. Nullable — school can exist without one assigned. */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "directorid")

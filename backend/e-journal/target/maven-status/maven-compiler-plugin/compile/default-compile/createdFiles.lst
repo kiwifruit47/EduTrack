@@ -10,6 +10,7 @@ com/edutrack/e_journal/entity/Absence$AbsenceBuilder.class
 com/edutrack/e_journal/dto/LoginRequest.class
 com/edutrack/e_journal/dto/SubjectDto.class
 com/edutrack/e_journal/entity/RoleEnum.class
+com/edutrack/e_journal/dto/SchoolDto$ProfileDto.class
 com/edutrack/e_journal/controller/AuthController.class
 com/edutrack/e_journal/repository/SubjectRepository.class
 com/edutrack/e_journal/config/SecurityConfig.class
@@ -26,12 +27,15 @@ com/edutrack/e_journal/entity/Schedule.class
 com/edutrack/e_journal/dto/UserDto.class
 com/edutrack/e_journal/repository/SchoolRepository.class
 com/edutrack/e_journal/entity/Role.class
+com/edutrack/e_journal/entity/SchoolType.class
 com/edutrack/e_journal/dto/AuthResponse.class
 com/edutrack/e_journal/repository/UserRepository.class
 com/edutrack/e_journal/entity/Schedule$ScheduleBuilder.class
 com/edutrack/e_journal/dto/UserSummaryDto.class
 com/edutrack/e_journal/entity/Absence.class
+com/edutrack/e_journal/repository/SchoolProfileRepository.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
+com/edutrack/e_journal/controller/SchoolController$ProfileRequest.class
 com/edutrack/e_journal/dto/SchoolRequest.class
 com/edutrack/e_journal/entity/Subject.class
 com/edutrack/e_journal/entity/Student.class
@@ -43,6 +47,7 @@ com/edutrack/e_journal/repository/ScheduleRepository.class
 com/edutrack/e_journal/controller/ClassController.class
 com/edutrack/e_journal/security/JwtAuthenticationFilter.class
 com/edutrack/e_journal/entity/SchoolClass$SchoolClassBuilder.class
+com/edutrack/e_journal/entity/SchoolProfile$SchoolProfileBuilder.class
 com/edutrack/e_journal/entity/SchoolClass.class
 com/edutrack/e_journal/repository/TeacherRepository.class
 com/edutrack/e_journal/repository/RoleRepository.class
@@ -52,3 +57,4 @@ com/edutrack/e_journal/dto/UpdateUserRequest.class
 com/edutrack/e_journal/controller/SubjectController.class
 com/edutrack/e_journal/security/JwtUtils.class
 com/edutrack/e_journal/dto/ChangePasswordRequest.class
+com/edutrack/e_journal/entity/SchoolProfile.class

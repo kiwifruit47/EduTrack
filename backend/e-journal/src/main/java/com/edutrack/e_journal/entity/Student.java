@@ -33,4 +33,9 @@ public class Student {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classid")
     private SchoolClass schoolClass;
+
+    /** Nullable — the profile this student follows at their school (e.g. "English Profile"). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profileid")
+    private SchoolProfile profile;
 }

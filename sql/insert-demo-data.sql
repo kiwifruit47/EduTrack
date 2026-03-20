@@ -81,7 +81,7 @@ INSERT INTO Users (Id, Email, PasswordHash, FirstName, LastName, RoleId) VALUES
 -- 3. SCHOOLS
 -- DirectorId set after Users are inserted
 -- -------------------------------------------------------------
-INSERT INTO Schools (Id, Name, Address, DirectorId) VALUES
+INSERT INTO Schools (Id, Name, Type, Address, DirectorId) VALUES
     (1, 'СОУ "Христо Ботев"', 'ул. „Шипка" 34, София',    2),
     (2, 'СОУ "Иван Вазов"',   'бул. „Марица" 12, Пловдив', 3);
 

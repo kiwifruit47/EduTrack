@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  IconButton, MenuItem, Paper, Select, InputLabel, FormControl,
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, TextField, Typography, CircularProgress, Alert,
+  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
+  Divider, FormControl, IconButton, InputLabel, List, ListItem, ListItemText,
+  MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, TextField, Typography, CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -11,7 +11,9 @@ import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
 
-const emptyForm = { name: '', address: '', headmasterId: '' };
+const SCHOOL_TYPES = ['GENERAL', 'FOREIGN_LANGUAGE', 'MATHEMATICS', 'ART', 'SPORTS', 'PROFESSIONAL'];
+
+const emptyForm = { name: '', address: '', headmasterId: '', type: '' };
 
 const fieldProps = {
   InputProps: { sx: { color: 'black' } },
@@ -25,26 +27,33 @@ function SchoolFormFields({ form, setForm, t, headmasters }) {
         label={t('schools.name')}
         value={form.name}
         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-        required
-        fullWidth
-        {...fieldProps}
+        required fullWidth {...fieldProps}
       />
       <TextField
         label={t('schools.address')}
         value={form.address}
         onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-        multiline
-        rows={3}
-        fullWidth
-        {...fieldProps}
+        multiline rows={2} fullWidth {...fieldProps}
       />
+      <FormControl fullWidth>
+        <InputLabel sx={{ color: 'black' }}>{t('schools.type')}</InputLabel>
+        <Select
+          value={form.type}
+          onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
+          label={t('schools.type')} sx={{ color: 'black' }}
+        >
+          <MenuItem value=""><em>{t('schools.noType')}</em></MenuItem>
+          {SCHOOL_TYPES.map(type => (
+            <MenuItem key={type} value={type}>{t(`schoolTypes.${type}`)}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <FormControl fullWidth>
         <InputLabel sx={{ color: 'black' }}>{t('schools.headmaster')}</InputLabel>
         <Select
           value={form.headmasterId}
           onChange={e => setForm(f => ({ ...f, headmasterId: e.target.value }))}
-          label={t('schools.headmaster')}
-          sx={{ color: 'black' }}
+          label={t('schools.headmaster')} sx={{ color: 'black' }}
         >
           <MenuItem value=""><em>{t('schools.noHeadmaster')}</em></MenuItem>
           {headmasters.map(h => (
@@ -56,6 +65,70 @@ function SchoolFormFields({ form, setForm, t, headmasters }) {
   );
 }
 
+function ProfileManager({ schoolId, t }) {
+  const [profiles, setProfiles]     = useState([]);
+  const [newName, setNewName]       = useState('');
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    api.get(`/api/schools/${schoolId}/profiles`)
+      .then(res => setProfiles(res.data))
+      .finally(() => setLoading(false));
+  }, [schoolId]);
+
+  const handleAdd = () => {
+    if (!newName.trim()) return;
+    api.post(`/api/schools/${schoolId}/profiles`, { name: newName.trim() })
+      .then(res => { setProfiles(prev => [...prev, res.data]); setNewName(''); });
+  };
+
+  const handleDelete = (id) => {
+    api.delete(`/api/schools/profiles/${id}`)
+      .then(() => setProfiles(prev => prev.filter(p => p.id !== id)));
+  };
+
+  if (loading) return null;
+
+  return (
+    <Box>
+      <Divider sx={{ my: 2 }} />
+      <Typography variant="subtitle1" sx={{ mb: 1 }}>{t('schools.profiles')}</Typography>
+      <List dense disablePadding>
+        {profiles.length === 0 && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {t('schools.noProfiles')}
+          </Typography>
+        )}
+        {profiles.map(p => (
+          <ListItem key={p.id} disablePadding sx={{ mb: 0.5 }}
+            secondaryAction={
+              <IconButton edge="end" size="small" onClick={() => handleDelete(p.id)}>
+                <DeleteIcon fontSize="small" sx={{ color: 'red' }} />
+              </IconButton>
+            }
+          >
+            <ListItemText primary={p.name} />
+          </ListItem>
+        ))}
+      </List>
+      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+        <TextField
+          size="small"
+          label={t('schools.addProfile')}
+          value={newName}
+          onChange={e => setNewName(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleAdd()}
+          fullWidth
+          {...fieldProps}
+        />
+        <Button variant="outlined" onClick={handleAdd} disabled={!newName.trim()}>
+          <AddIcon />
+        </Button>
+      </Box>
+    </Box>
+  );
+}
+
 function ViewSchools() {
   const { t } = useTranslation();
 
@@ -63,20 +136,15 @@ function ViewSchools() {
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [saving, setSaving]           = useState(false);
+  const [headmasters, setHeadmasters] = useState([]);
 
-  // Add dialog
   const [addOpen, setAddOpen]         = useState(false);
   const [addForm, setAddForm]         = useState(emptyForm);
 
-  // Edit dialog
   const [editOpen, setEditOpen]       = useState(false);
   const [editId, setEditId]           = useState(null);
   const [editForm, setEditForm]       = useState(emptyForm);
 
-  // Headmasters list for dropdown
-  const [headmasters, setHeadmasters] = useState([]);
-
-  // Delete confirm
   const [confirmId, setConfirmId]     = useState(null);
   const [confirmName, setConfirmName] = useState('');
 
@@ -97,17 +165,14 @@ function ViewSchools() {
   const toPayload = form => ({
     name: form.name,
     address: form.address,
+    type: form.type || null,
     headmasterId: form.headmasterId ? Number(form.headmasterId) : null,
   });
 
   const handleCreate = () => {
     setSaving(true);
     api.post('/api/schools', toPayload(addForm))
-      .then(res => {
-        setSchools(prev => [...prev, res.data]);
-        setAddOpen(false);
-        setAddForm(emptyForm);
-      })
+      .then(res => { setSchools(prev => [...prev, res.data]); setAddOpen(false); setAddForm(emptyForm); })
       .catch(() => setError(t('schools.createError')))
       .finally(() => setSaving(false));
   };
@@ -118,6 +183,7 @@ function ViewSchools() {
     setEditForm({
       name: school.name || '',
       address: school.address || '',
+      type: school.type || '',
       headmasterId: match ? match.id : '',
     });
     setEditOpen(true);
@@ -126,24 +192,15 @@ function ViewSchools() {
   const handleUpdate = () => {
     setSaving(true);
     api.put(`/api/schools/${editId}`, toPayload(editForm))
-      .then(res => {
-        setSchools(prev => prev.map(s => s.id === editId ? res.data : s));
-        setEditOpen(false);
-      })
+      .then(res => { setSchools(prev => prev.map(s => s.id === editId ? res.data : s)); setEditOpen(false); })
       .catch(() => setError(t('schools.updateError')))
       .finally(() => setSaving(false));
   };
 
   const handleDeleteConfirm = () => {
     api.delete(`/api/schools/${confirmId}`)
-      .then(() => {
-        setSchools(prev => prev.filter(s => s.id !== confirmId));
-        setConfirmId(null);
-      })
-      .catch(() => {
-        setError(t('schools.deleteError'));
-        setConfirmId(null);
-      });
+      .then(() => { setSchools(prev => prev.filter(s => s.id !== confirmId)); setConfirmId(null); })
+      .catch(() => { setError(t('schools.deleteError')); setConfirmId(null); });
   };
 
   return (
@@ -159,9 +216,7 @@ function ViewSchools() {
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
         ) : (
           <TableContainer component={Paper}>
             <Table>
@@ -169,28 +224,35 @@ function ViewSchools() {
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>{t('schools.name')}</TableCell>
-                  <TableCell>{t('schools.address')}</TableCell>
+                  <TableCell>{t('schools.type')}</TableCell>
                   <TableCell>{t('schools.headmaster')}</TableCell>
+                  <TableCell>{t('schools.profiles')}</TableCell>
                   <TableCell align="center">{t('schools.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {schools.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">{t('schools.noSchools')}</TableCell>
+                    <TableCell colSpan={6} align="center">{t('schools.noSchools')}</TableCell>
                   </TableRow>
                 ) : (
                   schools.map(school => (
-                    <TableRow
-                      key={school.id}
-                      hover
-                      onClick={() => handleRowClick(school)}
-                      sx={{ cursor: 'pointer' }}
-                    >
+                    <TableRow key={school.id} hover onClick={() => handleRowClick(school)} sx={{ cursor: 'pointer' }}>
                       <TableCell>{school.id}</TableCell>
                       <TableCell>{school.name}</TableCell>
-                      <TableCell>{school.address || '—'}</TableCell>
+                      <TableCell>
+                        {school.type
+                          ? <Chip label={t(`schoolTypes.${school.type}`)} size="small" />
+                          : '—'}
+                      </TableCell>
                       <TableCell>{school.headmasterName || '—'}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {school.profiles?.length > 0
+                            ? school.profiles.map(p => <Chip key={p.id} label={p.name} size="small" variant="outlined" />)
+                            : '—'}
+                        </Box>
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton onClick={e => { e.stopPropagation(); setConfirmId(school.id); setConfirmName(school.name); }}>
                           <DeleteIcon sx={{ color: 'red' }} />
@@ -219,11 +281,12 @@ function ViewSchools() {
         </DialogActions>
       </Dialog>
 
-      {/* Edit School Dialog */}
+      {/* Edit School Dialog — includes profile manager */}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{t('schools.editSchool')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
           <SchoolFormFields form={editForm} setForm={setEditForm} t={t} headmasters={headmasters} />
+          {editId && <ProfileManager schoolId={editId} t={t} />}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>{t('common.cancel')}</Button>
@@ -233,7 +296,7 @@ function ViewSchools() {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation */}
       <Dialog open={confirmId !== null} onClose={() => setConfirmId(null)}>
         <DialogTitle>{t('schools.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
@@ -241,9 +304,7 @@ function ViewSchools() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmId(null)}>{t('common.cancel')}</Button>
-          <Button variant="contained" color="error" onClick={handleDeleteConfirm}>
-            {t('common.delete')}
-          </Button>
+          <Button variant="contained" color="error" onClick={handleDeleteConfirm}>{t('common.delete')}</Button>
         </DialogActions>
       </Dialog>
     </Layout>

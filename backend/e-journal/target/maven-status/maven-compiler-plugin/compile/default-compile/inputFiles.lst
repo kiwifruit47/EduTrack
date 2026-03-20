@@ -28,6 +28,8 @@
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/Schedule.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/School.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/SchoolClass.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/SchoolProfile.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/SchoolType.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/Student.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/Subject.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/entity/Teacher.java
@@ -35,6 +37,7 @@
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/ClassRepository.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/RoleRepository.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/ScheduleRepository.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/SchoolProfileRepository.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/SchoolRepository.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/SubjectRepository.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/repository/TeacherRepository.java

@@ -87,6 +87,11 @@
     "name": "Name",
     "address": "Address",
     "headmaster": "Headmaster",
+    "type": "Type",
+    "noType": "None",
+    "profiles": "Profiles",
+    "noProfiles": "No profiles yet.",
+    "addProfile": "Add profile",
     "actions": "Actions",
     "addSchool": "Add School",
     "noSchools": "No schools found.",
@@ -98,6 +103,14 @@
     "updateError": "Failed to update school.",
     "deleteConfirmTitle": "Delete School",
     "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+  },
+  "schoolTypes": {
+    "GENERAL": "General",
+    "FOREIGN_LANGUAGE": "Foreign Language",
+    "MATHEMATICS": "Mathematics",
+    "ART": "Art",
+    "SPORTS": "Sports",
+    "PROFESSIONAL": "Professional"
   },
   "subjects": {
     "title": "Subjects",
