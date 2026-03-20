@@ -3,7 +3,7 @@ import {
   Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions,
   DialogContent, DialogTitle, FormControl, IconButton, InputLabel,
   MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, TextField, Typography,
+  TableHead, TableRow, TableSortLabel, TextField, Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -84,6 +84,8 @@ function ManageUsers() {
   const [error, setError]             = useState(null);
   const [saving, setSaving]           = useState(false);
   const [roleFilter, setRoleFilter]   = useState('ALL');
+  const [sortBy, setSortBy]           = useState('id');
+  const [sortDir, setSortDir]         = useState('asc');
 
   const [addOpen, setAddOpen]         = useState(false);
   const [addForm, setAddForm]         = useState(emptyForm);
@@ -102,7 +104,24 @@ function ManageUsers() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = roleFilter === 'ALL' ? users : users.filter(u => u.role === roleFilter);
+  const handleSort = (col) => {
+    if (sortBy === col) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(col);
+      setSortDir('asc');
+    }
+  };
+
+  const filtered = (roleFilter === 'ALL' ? users : users.filter(u => u.role === roleFilter))
+    .slice()
+    .sort((a, b) => {
+      const av = sortBy === 'id' ? a.id : (a[sortBy] ?? '').toLowerCase();
+      const bv = sortBy === 'id' ? b.id : (b[sortBy] ?? '').toLowerCase();
+      if (av < bv) return sortDir === 'asc' ? -1 : 1;
+      if (av > bv) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   const handleCreate = () => {
     setSaving(true);
@@ -183,11 +202,23 @@ function ManageUsers() {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ width: 48 }} />
-                  <TableCell>ID</TableCell>
-                  <TableCell>{t('users.firstName')}</TableCell>
-                  <TableCell>{t('users.lastName')}</TableCell>
-                  <TableCell>{t('users.email')}</TableCell>
-                  <TableCell>{t('users.role')}</TableCell>
+                  {[
+                    { id: 'id',        label: 'ID' },
+                    { id: 'firstName', label: t('users.firstName') },
+                    { id: 'lastName',  label: t('users.lastName') },
+                    { id: 'email',     label: t('users.email') },
+                    { id: 'role',      label: t('users.role') },
+                  ].map(col => (
+                    <TableCell key={col.id} sortDirection={sortBy === col.id ? sortDir : false}>
+                      <TableSortLabel
+                        active={sortBy === col.id}
+                        direction={sortBy === col.id ? sortDir : 'asc'}
+                        onClick={() => handleSort(col.id)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                   <TableCell align="center">{t('schools.actions')}</TableCell>
                 </TableRow>
               </TableHead>
