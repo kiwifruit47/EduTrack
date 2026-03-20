@@ -17,7 +17,7 @@ const emptyForm = { name: '', address: '', headmasterId: '', type: '' };
 
 const fieldProps = {
   InputProps: { sx: { color: 'black' } },
-  InputLabelProps: { shrink: true, sx: { color: 'black' } },
+  InputLabelProps: { shrink: true, sx: { color: 'black', '&.Mui-focused': { color: 'black' } } },
 };
 
 function SchoolFormFields({ form, setForm, t, headmasters }) {

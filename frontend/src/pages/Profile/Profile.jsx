@@ -12,7 +12,7 @@ import useAuth from '../../hooks/useAuth';
 
 const fieldSx = {
   InputProps: { sx: { color: 'black' } },
-  InputLabelProps: { shrink: true, sx: { color: 'black' } },
+  InputLabelProps: { shrink: true, sx: { color: 'black', '&.Mui-focused': { color: 'black' } } },
 };
 
 function Profile() {

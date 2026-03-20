@@ -58,4 +58,5 @@ com/edutrack/e_journal/dto/UpdateUserRequest.class
 com/edutrack/e_journal/controller/SubjectController.class
 com/edutrack/e_journal/security/JwtUtils.class
 com/edutrack/e_journal/dto/ChangePasswordRequest.class
+com/edutrack/e_journal/repository/StudentRepository.class
 com/edutrack/e_journal/entity/SchoolProfile.class

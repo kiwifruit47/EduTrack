@@ -15,7 +15,7 @@ const emptyForm = { name: '' };
 
 const fieldProps = {
   InputProps: { sx: { color: 'black' } },
-  InputLabelProps: { shrink: true, sx: { color: 'black' } },
+  InputLabelProps: { shrink: true, sx: { color: 'black', '&.Mui-focused': { color: 'black' } } },
 };
 
 function SubjectFormFields({ form, setForm, t }) {

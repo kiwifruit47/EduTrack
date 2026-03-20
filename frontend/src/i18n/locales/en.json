@@ -84,7 +84,9 @@
     "updateError": "Failed to update user.",
     "deleteError": "Failed to delete user.",
     "deleteConfirmTitle": "Delete User",
-    "deleteConfirmMessage": "Are you sure you want to delete {{name}}? This cannot be undone."
+    "deleteConfirmMessage": "Are you sure you want to delete {{name}}? This cannot be undone.",
+    "filterBySchool": "Filter by School",
+    "allSchools": "All Schools"
   },
   "schools": {
     "title": "Schools",

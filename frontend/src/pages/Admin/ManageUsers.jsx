@@ -26,7 +26,7 @@ const emptyForm = { firstName: '', lastName: '', email: '', password: '', role: 
 
 const fieldSx = {
   InputProps: { sx: { color: 'black' } },
-  InputLabelProps: { shrink: true, sx: { color: 'black' } },
+  InputLabelProps: { shrink: true, sx: { color: 'black', '&.Mui-focused': { color: 'black' } } },
 };
 
 function UserFormFields({ form, setForm, t, isEdit }) {
@@ -80,10 +80,12 @@ function ManageUsers() {
   const { t } = useTranslation();
 
   const [users, setUsers]             = useState([]);
+  const [schools, setSchools]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [saving, setSaving]           = useState(false);
   const [roleFilter, setRoleFilter]   = useState('ALL');
+  const [schoolFilter, setSchoolFilter] = useState('');
   const [sortBy, setSortBy]           = useState('id');
   const [sortDir, setSortDir]         = useState('asc');
 
@@ -98,8 +100,14 @@ function ManageUsers() {
   const [confirmName, setConfirmName] = useState('');
 
   useEffect(() => {
-    api.get('/api/users')
-      .then(res => setUsers(res.data))
+    Promise.all([
+      api.get('/api/users'),
+      api.get('/api/schools'),
+    ])
+      .then(([usersRes, schoolsRes]) => {
+        setUsers(usersRes.data);
+        setSchools(schoolsRes.data);
+      })
       .catch(() => setError(t('users.fetchError')))
       .finally(() => setLoading(false));
   }, []);
@@ -113,7 +121,9 @@ function ManageUsers() {
     }
   };
 
-  const filtered = (roleFilter === 'ALL' ? users : users.filter(u => u.role === roleFilter))
+  const filtered = users
+    .filter(u => roleFilter === 'ALL' || u.role === roleFilter)
+    .filter(u => !schoolFilter || u.schoolId === Number(schoolFilter))
     .slice()
     .sort((a, b) => {
       const av = sortBy === 'id' ? a.id : (a[sortBy] ?? '').toLowerCase();
@@ -177,17 +187,33 @@ function ManageUsers() {
           </Button>
         </Box>
 
-        {/* Role filter */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-          {['ALL', ...ROLES].map(r => (
-            <Chip
-              key={r}
-              label={r}
-              color={roleFilter === r ? 'primary' : 'default'}
-              onClick={() => setRoleFilter(r)}
-              clickable
-            />
-          ))}
+        {/* Filters */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+            {['ALL', ...ROLES].map(r => (
+              <Chip
+                key={r}
+                label={r}
+                color={roleFilter === r ? 'primary' : 'default'}
+                onClick={() => setRoleFilter(r)}
+                clickable
+              />
+            ))}
+          </Box>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel sx={{ color: 'black' }}>{t('users.filterBySchool')}</InputLabel>
+            <Select
+              value={schoolFilter}
+              onChange={e => setSchoolFilter(e.target.value)}
+              label={t('users.filterBySchool')}
+              sx={{ color: 'black' }}
+            >
+              <MenuItem value=""><em>{t('users.allSchools')}</em></MenuItem>
+              {schools.map(s => (
+                <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
