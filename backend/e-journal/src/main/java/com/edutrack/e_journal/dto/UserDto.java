@@ -11,4 +11,6 @@ public class UserDto {
     private String lastName;
     private String email;
     private String role;
+    private Long   schoolId;   // null for ADMIN / PARENT
+    private String schoolName; // null for ADMIN / PARENT
 }

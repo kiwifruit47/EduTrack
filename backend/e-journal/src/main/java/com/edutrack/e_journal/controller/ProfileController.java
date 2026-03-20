@@ -78,6 +78,7 @@ public class ProfileController {
     }
 
     private UserDto toDto(User u) {
-        return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole().getName().name());
+        return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),
+                u.getRole().getName().name(), null, null);
     }
 }

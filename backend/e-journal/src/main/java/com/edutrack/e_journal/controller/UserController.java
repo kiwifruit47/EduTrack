@@ -3,8 +3,11 @@ package com.edutrack.e_journal.controller;
 import com.edutrack.e_journal.dto.*;
 import com.edutrack.e_journal.entity.Role;
 import com.edutrack.e_journal.entity.RoleEnum;
+import com.edutrack.e_journal.entity.School;
 import com.edutrack.e_journal.entity.User;
 import com.edutrack.e_journal.repository.RoleRepository;
+import com.edutrack.e_journal.repository.SchoolRepository;
+import com.edutrack.e_journal.repository.StudentRepository;
 import com.edutrack.e_journal.repository.TeacherRepository;
 import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -27,6 +30,8 @@ public class UserController {
     private final UserRepository    userRepository;
     private final RoleRepository    roleRepository;
     private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final SchoolRepository  schoolRepository;
     private final PasswordEncoder   passwordEncoder;
 
     @GetMapping
@@ -122,6 +127,31 @@ public class UserController {
     }
 
     private UserDto toDto(User u) {
-        return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole().getName().name());
+        Long schoolId = null;
+        String schoolName = null;
+
+        RoleEnum role = u.getRole().getName();
+        if (role == RoleEnum.TEACHER) {
+            var t = teacherRepository.findById(u.getId()).orElse(null);
+            if (t != null && t.getSchool() != null) {
+                schoolId   = t.getSchool().getId();
+                schoolName = t.getSchool().getName();
+            }
+        } else if (role == RoleEnum.STUDENT) {
+            var s = studentRepository.findById(u.getId()).orElse(null);
+            if (s != null && s.getSchool() != null) {
+                schoolId   = s.getSchool().getId();
+                schoolName = s.getSchool().getName();
+            }
+        } else if (role == RoleEnum.HEADMASTER) {
+            School school = schoolRepository.findByDirector_Id(u.getId()).orElse(null);
+            if (school != null) {
+                schoolId   = school.getId();
+                schoolName = school.getName();
+            }
+        }
+
+        return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),
+                u.getRole().getName().name(), schoolId, schoolName);
     }
 }
