@@ -7,13 +7,16 @@ import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -43,6 +46,19 @@ public class ProfileController {
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+    }
+
+    @PutMapping(value = "/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadPicture(@AuthenticationPrincipal UserDetails principal,
+                                           @RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty() || file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image file");
+        }
+        User user = resolveUser(principal);
+        user.setProfilePicture(file.getBytes());
+        user.setProfilePictureType(file.getContentType());
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
     }
 
     // -------------------------------------------------------------------------

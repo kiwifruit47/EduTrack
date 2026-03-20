@@ -62,7 +62,10 @@
     "confirmPassword": "Confirm New Password",
     "changeSuccess": "Password changed successfully.",
     "changeError": "Failed to change password.",
-    "passwordMismatch": "New passwords do not match."
+    "passwordMismatch": "New passwords do not match.",
+    "uploadPicture": "Upload Picture",
+    "pictureError": "Failed to upload picture.",
+    "pictureTooLarge": "Image must be under 2 MB."
   },
   "users": {
     "title": "Manage Users",

@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import UserAvatar from '../../components/UserAvatar';
 import api from '../../api/axiosInstance';
 
 const ROLES = ['ADMIN', 'HEADMASTER', 'TEACHER', 'STUDENT', 'PARENT'];
@@ -181,6 +182,7 @@ function ManageUsers() {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell sx={{ width: 48 }} />
                   <TableCell>ID</TableCell>
                   <TableCell>{t('users.firstName')}</TableCell>
                   <TableCell>{t('users.lastName')}</TableCell>
@@ -192,11 +194,14 @@ function ManageUsers() {
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">{t('users.noUsers')}</TableCell>
+                    <TableCell colSpan={7} align="center">{t('users.noUsers')}</TableCell>
                   </TableRow>
                 ) : (
                   filtered.map(user => (
                     <TableRow key={user.id} hover onClick={() => handleRowClick(user)} sx={{ cursor: 'pointer' }}>
+                      <TableCell>
+                        <UserAvatar userId={user.id} name={`${user.firstName} ${user.lastName}`} size={36} />
+                      </TableCell>
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.firstName}</TableCell>
                       <TableCell>{user.lastName}</TableCell>

@@ -10,6 +10,7 @@ import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +51,18 @@ public class UserController {
         return userRepository.findAllByRole_Name(RoleEnum.HEADMASTER).stream()
                 .map(u -> new UserSummaryDto(u.getId(), u.getFirstName() + " " + u.getLastName()))
                 .toList();
+    }
+
+    @GetMapping("/{id}/picture")
+    public ResponseEntity<byte[]> getPicture(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if (user.getProfilePicture() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(user.getProfilePictureType()))
+                .body(user.getProfilePicture());
     }
 
     @PostMapping

@@ -62,7 +62,10 @@
     "confirmPassword": "Потвърди новата парола",
     "changeSuccess": "Паролата е сменена успешно.",
     "changeError": "Грешка при смяна на паролата.",
-    "passwordMismatch": "Новите пароли не съвпадат."
+    "passwordMismatch": "Новите пароли не съвпадат.",
+    "uploadPicture": "Качи снимка",
+    "pictureError": "Грешка при качване на снимка.",
+    "pictureTooLarge": "Снимката трябва да е под 2 МБ."
   },
   "users": {
     "title": "Управление на потребители",

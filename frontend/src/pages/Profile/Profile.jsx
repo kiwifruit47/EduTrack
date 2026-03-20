@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Alert, Box, Button, Card, CardContent, Divider,
   TextField, Typography,
 } from '@mui/material';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import UserAvatar from '../../components/UserAvatar';
 import api from '../../api/axiosInstance';
 import useAuth from '../../hooks/useAuth';
 
@@ -17,10 +19,27 @@ function Profile() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
+  const fileInputRef = useRef(null);
+  const [avatarVersion, setAvatarVersion] = useState(0);
+  const [pictureError, setPictureError] = useState(null);
+
   const [form, setForm]       = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [saving, setSaving]   = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError]     = useState(null);
+
+  const handlePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    e.target.value = '';
+    setPictureError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    api.put('/api/profile/picture', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(() => setAvatarVersion(v => v + 1))
+      .catch(() => setPictureError(t('profile.pictureError')));
+  };
 
   const handleSubmit = () => {
     setError(null);
@@ -51,13 +70,44 @@ function Profile() {
 
         {/* User info */}
         <Card sx={{ mb: 3 }}>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Typography><strong>{t('users.firstName')}:</strong> {user?.name?.split(' ')[0]}</Typography>
-            <Typography><strong>{t('users.lastName')}:</strong> {user?.name?.split(' ').slice(1).join(' ')}</Typography>
-            <Typography><strong>{t('users.email')}:</strong> {user?.email}</Typography>
-            <Typography><strong>{t('users.role')}:</strong> {user?.role}</Typography>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+              {/* Clickable avatar */}
+              <Box
+                sx={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }}
+                onClick={() => fileInputRef.current.click()}
+                title={t('profile.uploadPicture')}
+              >
+                <UserAvatar userId={user?.id} name={user?.name} size={72} refreshToken={avatarVersion} />
+                <Box sx={{
+                  position: 'absolute', bottom: 0, right: 0,
+                  bgcolor: 'primary.main', borderRadius: '50%',
+                  width: 22, height: 22,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <CameraAltIcon sx={{ fontSize: 13, color: 'white' }} />
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography><strong>{t('users.firstName')}:</strong> {user?.name?.split(' ')[0]}</Typography>
+                <Typography><strong>{t('users.lastName')}:</strong> {user?.name?.split(' ').slice(1).join(' ')}</Typography>
+                <Typography><strong>{t('users.email')}:</strong> {user?.email}</Typography>
+                <Typography><strong>{t('users.role')}:</strong> {user?.role}</Typography>
+              </Box>
+            </Box>
+
+            {pictureError && <Alert severity="error" sx={{ mt: 1 }}>{pictureError}</Alert>}
           </CardContent>
         </Card>
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handlePictureChange}
+        />
 
         <Divider sx={{ mb: 3 }} />
 

@@ -45,6 +45,12 @@ public class User {
     @JoinColumn(name = "roleid", nullable = false)
     private Role role;
 
+    @Column(name = "profile_picture", columnDefinition = "bytea")
+    private byte[] profilePicture;
+
+    @Column(name = "profile_picture_type", length = 50)
+    private String profilePictureType;
+
     /**
      * Populated only for users with role PARENT.
      * Maps the parent_student junction table.
