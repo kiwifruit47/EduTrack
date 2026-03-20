@@ -35,6 +35,7 @@ com/edutrack/e_journal/dto/UserSummaryDto.class
 com/edutrack/e_journal/entity/Absence.class
 com/edutrack/e_journal/repository/SchoolProfileRepository.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
+com/edutrack/e_journal/security/RequestLoggingFilter.class
 com/edutrack/e_journal/controller/SchoolController$ProfileRequest.class
 com/edutrack/e_journal/dto/SchoolRequest.class
 com/edutrack/e_journal/entity/Subject.class
