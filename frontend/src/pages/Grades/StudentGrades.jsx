@@ -1,10 +1,109 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import {
+  Alert, Box, Chip, CircularProgress, Paper, Tab,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography,
+} from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Layout from '../../components/Layout';
+import api from '../../api/axiosInstance';
+import useAuth from '../../hooks/useAuth';
 
-//same as StudentAbsences but with average insted of count
+const GRADE_COLOR = v => {
+  const n = parseFloat(v);
+  if (n >= 5.5) return 'success';
+  if (n >= 4.5) return 'primary';
+  if (n >= 3.5) return 'warning';
+  return 'error';
+};
+
 function StudentGrades() {
+  const { studentId } = useParams();
+  const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const [grades, setGrades]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+  const [termTab, setTermTab] = useState(0);
+
+  useEffect(() => {
+    const url = user?.role === 'STUDENT'
+      ? '/api/grades/student/me'
+      : `/api/grades/student/${studentId}`;
+    api.get(url)
+      .then(res => setGrades(res.data))
+      .catch(() => setError(t('grades.fetchError')))
+      .finally(() => setLoading(false));
+  }, [studentId]);
+
+  const termFilter = termTab === 0 ? null : termTab;
+  const filtered = termFilter ? grades.filter(g => g.term === termFilter) : grades;
+
+  const avg = filtered.length
+    ? (filtered.reduce((s, g) => s + parseFloat(g.value), 0) / filtered.length).toFixed(2)
+    : null;
+
   return (
-    <div>StudentGrades</div>
-  )
+    <Layout>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h5" sx={{ mb: 1 }}>{t('grades.title')}</Typography>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
+        ) : (
+          <>
+            <Tabs value={termTab} onChange={(_, v) => setTermTab(v)} sx={{ mb: 2 }}>
+              <Tab label={t('grades.all')} />
+              <Tab label={t('schedule.term1')} />
+              <Tab label={t('schedule.term2')} />
+            </Tabs>
+
+            {avg && (
+              <Box sx={{ mb: 2 }}>
+                <Chip label={`${t('grades.average')}: ${avg}`} color={GRADE_COLOR(avg)} />
+              </Box>
+            )}
+
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('grades.subject')}</TableCell>
+                    <TableCell>{t('grades.teacher')}</TableCell>
+                    <TableCell>{t('grades.term')}</TableCell>
+                    <TableCell>{t('grades.value')}</TableCell>
+                    <TableCell>{t('grades.date')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filtered.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">{t('grades.noGrades')}</TableCell>
+                    </TableRow>
+                  ) : (
+                    filtered.map(g => (
+                      <TableRow key={g.id} hover>
+                        <TableCell>{g.subjectName}</TableCell>
+                        <TableCell>{g.teacherName}</TableCell>
+                        <TableCell>{g.term}</TableCell>
+                        <TableCell>
+                          <Chip label={g.value} size="small" color={GRADE_COLOR(g.value)} />
+                        </TableCell>
+                        <TableCell>{g.createdAt?.slice(0, 10)}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
+      </Box>
+    </Layout>
+  );
 }
 
-export default StudentGrades
+export default StudentGrades;

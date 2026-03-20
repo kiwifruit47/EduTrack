@@ -21,7 +21,8 @@ import ParentHome from '../pages/Parent/ParentHome';
 import StudentHome from '../pages/Student/StudentHome';
 
 import TeacherHome from '../pages/Teacher/TeacherHome';
-import TeacherSchedule from '../pages/Teacher/TeacherSchedule'
+import TeacherSchedule from '../pages/Teacher/TeacherSchedule';
+import TeacherSchool from '../pages/Teacher/TeacherSchool';
 
 import Schedule from '../pages/Schedule/Schedule';
 
@@ -104,9 +105,9 @@ function AppRouter() {
       />
 
       <Route
-        path='/admin/viewSubjects' 
+        path='/admin/viewSubjects'
         element={
-          <ProtectedRoute roles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <ViewSubjects/>
           </ProtectedRoute>
         }
@@ -180,7 +181,16 @@ function AppRouter() {
       />
 
       <Route
-        path='/teacher/teacherSchedule/:teacherId' 
+        path='/teacher/school'
+        element={
+          <ProtectedRoute roles={["TEACHER"]}>
+            <TeacherSchool/>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/teacher/teacherSchedule/:teacherId'
         element={
           <ProtectedRoute roles={["TEACHER"]}>
             <TeacherSchedule/>
@@ -226,41 +236,47 @@ function AppRouter() {
         }
       />    
 
-      {/* Absences route */}
+      {/* Absences routes */}
       <Route
-        path='/absences/'
+        path='/absences'
         element={
           <ProtectedRoute roles={["ADMIN"]}>
             <AllSchoolsAbsences/>
           </ProtectedRoute>
         }
-      /> 
-
+      />
       <Route
-        path='/absences/:schoolId'
+        path='/absences/school/:schoolId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <SchoolAbsences/>
           </ProtectedRoute>
         }
-      /> 
+      />
       <Route
-        path='/absences/:classId'
+        path='/absences/class/:classId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
             <ClassAbsences/>
           </ProtectedRoute>
         }
-      /> 
-
+      />
       <Route
-        path='/absences/:studentId'
+        path='/absences/student/:studentId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER", "PARENT", "STUDENT"]}>
             <StudentAbsences/>
           </ProtectedRoute>
         }
-      /> 
+      />
+      <Route
+        path='/absences/me'
+        element={
+          <ProtectedRoute roles={["STUDENT"]}>
+            <StudentAbsences/>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Complaints route */}
       <Route
@@ -308,35 +324,39 @@ function AppRouter() {
             <AllSchoolsGrades/>
           </ProtectedRoute>
         }
-      /> 
-
+      />
       <Route
-        path='/grades/:schoolId'
+        path='/grades/school/:schoolId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <SchoolGrades/>
           </ProtectedRoute>
         }
-      /> 
-      
-      {/* teachers can view only for classes they teach */}
+      />
       <Route
-        path='/grades/:classId'
+        path='/grades/class/:classId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
             <ClassGrades/>
           </ProtectedRoute>
         }
-      /> 
-
+      />
       <Route
-        path='/grades/:studentId'
+        path='/grades/student/:studentId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER", "PARENT", "STUDENT"]}>
             <StudentGrades/>
           </ProtectedRoute>
         }
-      /> 
+      />
+      <Route
+        path='/grades/me'
+        element={
+          <ProtectedRoute roles={["STUDENT"]}>
+            <StudentGrades/>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Selection pages routes */}
       {/* ony for admin, bc headmaster can't choose school, it will be automatically displayed */}
@@ -378,19 +398,19 @@ function AppRouter() {
       />
 
       {/* The admin sees table with all schools, the headmaster - table with all classes in their school, parent/student only for one student, teacher is the only one who needs to select the class to then get to the table with students in it. Same for grades, absences and complaints */}
-      <Route 
+      <Route
         path='/select/class/grades'
         element={
-          <ProtectedRoute roles={["ADMIN", "TEACHER"]}>
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
             <SelectClassForGradesView />
           </ProtectedRoute>
         }
       />
 
-      <Route 
+      <Route
         path='/select/class/absences'
         element={
-          <ProtectedRoute roles={["ADMIN", "TEACHER"]}>
+          <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
             <SelectClassForAbsencesView />
           </ProtectedRoute>
         }

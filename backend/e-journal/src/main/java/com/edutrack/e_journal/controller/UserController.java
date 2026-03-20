@@ -50,6 +50,22 @@ public class UserController {
                 .toList();
     }
 
+    @GetMapping("/students/school/{schoolId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public List<UserDto> getStudentsBySchool(@PathVariable Long schoolId) {
+        return studentRepository.findAllBySchool_Id(schoolId).stream()
+                .map(s -> toDto(s.getUser()))
+                .toList();
+    }
+
+    @GetMapping("/parents/school/{schoolId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public List<UserDto> getParentsBySchool(@PathVariable Long schoolId) {
+        return userRepository.findAllByChildren_School_Id(schoolId).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
     @GetMapping("/headmasters")
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserSummaryDto> getHeadmasters() {

@@ -14,4 +14,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     boolean existsByEmail(String email);
 
     List<User> findAllByRole_Name(RoleEnum role);
+
+    List<User> findAllByChildren_School_Id(Long schoolId);
 }

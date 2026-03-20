@@ -98,8 +98,10 @@ const Sidebar = () => {
         ],
         HEADMASTER : [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
-            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedules"},
+            {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedule"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/select/class/grades"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/select/class/absences"},
             {key: "teachers", label: t('nav.teachers'), icon: <Teacher />, to: "/headmaster/viewTeachers"},
             {key: "parents", label: t('nav.parents'), icon: <ParentIcon />, to: "/headmaster/viewParents"},
             {key: "students", label: t('nav.students'), icon: <StudentIcon />, to: "/headmaster/viewStudents"},
@@ -119,8 +121,8 @@ const Sidebar = () => {
         PARENT: [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
             {key: "schedule", label: t('nav.schedule'), icon: <ScheduleIcon />, to: "/schedule/:classId"},
-            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:studentId"},
-            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:studentId"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/me"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/me"},
             {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:studentId"},
             {
                 key: "viewStudent",
@@ -139,8 +141,8 @@ const Sidebar = () => {
         STUDENT: [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
             {key: "schedule", label: t('nav.schedule'), icon: <ScheduleIcon />, to: "/schedule/:classId"},
-            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/:studentId"},
-            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/:studentId"},
+            {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/grades/me"},
+            {key: "absences", label: t('nav.absences'), icon: <AbsenceIcon />, to: "/absences/me"},
             {key: "complaints", label: t('nav.complaints'), icon: <ComplaintIcon />, to: "/complaints/:studentId"},
             {key: "profile", label: t('nav.profile'), icon: <ProfileIcon />, to: "/profile"},
             {key: "logout", label: t('nav.logout'), icon: <Logout />, to: "/login"}

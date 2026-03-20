@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
+import useAuth from '../../hooks/useAuth';
 
 const emptyForm = { name: '' };
 
@@ -33,6 +34,8 @@ function SubjectFormFields({ form, setForm, t }) {
 
 function ViewSubjects() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canEdit = user?.role === 'ADMIN';
 
   const [subjects, setSubjects]     = useState([]);
   const [loading, setLoading]       = useState(true);
@@ -109,9 +112,11 @@ function ViewSubjects() {
       <Box sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h5">{t('subjects.title')}</Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
-            {t('subjects.addSubject')}
-          </Button>
+          {canEdit && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
+              {t('subjects.addSubject')}
+            </Button>
+          )}
         </Box>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -127,29 +132,31 @@ function ViewSubjects() {
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>{t('subjects.name')}</TableCell>
-                  <TableCell align="center">{t('subjects.actions')}</TableCell>
+                  {canEdit && <TableCell align="center">{t('subjects.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {subjects.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center">{t('subjects.noSubjects')}</TableCell>
+                    <TableCell colSpan={canEdit ? 3 : 2} align="center">{t('subjects.noSubjects')}</TableCell>
                   </TableRow>
                 ) : (
                   subjects.map(subject => (
                     <TableRow
                       key={subject.id}
                       hover
-                      onClick={() => handleRowClick(subject)}
-                      sx={{ cursor: 'pointer' }}
+                      onClick={() => canEdit && handleRowClick(subject)}
+                      sx={{ cursor: canEdit ? 'pointer' : 'default' }}
                     >
                       <TableCell>{subject.id}</TableCell>
                       <TableCell>{subject.name}</TableCell>
-                      <TableCell align="center">
-                        <IconButton onClick={e => { e.stopPropagation(); setConfirmId(subject.id); setConfirmName(subject.name); }}>
-                          <DeleteIcon sx={{ color: 'red' }} />
-                        </IconButton>
-                      </TableCell>
+                      {canEdit && (
+                        <TableCell align="center">
+                          <IconButton onClick={e => { e.stopPropagation(); setConfirmId(subject.id); setConfirmName(subject.name); }}>
+                            <DeleteIcon sx={{ color: 'red' }} />
+                          </IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

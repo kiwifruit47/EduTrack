@@ -2,7 +2,12 @@ package com.edutrack.e_journal.controller;
 
 import com.edutrack.e_journal.dto.ChangePasswordRequest;
 import com.edutrack.e_journal.dto.UserDto;
+import com.edutrack.e_journal.entity.RoleEnum;
+import com.edutrack.e_journal.entity.School;
 import com.edutrack.e_journal.entity.User;
+import com.edutrack.e_journal.repository.SchoolRepository;
+import com.edutrack.e_journal.repository.StudentRepository;
+import com.edutrack.e_journal.repository.TeacherRepository;
 import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +29,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private final UserRepository  userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository    userRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final SchoolRepository  schoolRepository;
+    private final PasswordEncoder   passwordEncoder;
 
     @GetMapping
     public ResponseEntity<UserDto> getProfile(@AuthenticationPrincipal UserDetails principal) {
@@ -78,7 +86,29 @@ public class ProfileController {
     }
 
     private UserDto toDto(User u) {
+        Long schoolId = null;
+        String schoolName = null;
+        RoleEnum role = u.getRole().getName();
+        if (role == RoleEnum.TEACHER) {
+            var t = teacherRepository.findById(u.getId()).orElse(null);
+            if (t != null && t.getSchool() != null) {
+                schoolId   = t.getSchool().getId();
+                schoolName = t.getSchool().getName();
+            }
+        } else if (role == RoleEnum.STUDENT) {
+            var s = studentRepository.findById(u.getId()).orElse(null);
+            if (s != null && s.getSchool() != null) {
+                schoolId   = s.getSchool().getId();
+                schoolName = s.getSchool().getName();
+            }
+        } else if (role == RoleEnum.HEADMASTER) {
+            School school = schoolRepository.findByDirector_Id(u.getId()).orElse(null);
+            if (school != null) {
+                schoolId   = school.getId();
+                schoolName = school.getName();
+            }
+        }
         return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),
-                u.getRole().getName().name(), null, null);
+                role.name(), schoolId, schoolName);
     }
 }

@@ -52,6 +52,9 @@
   },
   "selectClass": {
     "title": "Select a Class",
+    "titleGrades": "Select a Class — Grades",
+    "titleAbsences": "Select a Class — Absences",
+    "titleComplaints": "Select a Class — Complaints",
     "fetchError": "Failed to load classes."
   },
   "profile": {
@@ -144,6 +147,43 @@
     "deleteError": "Failed to delete subject.",
     "deleteConfirmTitle": "Delete Subject",
     "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+  },
+  "grades": {
+    "title": "Grades",
+    "student": "Student",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "term": "Term",
+    "value": "Grade",
+    "date": "Date",
+    "average": "Average",
+    "all": "All",
+    "addGrade": "Add Grade",
+    "gradeValue": "Grade Value",
+    "noGrades": "No grades found.",
+    "fetchError": "Failed to load grades.",
+    "createError": "Failed to add grade.",
+    "deleteError": "Failed to delete grade."
+  },
+  "absences": {
+    "title": "Absences",
+    "student": "Student",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "term": "Term",
+    "date": "Date",
+    "excused": "Excused",
+    "unexcused": "Unexcused",
+    "excuse": "Mark as excused",
+    "unexcuse": "Mark as unexcused",
+    "total": "Total",
+    "excusedCount": "Excused",
+    "unexcusedCount": "Unexcused",
+    "addAbsence": "Add Absence",
+    "noAbsences": "No absences found.",
+    "fetchError": "Failed to load absences.",
+    "createError": "Failed to add absence.",
+    "deleteError": "Failed to delete absence."
   },
   "welcome": {
     "ADMIN": "Welcome, Admin, {{name}}!",

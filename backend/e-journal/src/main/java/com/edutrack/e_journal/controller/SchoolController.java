@@ -43,6 +43,14 @@ public class SchoolController {
         return schoolRepository.findAll().stream().map(this::toDto).toList();
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
+    public SchoolDto getById(@PathVariable Long id) {
+        return schoolRepository.findById(id)
+                .map(this::toDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolDto> create(@Valid @RequestBody SchoolRequest req) {
