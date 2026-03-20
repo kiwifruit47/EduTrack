@@ -72,21 +72,37 @@ function Profile() {
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-              {/* Clickable avatar */}
-              <Box
-                sx={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }}
-                onClick={() => fileInputRef.current.click()}
-                title={t('profile.uploadPicture')}
-              >
-                <UserAvatar userId={user?.id} name={user?.name} size={72} refreshToken={avatarVersion} />
-                <Box sx={{
-                  position: 'absolute', bottom: 0, right: 0,
-                  bgcolor: 'primary.main', borderRadius: '50%',
-                  width: 22, height: 22,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <CameraAltIcon sx={{ fontSize: 13, color: 'white' }} />
+              {/* Clickable avatar + delete */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                <Box
+                  sx={{ position: 'relative', cursor: 'pointer' }}
+                  onClick={() => fileInputRef.current.click()}
+                  title={t('profile.uploadPicture')}
+                >
+                  <UserAvatar userId={user?.id} name={user?.name} size={72} refreshToken={avatarVersion} />
+                  <Box sx={{
+                    position: 'absolute', bottom: 0, right: 0,
+                    bgcolor: 'primary.main', borderRadius: '50%',
+                    width: 22, height: 22,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <CameraAltIcon sx={{ fontSize: 13, color: 'white' }} />
+                  </Box>
                 </Box>
+                <Button
+                  size="small"
+                  color="error"
+                  variant="outlined"
+                  sx={{ fontSize: 11 }}
+                  onClick={() => {
+                    setPictureError(null);
+                    api.delete('/api/profile/picture')
+                      .then(() => setAvatarVersion(v => v + 1))
+                      .catch(() => setPictureError(t('profile.pictureError')));
+                  }}
+                >
+                  {t('profile.deletePicture')}
+                </Button>
               </Box>
 
               <Box>

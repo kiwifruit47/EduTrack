@@ -61,6 +61,15 @@ public class ProfileController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/picture")
+    public ResponseEntity<Void> deletePicture(@AuthenticationPrincipal UserDetails principal) {
+        User user = resolveUser(principal);
+        user.setProfilePicture(null);
+        user.setProfilePictureType(null);
+        userRepository.save(user);
+        return ResponseEntity.noContent().build();
+    }
+
     // -------------------------------------------------------------------------
 
     private User resolveUser(UserDetails principal) {

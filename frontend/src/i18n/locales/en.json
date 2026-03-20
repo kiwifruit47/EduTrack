@@ -64,6 +64,7 @@
     "changeError": "Failed to change password.",
     "passwordMismatch": "New passwords do not match.",
     "uploadPicture": "Upload Picture",
+    "deletePicture": "Delete Picture",
     "pictureError": "Failed to upload picture.",
     "pictureTooLarge": "Image must be under 2 MB."
   },

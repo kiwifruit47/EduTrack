@@ -64,6 +64,7 @@
     "changeError": "Грешка при смяна на паролата.",
     "passwordMismatch": "Новите пароли не съвпадат.",
     "uploadPicture": "Качи снимка",
+    "deletePicture": "Изтрий снимка",
     "pictureError": "Грешка при качване на снимка.",
     "pictureTooLarge": "Снимката трябва да е под 2 МБ."
   },
