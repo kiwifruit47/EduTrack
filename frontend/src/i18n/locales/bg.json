@@ -98,6 +98,14 @@
     "profiles": "Профили",
     "noProfiles": "Няма профили.",
     "addProfile": "Добави профил",
+    "dailySchedule": "Дневен график",
+    "addScheduleEntry": "Добави запис",
+    "noScheduleEntries": "Няма записи в графика.",
+    "entryType": "Вид",
+    "entryLabel": "Наименование",
+    "startTime": "Начален час",
+    "endTime": "Краен час",
+    "eventDate": "Дата",
     "actions": "Действия",
     "addSchool": "Добави училище",
     "noSchools": "Няма намерени училища.",
@@ -109,6 +117,11 @@
     "updateError": "Грешка при обновяване на училище.",
     "deleteConfirmTitle": "Изтриване на училище",
     "deleteConfirmMessage": "Сигурни ли сте, че искате да изтриете \"{{name}}\"? Това действие е необратимо."
+  },
+  "entryTypes": {
+    "LECTURE": "Час",
+    "BREAK": "Почивка",
+    "SPECIAL_EVENT": "Специално събитие"
   },
   "schoolTypes": {
     "GENERAL": "Общообразователно",

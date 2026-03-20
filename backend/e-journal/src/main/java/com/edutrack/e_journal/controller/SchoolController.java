@@ -2,9 +2,12 @@ package com.edutrack.e_journal.controller;
 
 import com.edutrack.e_journal.dto.SchoolDto;
 import com.edutrack.e_journal.dto.SchoolRequest;
+import com.edutrack.e_journal.dto.SchoolScheduleEntryDto;
+import com.edutrack.e_journal.dto.SchoolScheduleEntryRequest;
 import com.edutrack.e_journal.entity.*;
 import com.edutrack.e_journal.repository.SchoolProfileRepository;
 import com.edutrack.e_journal.repository.SchoolRepository;
+import com.edutrack.e_journal.repository.SchoolScheduleEntryRepository;
 import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +21,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -25,9 +30,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SchoolController {
 
-    private final SchoolRepository        schoolRepository;
-    private final UserRepository          userRepository;
-    private final SchoolProfileRepository profileRepository;
+    private final SchoolRepository             schoolRepository;
+    private final UserRepository               userRepository;
+    private final SchoolProfileRepository      profileRepository;
+    private final SchoolScheduleEntryRepository scheduleEntryRepository;
 
     // ── Schools ──────────────────────────────────────────────────────────────
 
@@ -109,6 +115,69 @@ public class SchoolController {
         return ResponseEntity.noContent().build();
     }
 
+    // ── Schedule ──────────────────────────────────────────────────────────────
+
+    @GetMapping("/{schoolId}/schedule")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
+    public List<SchoolScheduleEntryDto> getSchedule(@PathVariable Long schoolId) {
+        return scheduleEntryRepository.findAllBySchool_IdOrderBySortOrder(schoolId).stream()
+                .map(this::toScheduleDto)
+                .toList();
+    }
+
+    @PostMapping("/{schoolId}/schedule")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SchoolScheduleEntryDto> addScheduleEntry(
+            @PathVariable Long schoolId,
+            @Valid @RequestBody SchoolScheduleEntryRequest req) {
+
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+
+        int nextOrder = scheduleEntryRepository.findAllBySchool_IdOrderBySortOrder(schoolId).size();
+
+        SchoolScheduleEntry entry = SchoolScheduleEntry.builder()
+                .school(school)
+                .type(resolveEntryType(req.getType()))
+                .label(req.getLabel())
+                .startTime(LocalTime.parse(req.getStartTime()))
+                .endTime(LocalTime.parse(req.getEndTime()))
+                .eventDate(parseDate(req.getEventDate()))
+                .sortOrder(req.getSortOrder() != null ? req.getSortOrder() : nextOrder)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(toScheduleDto(scheduleEntryRepository.save(entry)));
+    }
+
+    @PutMapping("/schedule/{entryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SchoolScheduleEntryDto> updateScheduleEntry(
+            @PathVariable Long entryId,
+            @Valid @RequestBody SchoolScheduleEntryRequest req) {
+
+        SchoolScheduleEntry entry = scheduleEntryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
+
+        entry.setType(resolveEntryType(req.getType()));
+        entry.setLabel(req.getLabel());
+        entry.setStartTime(LocalTime.parse(req.getStartTime()));
+        entry.setEndTime(LocalTime.parse(req.getEndTime()));
+        entry.setEventDate(parseDate(req.getEventDate()));
+        if (req.getSortOrder() != null) entry.setSortOrder(req.getSortOrder());
+
+        return ResponseEntity.ok(toScheduleDto(scheduleEntryRepository.save(entry)));
+    }
+
+    @DeleteMapping("/schedule/{entryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteScheduleEntry(@PathVariable Long entryId) {
+        if (!scheduleEntryRepository.existsById(entryId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found");
+        }
+        scheduleEntryRepository.deleteById(entryId);
+        return ResponseEntity.noContent().build();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private SchoolType resolveType(String type) {
@@ -118,6 +187,18 @@ public class SchoolController {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid school type: " + type);
         }
+    }
+
+    private ScheduleEntryType resolveEntryType(String type) {
+        try {
+            return ScheduleEntryType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid entry type: " + type);
+        }
+    }
+
+    private LocalDate parseDate(String date) {
+        return (date != null && !date.isBlank()) ? LocalDate.parse(date) : null;
     }
 
     private User resolveHeadmaster(Long id) {
@@ -135,6 +216,18 @@ public class SchoolController {
                 .map(p -> new SchoolDto.ProfileDto(p.getId(), p.getName()))
                 .toList();
         return new SchoolDto(s.getId(), s.getName(), s.getAddress(), type, headmasterName, profiles);
+    }
+
+    private SchoolScheduleEntryDto toScheduleDto(SchoolScheduleEntry e) {
+        return new SchoolScheduleEntryDto(
+                e.getId(),
+                e.getType().name(),
+                e.getLabel(),
+                e.getStartTime().toString(),
+                e.getEndTime().toString(),
+                e.getEventDate() != null ? e.getEventDate().toString() : null,
+                e.getSortOrder()
+        );
     }
 
     // ── Inline request DTO ───────────────────────────────────────────────────

@@ -98,6 +98,14 @@
     "profiles": "Profiles",
     "noProfiles": "No profiles yet.",
     "addProfile": "Add profile",
+    "dailySchedule": "Daily Schedule",
+    "addScheduleEntry": "Add Entry",
+    "noScheduleEntries": "No schedule entries yet.",
+    "entryType": "Type",
+    "entryLabel": "Label",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "eventDate": "Date",
     "actions": "Actions",
     "addSchool": "Add School",
     "noSchools": "No schools found.",
@@ -109,6 +117,11 @@
     "updateError": "Failed to update school.",
     "deleteConfirmTitle": "Delete School",
     "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+  },
+  "entryTypes": {
+    "LECTURE": "Lecture",
+    "BREAK": "Break",
+    "SPECIAL_EVENT": "Special Event"
   },
   "schoolTypes": {
     "GENERAL": "General",
