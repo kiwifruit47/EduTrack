@@ -37,6 +37,7 @@ INSERT INTO Roles (Id, Name) VALUES
 -- 2. USERS
 -- BCrypt(password) = $2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu
 -- -------------------------------------------------------------
+-- All demo users share the password: password
 INSERT INTO Users (Id, Email, PasswordHash, FirstName, LastName, RoleId) VALUES
     -- Admin
     (1,  'agenta007@edutrack.bg',          '$2a$10$xh6NdTDAHBbT5c3CoQ.DQevUFcnMgxsYFxBFluURaaxPDCZrxoZlu', 'Стати',     'Косев',    1),
