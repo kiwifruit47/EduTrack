@@ -289,7 +289,7 @@ function AppRouter() {
       />
       
       <Route
-        path='/complaints/:schoolId'
+        path='/complaints/school/:schoolId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <SchoolComplaints />
@@ -297,9 +297,8 @@ function AppRouter() {
         }
       />
 
-      {/* teachers can view only for classes they teach */}
       <Route
-        path='/complaints/:classId'
+        path='/complaints/class/:classId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER"]}>
             <ClassComplaints />
@@ -308,7 +307,7 @@ function AppRouter() {
       />
 
       <Route
-        path='/complaints/:studentId'
+        path='/complaints/student/:studentId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER", "TEACHER", "PARENT", "STUDENT"]}>
             <StudentComplaints />
