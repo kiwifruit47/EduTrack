@@ -208,9 +208,9 @@ function AppRouter() {
         }
       />
 
-      {/* Statistics route */}
+      {/* Statistics routes */}
       <Route
-        path='/statistics/:subjectId'
+        path='/statistics/subject/:subjectId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <SubjectStatistics/>
@@ -219,7 +219,7 @@ function AppRouter() {
       />
 
       <Route
-        path='/statistics/:teacherId'
+        path='/statistics/teacher/:teacherId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <TeacherStatistics/>
@@ -228,13 +228,13 @@ function AppRouter() {
       />
 
       <Route
-        path='/statistics/:schoolId'
+        path='/statistics/school/:schoolId'
         element={
           <ProtectedRoute roles={["ADMIN", "HEADMASTER"]}>
             <SchoolStatistics/>
           </ProtectedRoute>
         }
-      />    
+      />
 
       {/* Absences routes */}
       <Route

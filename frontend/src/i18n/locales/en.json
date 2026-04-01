@@ -57,6 +57,12 @@
     "titleComplaints": "Select a Class — Complaints",
     "fetchError": "Failed to load classes."
   },
+  "selectSchool": {
+    "title": "Select a School — Statistics",
+    "noSchools": "No schools found.",
+    "noHeadmaster": "No headmaster",
+    "fetchError": "Failed to load schools."
+  },
   "profile": {
     "title": "My Profile",
     "changePassword": "Change Password",
