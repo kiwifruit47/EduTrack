@@ -3,6 +3,7 @@
 -- =============================================================
 
 -- Drop in reverse dependency order
+DROP TABLE IF EXISTS school_schedule_entries CASCADE;
 DROP TABLE IF EXISTS Absences            CASCADE;
 DROP TABLE IF EXISTS Grades              CASCADE;
 DROP TABLE IF EXISTS Schedules           CASCADE;
@@ -151,4 +152,19 @@ CREATE TABLE Absences (
     IsExcused  BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (StudentId)  REFERENCES Students(UserId)  ON DELETE CASCADE,
     FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id)     ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 13. School_Schedule_Entries  (daily timetable + special events)
+-- -------------------------------------------------------------
+CREATE TABLE school_schedule_entries (
+    id         SERIAL PRIMARY KEY,
+    schoolid   INT          NOT NULL,
+    type       VARCHAR(20)  NOT NULL CHECK (type IN ('LECTURE', 'BREAK', 'SPECIAL_EVENT')),
+    label      VARCHAR(100) NOT NULL,
+    start_time TIME         NOT NULL,
+    end_time   TIME         NOT NULL,
+    event_date DATE,                  -- only for SPECIAL_EVENT
+    sort_order INT          NOT NULL DEFAULT 0,
+    FOREIGN KEY (schoolid) REFERENCES Schools(Id) ON DELETE CASCADE
 );

@@ -1,6 +1,6 @@
 -- 0. Изчистване на старата база данни
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS Absences, Grades, Schedules, Teacher_Qualifications, Subjects, Parent_Student, Students, Teachers, Classes, Schools, Users, Roles;
+DROP TABLE IF EXISTS school_schedule_entries, Absences, Grades, Schedules, Teacher_Qualifications, Subjects, Parent_Student, Students, Teachers, Classes, Schools, Users, Roles;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Потребители и Роли
@@ -107,4 +107,17 @@ CREATE TABLE Absences (
                           IsExcused BOOLEAN DEFAULT FALSE,
                           FOREIGN KEY (StudentId) REFERENCES Students(UserId) ON DELETE CASCADE,
                           FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id) ON DELETE CASCADE
+);
+
+-- 6. Дневен график и специални събития
+CREATE TABLE school_schedule_entries (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    schoolid   INT          NOT NULL,
+    type       VARCHAR(20)  NOT NULL CHECK (type IN ('LECTURE', 'BREAK', 'SPECIAL_EVENT')),
+    label      VARCHAR(100) NOT NULL,
+    start_time TIME         NOT NULL,
+    end_time   TIME         NOT NULL,
+    event_date DATE,
+    sort_order INT          NOT NULL DEFAULT 0,
+    FOREIGN KEY (schoolid) REFERENCES Schools(Id) ON DELETE CASCADE
 );
