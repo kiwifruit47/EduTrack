@@ -35,7 +35,7 @@ public class Grade {
 
     @NotNull
     @DecimalMin("2.00") @DecimalMax("6.00")
-    @Column(nullable = false, columnDefinition = "DECIMAL(3,2) CHECK (value >= 2 AND value <= 6)")
+    @Column(nullable = false, columnDefinition = "DECIMAL(3,2) CHECK (value IN (2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6))")
     private BigDecimal value;
 
     @CreationTimestamp

@@ -20,12 +20,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/grades")
 @RequiredArgsConstructor
 public class GradeController {
+
+    private static final Set<BigDecimal> VALID_VALUES = Set.of(
+        new BigDecimal("2.0"), new BigDecimal("2.5"),
+        new BigDecimal("3.0"), new BigDecimal("3.5"),
+        new BigDecimal("4.0"), new BigDecimal("4.5"),
+        new BigDecimal("5.0"), new BigDecimal("5.5"),
+        new BigDecimal("6.0")
+    );
 
     private final GradeRepository    gradeRepository;
     private final StudentRepository  studentRepository;
@@ -57,6 +67,9 @@ public class GradeController {
     @PostMapping
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<GradeDto> create(@Valid @RequestBody GradeRequest req) {
+        if (!VALID_VALUES.contains(req.getValue().setScale(1)))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Grade must be one of: 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6");
         Student student = studentRepository.findById(req.getStudentId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student not found"));
         Schedule schedule = scheduleRepository.findById(req.getScheduleId())

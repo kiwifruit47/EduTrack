@@ -139,7 +139,7 @@ CREATE TABLE Grades (
     Id         SERIAL PRIMARY KEY,
     StudentId  INT            NOT NULL,
     ScheduleId INT            NOT NULL,
-    Value      DECIMAL(3, 2)  NOT NULL CHECK (Value >= 2 AND Value <= 6),
+    Value      DECIMAL(3, 2)  NOT NULL CHECK (Value IN (2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6)),
     CreatedAt  TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (StudentId)  REFERENCES Students(UserId)  ON DELETE CASCADE,
     FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id)     ON DELETE CASCADE

@@ -155,11 +155,12 @@ function ClassGrades() {
       .catch(() => setError(t('grades.deleteError')));
   };
 
+  const VALID_GRADES = ['2', '2.5', '3', '3.5', '4', '4.5', '5', '5.5', '6'];
+
   const isAddValid =
     addForm.studentId &&
     resolvedScheduleId &&
-    parseFloat(addForm.value) >= 2 &&
-    parseFloat(addForm.value) <= 6;
+    VALID_GRADES.includes(addForm.value);
 
   const colSpan = subjectColumns.length + (canEdit ? 3 : 2);
 
@@ -330,15 +331,33 @@ function ClassGrades() {
             </Select>
           </FormControl>
 
-          <TextField
-            label={t('grades.gradeValue')}
-            type="number"
-            inputProps={{ min: 2, max: 6, step: 0.5 }}
-            value={addForm.value}
-            onChange={e => setAddForm(f => ({ ...f, value: e.target.value }))}
-            fullWidth
-            {...fieldSx}
-          />
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>
+              {t('grades.gradeValue')}
+            </InputLabel>
+            <Select
+              value={addForm.value}
+              onChange={e => setAddForm(f => ({ ...f, value: e.target.value }))}
+              label={t('grades.gradeValue')}
+              sx={{ color: 'black' }}
+            >
+              {[
+                { v: '6',   label: t('grades.excellent') },
+                { v: '5.5', label: null },
+                { v: '5',   label: t('grades.veryGood') },
+                { v: '4.5', label: null },
+                { v: '4',   label: t('grades.good') },
+                { v: '3.5', label: null },
+                { v: '3',   label: t('grades.average') },
+                { v: '2.5', label: null },
+                { v: '2',   label: t('grades.poor') },
+              ].map(({ v, label }) => (
+                <MenuItem key={v} value={v}>
+                  {v}{label ? ` — ${label}` : ''}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddOpen(false)}>{t('common.cancel')}</Button>
