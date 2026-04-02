@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalTime;
+
 /**
  * A Schedule entry binds a Class, Subject, and Teacher together for a given Term.
  * Grades and Absences are recorded against Schedule entries.
@@ -46,4 +48,12 @@ public class Schedule {
     @Min(1) @Max(5)
     @Column(name = "dayofweek", nullable = false)
     private Integer dayOfWeek;
+
+    @NotNull
+    @Column(name = "starttime", nullable = false)
+    private LocalTime startTime;
+
+    @NotNull
+    @Column(name = "endtime", nullable = false)
+    private LocalTime endTime;
 }

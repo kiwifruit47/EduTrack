@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -64,6 +65,8 @@ public class ScheduleController {
                 .teacher(teacher)
                 .term(req.getTerm())
                 .dayOfWeek(req.getDayOfWeek())
+                .startTime(LocalTime.parse(req.getStartTime()))
+                .endTime(LocalTime.parse(req.getEndTime()))
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(scheduleRepository.save(schedule)));
@@ -94,7 +97,9 @@ public class ScheduleController {
                 s.getSchoolClass().getName(),
                 s.getSchool().getName(),
                 s.getTerm(),
-                s.getDayOfWeek()
+                s.getDayOfWeek(),
+                s.getStartTime().toString(),
+                s.getEndTime().toString()
         );
     }
 }

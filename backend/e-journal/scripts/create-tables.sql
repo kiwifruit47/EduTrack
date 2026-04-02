@@ -76,15 +76,18 @@ CREATE TABLE Teacher_Qualifications (
 );
 
 CREATE TABLE Schedules (
-                           Id INT AUTO_INCREMENT PRIMARY KEY,
-                           SchoolId INT NOT NULL,
-                           ClassId INT NOT NULL,
-                           SubjectId INT NOT NULL,
-                           TeacherId INT NOT NULL,
-                           Term INT NOT NULL CHECK (Term IN (1, 2)),
-                           FOREIGN KEY (SchoolId) REFERENCES Schools(Id) ON DELETE CASCADE,
-                           FOREIGN KEY (ClassId) REFERENCES Classes(Id) ON DELETE CASCADE,
-                           FOREIGN KEY (SubjectId) REFERENCES Subjects(Id) ON DELETE CASCADE,
+                           Id        INT  AUTO_INCREMENT PRIMARY KEY,
+                           SchoolId  INT  NOT NULL,
+                           ClassId   INT  NOT NULL,
+                           SubjectId INT  NOT NULL,
+                           TeacherId INT  NOT NULL,
+                           Term      INT  NOT NULL CHECK (Term IN (1, 2)),
+                           DayOfWeek INT  NOT NULL CHECK (DayOfWeek BETWEEN 1 AND 5),
+                           StartTime TIME NOT NULL,
+                           EndTime   TIME NOT NULL,
+                           FOREIGN KEY (SchoolId)  REFERENCES Schools(Id)      ON DELETE CASCADE,
+                           FOREIGN KEY (ClassId)   REFERENCES Classes(Id)      ON DELETE CASCADE,
+                           FOREIGN KEY (SubjectId) REFERENCES Subjects(Id)     ON DELETE CASCADE,
                            FOREIGN KEY (TeacherId) REFERENCES Teachers(UserId) ON DELETE CASCADE
 );
 

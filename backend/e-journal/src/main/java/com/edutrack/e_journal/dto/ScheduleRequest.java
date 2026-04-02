@@ -2,6 +2,7 @@ package com.edutrack.e_journal.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,4 +25,10 @@ public class ScheduleRequest {
 
     @NotNull @Min(1) @Max(5)
     private Integer dayOfWeek;
+
+    @NotBlank
+    private String startTime;  // "HH:mm"
+
+    @NotBlank
+    private String endTime;    // "HH:mm"
 }

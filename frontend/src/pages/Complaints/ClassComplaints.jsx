@@ -249,7 +249,7 @@ function ClassComplaints() {
                 ? <MenuItem value="" disabled>{t('complaints.noSubjectsToday')}</MenuItem>
                 : daySchedules.map(s => (
                     <MenuItem key={s.id} value={s.id}>
-                      {s.subjectName} — {s.teacherName}
+                      {s.startTime} — {s.subjectName} ({s.teacherName})
                     </MenuItem>
                   ))
               }
