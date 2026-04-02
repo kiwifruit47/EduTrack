@@ -69,6 +69,18 @@ public class ProfileController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/bio")
+    public ResponseEntity<UserDto> updateBio(@AuthenticationPrincipal UserDetails principal,
+                                             @RequestBody Map<String, String> body) {
+        User user = resolveUser(principal);
+        String bio = body.getOrDefault("bio", "").strip();
+        if (bio.length() > 500)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bio must be 500 characters or fewer");
+        user.setBio(bio.isEmpty() ? null : bio);
+        userRepository.save(user);
+        return ResponseEntity.ok(toDto(user));
+    }
+
     @DeleteMapping("/picture")
     public ResponseEntity<Void> deletePicture(@AuthenticationPrincipal UserDetails principal) {
         User user = resolveUser(principal);
@@ -109,6 +121,6 @@ public class ProfileController {
             }
         }
         return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),
-                role.name(), schoolId, schoolName);
+                role.name(), schoolId, schoolName, u.getBio());
     }
 }

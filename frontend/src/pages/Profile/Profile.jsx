@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert, Box, Button, Card, CardContent, Divider,
   TextField, Typography,
@@ -23,10 +23,19 @@ function Profile() {
   const [avatarVersion, setAvatarVersion] = useState(0);
   const [pictureError, setPictureError] = useState(null);
 
+  const [bio, setBio]           = useState('');
+  const [bioSaving, setBioSaving] = useState(false);
+  const [bioSuccess, setBioSuccess] = useState(false);
+  const [bioError, setBioError]   = useState(null);
+
   const [form, setForm]       = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [saving, setSaving]   = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError]     = useState(null);
+
+  useEffect(() => {
+    api.get('/api/profile').then(res => setBio(res.data.bio ?? ''));
+  }, []);
 
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
@@ -39,6 +48,16 @@ function Profile() {
     api.put('/api/profile/picture', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
       .then(() => setAvatarVersion(v => v + 1))
       .catch(() => setPictureError(t('profile.pictureError')));
+  };
+
+  const handleBioSave = () => {
+    setBioError(null);
+    setBioSuccess(false);
+    setBioSaving(true);
+    api.put('/api/profile/bio', { bio })
+      .then(() => setBioSuccess(true))
+      .catch(() => setBioError(t('profile.bioError')))
+      .finally(() => setBioSaving(false));
   };
 
   const handleSubmit = () => {
@@ -124,6 +143,35 @@ function Profile() {
           style={{ display: 'none' }}
           onChange={handlePictureChange}
         />
+
+        <Divider sx={{ mb: 3 }} />
+
+        {/* Bio */}
+        <Typography variant="h6" sx={{ mb: 2 }}>{t('profile.bio')}</Typography>
+
+        {bioSuccess && <Alert severity="success" sx={{ mb: 2 }}>{t('profile.bioSaved')}</Alert>}
+        {bioError   && <Alert severity="error"   sx={{ mb: 2 }}>{bioError}</Alert>}
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+          <TextField
+            placeholder={t('profile.bioPlaceholder')}
+            value={bio}
+            onChange={e => { setBio(e.target.value.slice(0, 500)); setBioSuccess(false); }}
+            multiline
+            rows={4}
+            fullWidth
+            helperText={`${bio.length} / 500`}
+            {...fieldSx}
+          />
+          <Button
+            variant="contained"
+            onClick={handleBioSave}
+            disabled={bioSaving}
+            sx={{ alignSelf: 'flex-start' }}
+          >
+            {t('common.save')}
+          </Button>
+        </Box>
 
         <Divider sx={{ mb: 3 }} />
 

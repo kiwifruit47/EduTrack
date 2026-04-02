@@ -16,6 +16,7 @@ CREATE TABLE Users (
                        FirstName VARCHAR(50) NOT NULL,
                        LastName VARCHAR(50) NOT NULL,
                        RoleId INT NOT NULL,
+                       Bio    VARCHAR(500),
                        FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE RESTRICT
 );
 

@@ -51,6 +51,10 @@ public class User {
     @Column(name = "profile_picture_type", length = 50)
     private String profilePictureType;
 
+    @Size(max = 500)
+    @Column(name = "bio", length = 500)
+    private String bio;
+
     /**
      * Populated only for users with role PARENT.
      * Maps the parent_student junction table.
