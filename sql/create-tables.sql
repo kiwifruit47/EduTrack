@@ -4,6 +4,7 @@
 
 -- Drop in reverse dependency order
 DROP TABLE IF EXISTS school_schedule_entries CASCADE;
+DROP TABLE IF EXISTS Complaints          CASCADE;
 DROP TABLE IF EXISTS Absences            CASCADE;
 DROP TABLE IF EXISTS Grades              CASCADE;
 DROP TABLE IF EXISTS Schedules           CASCADE;
@@ -155,7 +156,20 @@ CREATE TABLE Absences (
 );
 
 -- -------------------------------------------------------------
--- 13. School_Schedule_Entries  (daily timetable + special events)
+-- 13. Complaints
+-- -------------------------------------------------------------
+CREATE TABLE Complaints (
+    Id          SERIAL PRIMARY KEY,
+    StudentId   INT          NOT NULL,
+    ScheduleId  INT          NOT NULL,
+    Description VARCHAR(500) NOT NULL,
+    Date        DATE         NOT NULL,
+    FOREIGN KEY (StudentId)  REFERENCES Students(UserId)  ON DELETE CASCADE,
+    FOREIGN KEY (ScheduleId) REFERENCES Schedules(Id)     ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- 14. School_Schedule_Entries  (daily timetable + special events)
 -- -------------------------------------------------------------
 CREATE TABLE school_schedule_entries (
     id         SERIAL PRIMARY KEY,

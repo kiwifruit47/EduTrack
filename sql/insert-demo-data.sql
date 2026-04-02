@@ -210,7 +210,9 @@ INSERT INTO Subjects (Id, Name) VALUES
     (8,  'Английски език'),
     (9,  'Музика'),
     (10, 'Физическо възпитание и спорт'),
-    (11, 'Информационни технологии');
+    (11, 'Информационни технологии'),
+    (12, 'Домашен бит и техника')
+    ;
 
 
 -- -------------------------------------------------------------
@@ -507,7 +509,29 @@ INSERT INTO Absences (StudentId, ScheduleId, Date, IsExcused) VALUES
 
 
 -- -------------------------------------------------------------
--- 13. SCHOOL SCHEDULE ENTRIES  (Id, SchoolId, Type, Label, StartTime, EndTime, EventDate, SortOrder)
+-- 13. COMPLAINTS  (StudentId, ScheduleId, Description, Date)
+-- -------------------------------------------------------------
+INSERT INTO Complaints (StudentId, ScheduleId, Description, Date) VALUES
+    -- Ангел (10А, School 1)
+    (9,  1, 'Смущаване на час по математика.', '2024-10-08'),
+
+    -- Борислава (10А, School 1)
+    (10, 3, 'Неизпълнено домашно по български език.', '2024-10-15'),
+
+    -- Габриела (11Б, School 1)
+    (12, 4, 'Грубо поведение към съученик.', '2024-10-18'),
+    (12, 5, 'Отказ за участие в час.', '2024-10-25'),
+
+    -- Диана (9А, School 2)
+    (13, 7, 'Закъснение и нарушаване на дисциплината.', '2024-10-10'),
+
+    -- Тодор (11А, School 4)
+    (33, 19, 'Употреба на телефон по време на час.', '2024-10-07'),
+    (33, 20, 'Липса на учебни материали.', '2024-10-14');
+
+
+-- -------------------------------------------------------------
+-- 14. SCHOOL SCHEDULE ENTRIES  (Id, SchoolId, Type, Label, StartTime, EndTime, EventDate, SortOrder)
 -- -------------------------------------------------------------
 INSERT INTO school_schedule_entries (id, schoolid, type, label, start_time, end_time, event_date, sort_order) VALUES
 

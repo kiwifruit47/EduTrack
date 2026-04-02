@@ -199,6 +199,21 @@
     "createError": "Failed to add absence.",
     "deleteError": "Failed to delete absence."
   },
+  "complaints": {
+    "title": "Complaints",
+    "student": "Student",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "term": "Term",
+    "date": "Date",
+    "description": "Description",
+    "total": "Total",
+    "addComplaint": "Add Complaint",
+    "noComplaints": "No complaints found.",
+    "fetchError": "Failed to load complaints.",
+    "createError": "Failed to add complaint.",
+    "deleteError": "Failed to delete complaint."
+  },
   "stats": {
     "fetchError": "Failed to load statistics.",
     "noData": "No data for the selected term.",
