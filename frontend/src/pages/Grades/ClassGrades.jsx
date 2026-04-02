@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions,
   DialogContent, DialogTitle, FormControl, IconButton, InputLabel,
@@ -32,17 +32,17 @@ function ClassGrades() {
   const { user } = useAuth();
   const canEdit = ['ADMIN', 'HEADMASTER', 'TEACHER'].includes(user?.role);
 
-  const [classInfo, setClassInfo]   = useState(null);
-  const [grades, setGrades]         = useState([]);
-  const [schedules, setSchedules]   = useState([]);
-  const [students, setStudents]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
-  const [termTab, setTermTab]       = useState(0); // 0=All, 1=Term1, 2=Term2
+  const [classInfo, setClassInfo] = useState(null);
+  const [grades, setGrades]       = useState([]);
+  const [schedules, setSchedules] = useState([]);
+  const [students, setStudents]   = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
+  const [termTab, setTermTab]     = useState(0); // 0=All, 1=Term1, 2=Term2
 
-  const [addOpen, setAddOpen]       = useState(false);
-  const [addForm, setAddForm]       = useState({ studentId: '', scheduleId: '', value: '' });
-  const [saving, setSaving]         = useState(false);
+  const [addOpen, setAddOpen]     = useState(false);
+  const [addForm, setAddForm]     = useState({ studentId: '', subjectId: '', term: '', value: '' });
+  const [saving, setSaving]       = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -62,32 +62,106 @@ function ClassGrades() {
   }, [classId]);
 
   const termFilter = termTab === 0 ? null : termTab;
-  const filtered = termFilter ? grades.filter(g => g.term === termFilter) : grades;
+
+  // Schedules visible under the active term filter
+  const visibleSchedules = useMemo(
+    () => termFilter ? schedules.filter(s => s.term === termFilter) : schedules,
+    [schedules, termFilter]
+  );
+
+  // One column per unique subject in the visible schedules
+  const subjectColumns = useMemo(() => {
+    const seen = new Set();
+    return visibleSchedules.filter(s => {
+      if (seen.has(s.subjectId)) return false;
+      seen.add(s.subjectId);
+      return true;
+    });
+  }, [visibleSchedules]);
+
+  // Grades filtered by active term
+  const filteredGrades = useMemo(
+    () => termFilter ? grades.filter(g => g.term === termFilter) : grades,
+    [grades, termFilter]
+  );
+
+  // gradeMap[studentId][subjectId] = GradeDto[]
+  const gradeMap = useMemo(() => {
+    const m = {};
+    filteredGrades.forEach(g => {
+      if (!m[g.studentId]) m[g.studentId] = {};
+      if (!m[g.studentId][g.subjectId]) m[g.studentId][g.subjectId] = [];
+      m[g.studentId][g.subjectId].push(g);
+    });
+    return m;
+  }, [filteredGrades]);
+
+  // Unique subjects available for this class (for the dialog dropdown)
+  const uniqueSubjects = useMemo(() => {
+    const seen = new Set();
+    return schedules.filter(s => {
+      if (seen.has(s.subjectId)) return false;
+      seen.add(s.subjectId);
+      return true;
+    });
+  }, [schedules]);
+
+  // Resolve the schedule entry that matches the selected subject + term
+  const resolvedScheduleId = useMemo(() => {
+    if (!addForm.subjectId || !addForm.term) return null;
+    const match = schedules.find(
+      s => s.subjectId === Number(addForm.subjectId) && s.term === Number(addForm.term)
+    );
+    return match ? match.id : null;
+  }, [schedules, addForm.subjectId, addForm.term]);
+
+  const termByMonth = () => {
+    const m = new Date().getMonth() + 1; // 1–12
+    if (m >= 9 || m <= 2) return '1';   // Sep–Feb → term 1
+    if (m >= 3 && m <= 6) return '2';   // Mar–Jun → term 2
+    return '';                           // Jul–Aug → summer, leave blank
+  };
+
+  const openAdd = (studentId = '') => {
+    setAddForm({
+      studentId: String(studentId),
+      subjectId: '',
+      term: termTab !== 0 ? String(termTab) : termByMonth(),
+      value: '',
+    });
+    setAddOpen(true);
+  };
 
   const handleAdd = () => {
+    if (!resolvedScheduleId) return;
     setSaving(true);
     api.post('/api/grades', {
-      studentId: Number(addForm.studentId),
-      scheduleId: Number(addForm.scheduleId),
-      value: parseFloat(addForm.value),
+      studentId:  Number(addForm.studentId),
+      scheduleId: resolvedScheduleId,
+      value:      parseFloat(addForm.value),
     })
       .then(res => {
         setGrades(prev => [...prev, res.data]);
         setAddOpen(false);
-        setAddForm({ studentId: '', scheduleId: '', value: '' });
+        setAddForm({ studentId: '', subjectId: '', term: '', value: '' });
       })
       .catch(() => setError(t('grades.createError')))
       .finally(() => setSaving(false));
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = id => {
     api.delete(`/api/grades/${id}`)
       .then(() => setGrades(prev => prev.filter(g => g.id !== id)))
       .catch(() => setError(t('grades.deleteError')));
   };
 
-  const isAddValid = addForm.studentId && addForm.scheduleId
-    && addForm.value >= 2 && addForm.value <= 6;
+  const isAddValid =
+    addForm.studentId &&
+    resolvedScheduleId &&
+    parseFloat(addForm.value) >= 2 &&
+    parseFloat(addForm.value) <= 6;
+
+  const colSpan = subjectColumns.length + (canEdit ? 3 : 2);
 
   return (
     <Layout>
@@ -96,15 +170,14 @@ function ClassGrades() {
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
         ) : (
           <>
+            {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
               <Box>
-                <Typography variant="h5">
-                  {t('grades.title')} — {classInfo?.name}
-                </Typography>
+                <Typography variant="h5">{t('grades.title')} — {classInfo?.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{classInfo?.schoolName}</Typography>
               </Box>
               {canEdit && (
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => openAdd()}>
                   {t('grades.addGrade')}
                 </Button>
               )}
@@ -118,44 +191,83 @@ function ClassGrades() {
               <Tab label={t('schedule.term2')} />
             </Tabs>
 
+            {/* Journal table: rows = students, columns = subjects */}
             <TableContainer component={Paper}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t('grades.student')}</TableCell>
-                    <TableCell>{t('grades.subject')}</TableCell>
-                    <TableCell>{t('grades.teacher')}</TableCell>
-                    <TableCell>{t('grades.term')}</TableCell>
-                    <TableCell>{t('grades.value')}</TableCell>
-                    <TableCell>{t('grades.date')}</TableCell>
-                    {canEdit && <TableCell align="center">{t('schools.actions')}</TableCell>}
+                    <TableCell sx={{ fontWeight: 700, minWidth: 150 }}>{t('grades.student')}</TableCell>
+                    {subjectColumns.map(s => (
+                      <TableCell key={s.subjectId} sx={{ fontWeight: 700 }}>
+                        {s.subjectName}
+                      </TableCell>
+                    ))}
+                    <TableCell sx={{ fontWeight: 700, minWidth: 90 }}>{t('grades.average')}</TableCell>
+                    {canEdit && <TableCell sx={{ width: 48 }} />}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filtered.length === 0 ? (
+                  {students.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={canEdit ? 7 : 6} align="center">{t('grades.noGrades')}</TableCell>
+                      <TableCell colSpan={colSpan} align="center">{t('grades.noGrades')}</TableCell>
                     </TableRow>
                   ) : (
-                    filtered.map(g => (
-                      <TableRow key={g.id} hover>
-                        <TableCell>{g.studentName}</TableCell>
-                        <TableCell>{g.subjectName}</TableCell>
-                        <TableCell>{g.teacherName}</TableCell>
-                        <TableCell>{g.term}</TableCell>
-                        <TableCell>
-                          <Chip label={g.value} size="small" color={GRADE_COLOR(g.value)} />
-                        </TableCell>
-                        <TableCell>{g.createdAt?.slice(0, 10)}</TableCell>
-                        {canEdit && (
-                          <TableCell align="center">
-                            <IconButton size="small" onClick={() => handleDelete(g.id)}>
-                              <DeleteIcon fontSize="small" sx={{ color: 'red' }} />
-                            </IconButton>
+                    students.map(student => {
+                      const sg = filteredGrades.filter(g => g.studentId === student.id);
+                      const avg = sg.length
+                        ? (sg.reduce((acc, g) => acc + parseFloat(g.value), 0) / sg.length).toFixed(2)
+                        : null;
+
+                      return (
+                        <TableRow key={student.id} hover>
+                          <TableCell sx={{ fontWeight: 500 }}>{student.name}</TableCell>
+
+                          {subjectColumns.map(subj => {
+                            const cellGrades = gradeMap[student.id]?.[subj.subjectId] ?? [];
+                            return (
+                              <TableCell key={subj.subjectId}>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {cellGrades.map(g => (
+                                    <Chip
+                                      key={g.id}
+                                      label={g.value}
+                                      size="small"
+                                      color={GRADE_COLOR(g.value)}
+                                      onDelete={canEdit ? () => handleDelete(g.id) : undefined}
+                                      deleteIcon={<DeleteIcon />}
+                                    />
+                                  ))}
+                                </Box>
+                              </TableCell>
+                            );
+                          })}
+
+                          <TableCell>
+                            {avg && (
+                              <Chip
+                                label={avg}
+                                size="small"
+                                color={GRADE_COLOR(avg)}
+                                variant="outlined"
+                              />
+                            )}
                           </TableCell>
-                        )}
-                      </TableRow>
-                    ))
+
+                          {canEdit && (
+                            <TableCell align="right">
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                title={t('grades.addGrade')}
+                                onClick={() => openAdd(student.id)}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -164,34 +276,68 @@ function ClassGrades() {
         )}
       </Box>
 
+      {/* Add-grade dialog */}
       <Dialog open={addOpen} onClose={() => setAddOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{t('grades.addGrade')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+
           <FormControl fullWidth>
-            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>{t('grades.student')}</InputLabel>
-            <Select value={addForm.studentId} onChange={e => setAddForm(f => ({ ...f, studentId: e.target.value }))}
-              label={t('grades.student')} sx={{ color: 'black' }}>
-              {students.map(s => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)}
+            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>
+              {t('grades.student')}
+            </InputLabel>
+            <Select
+              value={addForm.studentId}
+              onChange={e => setAddForm(f => ({ ...f, studentId: e.target.value }))}
+              label={t('grades.student')}
+              sx={{ color: 'black' }}
+            >
+              {students.map(s => (
+                <MenuItem key={s.id} value={String(s.id)}>{s.name}</MenuItem>
+              ))}
             </Select>
           </FormControl>
+
           <FormControl fullWidth>
-            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>{t('grades.subject')}</InputLabel>
-            <Select value={addForm.scheduleId} onChange={e => setAddForm(f => ({ ...f, scheduleId: e.target.value }))}
-              label={t('grades.subject')} sx={{ color: 'black' }}>
-              {schedules.map(s => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.subjectName} — {t('schedule.term')} {s.term}
+            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>
+              {t('grades.subject')}
+            </InputLabel>
+            <Select
+              value={addForm.subjectId}
+              onChange={e => setAddForm(f => ({ ...f, subjectId: e.target.value }))}
+              label={t('grades.subject')}
+              sx={{ color: 'black' }}
+            >
+              {uniqueSubjects.map(s => (
+                <MenuItem key={s.subjectId} value={String(s.subjectId)}>
+                  {s.subjectName}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>
+              {t('schedule.term')}
+            </InputLabel>
+            <Select
+              value={addForm.term}
+              onChange={e => setAddForm(f => ({ ...f, term: e.target.value }))}
+              label={t('schedule.term')}
+              sx={{ color: 'black' }}
+            >
+              <MenuItem value="1">{t('schedule.term1')}</MenuItem>
+              <MenuItem value="2">{t('schedule.term2')}</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             label={t('grades.gradeValue')}
             type="number"
             inputProps={{ min: 2, max: 6, step: 0.5 }}
             value={addForm.value}
             onChange={e => setAddForm(f => ({ ...f, value: e.target.value }))}
-            fullWidth {...fieldSx}
+            fullWidth
+            {...fieldSx}
           />
         </DialogContent>
         <DialogActions>
