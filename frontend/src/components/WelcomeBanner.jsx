@@ -115,7 +115,7 @@ function WelcomeBanner() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {user?.email}
           </Typography>
-          <Chip label={user?.role} color={ROLE_CHIP_COLOR[user?.role] ?? 'default'} size="small" />
+          <Chip label={t(`roles.${user?.role}`)} color={ROLE_CHIP_COLOR[user?.role] ?? 'default'} size="small" />
         </Box>
       </Paper>
 

@@ -97,6 +97,14 @@
     "filterBySchool": "Filter by School",
     "allSchools": "All Schools"
   },
+  "roles": {
+    "ALL":        "All",
+    "ADMIN":      "Admin",
+    "HEADMASTER": "Headmaster",
+    "TEACHER":    "Teacher",
+    "STUDENT":    "Student",
+    "PARENT":     "Parent"
+  },
   "schools": {
     "title": "Schools",
     "name": "Name",

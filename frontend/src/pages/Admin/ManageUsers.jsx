@@ -69,7 +69,7 @@ function UserFormFields({ form, setForm, t, isEdit }) {
           label={t('users.role')}
           sx={{ color: 'black' }}
         >
-          {ROLES.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+          {ROLES.map(r => <MenuItem key={r} value={r}>{t(`roles.${r}`)}</MenuItem>)}
         </Select>
       </FormControl>
     </>
@@ -193,7 +193,7 @@ function ManageUsers() {
             {['ALL', ...ROLES].map(r => (
               <Chip
                 key={r}
-                label={r}
+                label={t(`roles.${r}`)}
                 color={roleFilter === r ? 'primary' : 'default'}
                 onClick={() => setRoleFilter(r)}
                 clickable
@@ -264,7 +264,7 @@ function ManageUsers() {
                       <TableCell>{user.lastName}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        <Chip label={user.role} color={ROLE_COLORS[user.role] || 'default'} size="small" />
+                        <Chip label={t(`roles.${user.role}`)} color={ROLE_COLORS[user.role] || 'default'} size="small" />
                       </TableCell>
                       <TableCell align="center">
                         <IconButton onClick={e => { e.stopPropagation(); setConfirmId(user.id); setConfirmName(`${user.firstName} ${user.lastName}`); }}>

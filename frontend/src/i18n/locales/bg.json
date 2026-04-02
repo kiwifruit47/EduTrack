@@ -97,6 +97,14 @@
     "filterBySchool": "Филтър по училище",
     "allSchools": "Всички училища"
   },
+  "roles": {
+    "ALL":        "Всички",
+    "ADMIN":      "Администратор",
+    "HEADMASTER": "Директор",
+    "TEACHER":    "Учител",
+    "STUDENT":    "Ученик",
+    "PARENT":     "Родител"
+  },
   "schools": {
     "title": "Училища",
     "name": "Наименование",
