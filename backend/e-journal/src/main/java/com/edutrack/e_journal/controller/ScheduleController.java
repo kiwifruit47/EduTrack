@@ -63,6 +63,7 @@ public class ScheduleController {
                 .subject(subject)
                 .teacher(teacher)
                 .term(req.getTerm())
+                .dayOfWeek(req.getDayOfWeek())
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(scheduleRepository.save(schedule)));
@@ -92,7 +93,8 @@ public class ScheduleController {
                 s.getSchoolClass().getId(),
                 s.getSchoolClass().getName(),
                 s.getSchool().getName(),
-                s.getTerm()
+                s.getTerm(),
+                s.getDayOfWeek()
         );
     }
 }

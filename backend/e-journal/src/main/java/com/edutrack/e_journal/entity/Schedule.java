@@ -41,4 +41,9 @@ public class Schedule {
     @Min(1) @Max(2)
     @Column(nullable = false, columnDefinition = "INTEGER CHECK (term IN (1, 2))")
     private Integer term;
+
+    /** Day of week: 1 = Monday … 5 = Friday */
+    @Min(1) @Max(5)
+    @Column(name = "dayofweek", nullable = false)
+    private Integer dayOfWeek;
 }

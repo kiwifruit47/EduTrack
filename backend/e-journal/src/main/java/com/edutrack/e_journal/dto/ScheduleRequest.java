@@ -21,4 +21,7 @@ public class ScheduleRequest {
 
     @NotNull @Min(1) @Max(2)
     private Integer term;
+
+    @NotNull @Min(1) @Max(5)
+    private Integer dayOfWeek;
 }

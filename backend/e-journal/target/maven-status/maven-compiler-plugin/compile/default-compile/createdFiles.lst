@@ -10,6 +10,7 @@ com/edutrack/e_journal/entity/SchoolScheduleEntry$SchoolScheduleEntryBuilder.cla
 com/edutrack/e_journal/repository/AbsenceRepository.class
 com/edutrack/e_journal/repository/GradeRepository.class
 com/edutrack/e_journal/dto/SchoolClassDto.class
+com/edutrack/e_journal/controller/ComplaintController.class
 com/edutrack/e_journal/repository/ClassRepository.class
 com/edutrack/e_journal/entity/Absence$AbsenceBuilder.class
 com/edutrack/e_journal/dto/LoginRequest.class
@@ -28,6 +29,7 @@ com/edutrack/e_journal/entity/Teacher.class
 com/edutrack/e_journal/entity/School$SchoolBuilder.class
 com/edutrack/e_journal/controller/GradeController.class
 com/edutrack/e_journal/entity/Subject$SubjectBuilder.class
+com/edutrack/e_journal/repository/ComplaintRepository.class
 com/edutrack/e_journal/entity/Grade.class
 com/edutrack/e_journal/dto/SchoolScheduleEntryDto.class
 com/edutrack/e_journal/dto/ScheduleRequest.class
@@ -40,11 +42,13 @@ com/edutrack/e_journal/repository/SchoolRepository.class
 com/edutrack/e_journal/entity/Role.class
 com/edutrack/e_journal/entity/SchoolType.class
 com/edutrack/e_journal/dto/AuthResponse.class
+com/edutrack/e_journal/dto/ComplaintDto.class
 com/edutrack/e_journal/repository/UserRepository.class
 com/edutrack/e_journal/entity/Schedule$ScheduleBuilder.class
 com/edutrack/e_journal/dto/UserSummaryDto.class
 com/edutrack/e_journal/entity/Absence.class
 com/edutrack/e_journal/repository/SchoolProfileRepository.class
+com/edutrack/e_journal/dto/ComplaintRequest.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
 com/edutrack/e_journal/security/RequestLoggingFilter.class
 com/edutrack/e_journal/controller/SchoolController$ProfileRequest.class
@@ -52,6 +56,7 @@ com/edutrack/e_journal/dto/SchoolRequest.class
 com/edutrack/e_journal/entity/Subject.class
 com/edutrack/e_journal/entity/Student.class
 com/edutrack/e_journal/entity/Student$StudentBuilder.class
+com/edutrack/e_journal/entity/Complaint$ComplaintBuilder.class
 com/edutrack/e_journal/dto/GradeRequest.class
 com/edutrack/e_journal/security/CustomUserDetailsService.class
 com/edutrack/e_journal/dto/SchoolDto.class
@@ -73,4 +78,5 @@ com/edutrack/e_journal/dto/ChangePasswordRequest.class
 com/edutrack/e_journal/repository/StudentRepository.class
 com/edutrack/e_journal/repository/SchoolScheduleEntryRepository.class
 com/edutrack/e_journal/entity/SchoolProfile.class
+com/edutrack/e_journal/entity/Complaint.class
 com/edutrack/e_journal/dto/AbsenceRequest.class

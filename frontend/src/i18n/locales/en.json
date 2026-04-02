@@ -209,6 +209,8 @@
     "description": "Description",
     "total": "Total",
     "addComplaint": "Add Complaint",
+    "pickDay": "Pick a day from this week",
+    "noSubjectsToday": "No subjects scheduled today",
     "noComplaints": "No complaints found.",
     "fetchError": "Failed to load complaints.",
     "createError": "Failed to add complaint.",

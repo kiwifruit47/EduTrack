@@ -15,4 +15,5 @@ public class ScheduleDto {
     private String  className;
     private String  schoolName;
     private Integer term;
+    private Integer dayOfWeek;
 }

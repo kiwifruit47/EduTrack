@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions,
   DialogContent, DialogTitle, FormControl, IconButton, InputLabel,
-  MenuItem, Paper, Select, Tab, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Tabs, TextField, Typography,
+  MenuItem, Paper, Select, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Tab, Tabs, TextField, Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,9 +18,36 @@ const fieldSx = {
   InputLabelProps: { shrink: true, sx: { color: 'black', '&.Mui-focused': { color: 'black' } } },
 };
 
+/** Returns the Monday–Friday dates of the week containing `date`. */
+function getWeekDays(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun…6=Sat
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return Array.from({ length: 5 }, (_, i) => {
+    const dd = new Date(monday);
+    dd.setDate(monday.getDate() + i);
+    return dd;
+  });
+}
+
+/** Format a Date as "yyyy-MM-dd" */
+function toISODate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+/** day-of-week index the DB uses: Mon=1…Fri=5 */
+function dbDayOfWeek(date) {
+  const js = date.getDay(); // 0=Sun…6=Sat
+  return js === 0 ? 7 : js; // Sun→7, Mon→1…Fri→5  (only 1-5 are valid)
+}
+
+const DAY_LABELS = ['', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет'];
+const DAY_LABELS_EN = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
 function ClassComplaints() {
   const { classId } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const canEdit = ['ADMIN', 'HEADMASTER', 'TEACHER'].includes(user?.role);
 
@@ -33,7 +60,7 @@ function ClassComplaints() {
   const [termTab, setTermTab]       = useState(0);
 
   const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ studentId: '', scheduleId: '', date: '', description: '' });
+  const [addForm, setAddForm] = useState({ studentId: '', scheduleId: '', date: toISODate(new Date()), description: '' });
   const [saving, setSaving]   = useState(false);
 
   useEffect(() => {
@@ -53,6 +80,18 @@ function ClassComplaints() {
       .finally(() => setLoading(false));
   }, [classId]);
 
+  // Week days for the current week
+  const weekDays = useMemo(() => getWeekDays(new Date()), []);
+
+  // Schedules for the selected date's day-of-week
+  const selectedDayOfWeek = dbDayOfWeek(new Date(addForm.date + 'T00:00:00'));
+  const daySchedules = schedules.filter(s => s.dayOfWeek === selectedDayOfWeek);
+
+  // Reset scheduleId when the day changes and the current selection is no longer valid
+  const handleDateSelect = (dateStr) => {
+    setAddForm(f => ({ ...f, date: dateStr, scheduleId: '' }));
+  };
+
   const termFilter = termTab === 0 ? null : termTab;
   const filtered = termFilter
     ? complaints.filter(c => c.term === termFilter)
@@ -69,7 +108,7 @@ function ClassComplaints() {
       .then(res => {
         setComplaints(prev => [...prev, res.data]);
         setAddOpen(false);
-        setAddForm({ studentId: '', scheduleId: '', date: '', description: '' });
+        setAddForm({ studentId: '', scheduleId: '', date: toISODate(new Date()), description: '' });
       })
       .catch(() => setError(t('complaints.createError')))
       .finally(() => setSaving(false));
@@ -82,6 +121,8 @@ function ClassComplaints() {
   };
 
   const isAddValid = addForm.studentId && addForm.scheduleId && addForm.date && addForm.description.trim();
+
+  const dayLabels = i18n.language === 'bg' ? DAY_LABELS : DAY_LABELS_EN;
 
   return (
     <Layout>
@@ -163,6 +204,8 @@ function ClassComplaints() {
       <Dialog open={addOpen} onClose={() => setAddOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{t('complaints.addComplaint')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+
+          {/* Student picker */}
           <FormControl fullWidth>
             <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>{t('complaints.student')}</InputLabel>
             <Select value={addForm.studentId} onChange={e => setAddForm(f => ({ ...f, studentId: e.target.value }))}
@@ -170,22 +213,50 @@ function ClassComplaints() {
               {students.map(s => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)}
             </Select>
           </FormControl>
+
+          {/* Current-week day selector */}
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+              {t('complaints.pickDay')}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {weekDays.map((d, i) => {
+                const iso = toISODate(d);
+                const isSelected = addForm.date === iso;
+                return (
+                  <Button
+                    key={iso}
+                    variant={isSelected ? 'contained' : 'outlined'}
+                    size="small"
+                    onClick={() => handleDateSelect(iso)}
+                    sx={{ minWidth: 56, flexDirection: 'column', py: 0.5, lineHeight: 1.2 }}
+                  >
+                    <span style={{ fontSize: '0.7rem' }}>{dayLabels[i + 1]}</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{d.getDate()}</span>
+                  </Button>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Subject filtered by selected day's schedule */}
           <FormControl fullWidth>
             <InputLabel sx={{ color: 'black', '&.Mui-focused': { color: 'black' } }}>{t('complaints.subject')}</InputLabel>
             <Select value={addForm.scheduleId} onChange={e => setAddForm(f => ({ ...f, scheduleId: e.target.value }))}
-              label={t('complaints.subject')} sx={{ color: 'black' }}>
-              {schedules.map(s => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.subjectName} — {t('schedule.term')} {s.term}
-                </MenuItem>
-              ))}
+              label={t('complaints.subject')} sx={{ color: 'black' }}
+              disabled={daySchedules.length === 0}>
+              {daySchedules.length === 0
+                ? <MenuItem value="" disabled>{t('complaints.noSubjectsToday')}</MenuItem>
+                : daySchedules.map(s => (
+                    <MenuItem key={s.id} value={s.id}>
+                      {s.subjectName} — {s.teacherName}
+                    </MenuItem>
+                  ))
+              }
             </Select>
           </FormControl>
-          <TextField
-            label={t('complaints.date')} type="date" value={addForm.date}
-            onChange={e => setAddForm(f => ({ ...f, date: e.target.value }))}
-            fullWidth {...fieldSx}
-          />
+
+          {/* Description */}
           <TextField
             label={t('complaints.description')} value={addForm.description}
             onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))}
