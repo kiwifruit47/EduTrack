@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Box, Chip, CircularProgress, Paper, Tab,
+  Alert, Box, Chip, CircularProgress, Divider, Paper, Tab,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -44,6 +44,18 @@ function StudentGrades() {
     ? (filtered.reduce((s, g) => s + parseFloat(g.value), 0) / filtered.length).toFixed(2)
     : null;
 
+  const subjectAverages = useMemo(() => {
+    const map = {};
+    filtered.forEach(g => {
+      if (!map[g.subjectId]) map[g.subjectId] = { name: g.subjectName, sum: 0, count: 0 };
+      map[g.subjectId].sum   += parseFloat(g.value);
+      map[g.subjectId].count += 1;
+    });
+    return Object.values(map)
+      .map(s => ({ name: s.name, avg: (s.sum / s.count).toFixed(2) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [filtered]);
+
   return (
     <Layout>
       <Box sx={{ p: 3 }}>
@@ -61,9 +73,26 @@ function StudentGrades() {
               <Tab label={t('schedule.term2')} />
             </Tabs>
 
-            {avg && (
-              <Box sx={{ mb: 2 }}>
-                <Chip label={`${t('grades.average')}: ${avg}`} color={GRADE_COLOR(avg)} />
+            {subjectAverages.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  {t('grades.average')}
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                  {subjectAverages.map(s => (
+                    <Chip
+                      key={s.name}
+                      label={`${s.name}: ${s.avg}`}
+                      color={GRADE_COLOR(s.avg)}
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
+                <Divider sx={{ mb: 1.5 }} />
+                <Chip
+                  label={`${t('grades.average')} (${t('grades.all')}): ${avg}`}
+                  color={GRADE_COLOR(avg)}
+                />
               </Box>
             )}
 
