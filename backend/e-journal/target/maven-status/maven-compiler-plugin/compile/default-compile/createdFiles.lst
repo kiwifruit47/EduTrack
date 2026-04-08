@@ -5,6 +5,7 @@ com/edutrack/e_journal/entity/SchoolScheduleEntry.class
 com/edutrack/e_journal/entity/School.class
 com/edutrack/e_journal/controller/ScheduleController.class
 com/edutrack/e_journal/entity/ScheduleEntryType.class
+com/edutrack/e_journal/security/LocalhostAdminFilter.class
 com/edutrack/e_journal/dto/SubjectRequest.class
 com/edutrack/e_journal/entity/SchoolScheduleEntry$SchoolScheduleEntryBuilder.class
 com/edutrack/e_journal/repository/AbsenceRepository.class
@@ -38,6 +39,7 @@ com/edutrack/e_journal/dto/SchoolTermConfigDto.class
 com/edutrack/e_journal/dto/SchoolScheduleEntryDto.class
 com/edutrack/e_journal/dto/ScheduleRequest.class
 com/edutrack/e_journal/dto/AbsenceDto.class
+com/edutrack/e_journal/config/OpenApiConfig.class
 com/edutrack/e_journal/dto/GradeDto.class
 com/edutrack/e_journal/entity/User$UserBuilder.class
 com/edutrack/e_journal/entity/Schedule.class
