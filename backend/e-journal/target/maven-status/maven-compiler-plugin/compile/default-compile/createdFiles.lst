@@ -53,6 +53,7 @@ com/edutrack/e_journal/entity/Role$RoleBuilder.class
 com/edutrack/e_journal/security/RequestLoggingFilter.class
 com/edutrack/e_journal/controller/SchoolController$ProfileRequest.class
 com/edutrack/e_journal/dto/SchoolRequest.class
+com/edutrack/e_journal/controller/StudentController.class
 com/edutrack/e_journal/entity/Subject.class
 com/edutrack/e_journal/entity/Student.class
 com/edutrack/e_journal/entity/Student$StudentBuilder.class

@@ -8,4 +8,5 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllBySchool_Id(Long schoolId);
     List<Student> findAllBySchoolClass_Id(Long classId);
+    List<Student> findAllBySchoolIsNull();
 }

@@ -13,6 +13,7 @@ import ViewSchools from '../pages/Admin/ViewSchools';
 import ViewSubjects from '../pages/Admin/ViewSubjects';
 
 import HeadmasterHome from '../pages/Headmaster/HeadmasterHome';
+import HeadmasterSchool from '../pages/Headmaster/HeadmasterSchool';
 import ViewParents from '../pages/Headmaster/ViewParents';
 import ViewStudents from '../pages/Headmaster/ViewStudents';
 import ViewTeachers from '../pages/Headmaster/ViewTeachers';
@@ -124,7 +125,16 @@ function AppRouter() {
       />
 
       <Route
-        path='/headmaster/viewParents' 
+        path='/headmaster/mySchool'
+        element={
+          <ProtectedRoute roles={["HEADMASTER"]}>
+            <HeadmasterSchool />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/headmaster/viewParents'
         element={
           <ProtectedRoute roles={["HEADMASTER"]}>
             <ViewParents/>

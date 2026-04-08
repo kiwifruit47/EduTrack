@@ -96,24 +96,30 @@ function ClassGrades() {
     return m;
   }, [filteredGrades]);
 
+  // For teachers, only expose subjects they personally teach in this class.
+  const teacherSchedules = useMemo(() => {
+    if (user?.role !== 'TEACHER') return schedules;
+    return schedules.filter(s => s.teacherId === user.id);
+  }, [schedules, user]);
+
   // Unique subjects available for this class (for the dialog dropdown)
   const uniqueSubjects = useMemo(() => {
     const seen = new Set();
-    return schedules.filter(s => {
+    return teacherSchedules.filter(s => {
       if (seen.has(s.subjectId)) return false;
       seen.add(s.subjectId);
       return true;
     });
-  }, [schedules]);
+  }, [teacherSchedules]);
 
   // Resolve the schedule entry that matches the selected subject + term
   const resolvedScheduleId = useMemo(() => {
     if (!addForm.subjectId || !addForm.term) return null;
-    const match = schedules.find(
+    const match = teacherSchedules.find(
       s => s.subjectId === Number(addForm.subjectId) && s.term === Number(addForm.term)
     );
     return match ? match.id : null;
-  }, [schedules, addForm.subjectId, addForm.term]);
+  }, [teacherSchedules, addForm.subjectId, addForm.term]);
 
   const termByMonth = () => {
     const m = new Date().getMonth() + 1; // 1–12

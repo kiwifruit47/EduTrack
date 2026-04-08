@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -134,10 +136,13 @@ public class SchoolController {
     }
 
     @PostMapping("/{schoolId}/schedule")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<SchoolScheduleEntryDto> addScheduleEntry(
             @PathVariable Long schoolId,
-            @Valid @RequestBody SchoolScheduleEntryRequest req) {
+            @Valid @RequestBody SchoolScheduleEntryRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        checkHeadmasterSchoolAccess(principal, schoolId);
 
         School school = schoolRepository.findById(schoolId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
@@ -158,13 +163,16 @@ public class SchoolController {
     }
 
     @PutMapping("/schedule/{entryId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<SchoolScheduleEntryDto> updateScheduleEntry(
             @PathVariable Long entryId,
-            @Valid @RequestBody SchoolScheduleEntryRequest req) {
+            @Valid @RequestBody SchoolScheduleEntryRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
 
         SchoolScheduleEntry entry = scheduleEntryRepository.findById(entryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
+
+        checkHeadmasterSchoolAccess(principal, entry.getSchool().getId());
 
         entry.setType(resolveEntryType(req.getType()));
         entry.setLabel(req.getLabel());
@@ -177,16 +185,41 @@ public class SchoolController {
     }
 
     @DeleteMapping("/schedule/{entryId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteScheduleEntry(@PathVariable Long entryId) {
-        if (!scheduleEntryRepository.existsById(entryId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found");
-        }
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public ResponseEntity<Void> deleteScheduleEntry(
+            @PathVariable Long entryId,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        SchoolScheduleEntry entry = scheduleEntryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
+
+        checkHeadmasterSchoolAccess(principal, entry.getSchool().getId());
+
         scheduleEntryRepository.deleteById(entryId);
         return ResponseEntity.noContent().build();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /**
+     * If the caller is a HEADMASTER, verify they own the given school.
+     * ADMIN users bypass this check.
+     */
+    private void checkHeadmasterSchoolAccess(UserDetails principal, Long schoolId) {
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) {
+            User headmaster = userRepository.findByEmail(principal.getUsername())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+            School headmasterSchool = schoolRepository.findByDirector_Id(headmaster.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "No school assigned to this headmaster"));
+            if (!headmasterSchool.getId().equals(schoolId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Access denied to this school's schedule");
+            }
+        }
+    }
 
     private SchoolType resolveType(String type) {
         if (type == null || type.isBlank()) return null;

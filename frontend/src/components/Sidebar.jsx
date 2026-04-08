@@ -98,6 +98,7 @@ const Sidebar = () => {
         ],
         HEADMASTER : [
             {key: "home", label: t('nav.home'), icon: <HomeIcon />, to: "/"},
+            {key: "mySchool", label: t('nav.mySchool'), icon: <SchoolIcon />, to: "/headmaster/mySchool"},
             {key: "schedules", label: t('nav.schedules'), icon: <ScheduleIcon />, to: "/select/class/schedule"},
             {key: "subjects", label: t('nav.subjects'), icon: <SubjectIcon />, to: "/admin/viewSubjects"},
             {key: "grades", label: t('nav.grades'), icon: <Grade />, to: "/select/class/grades"},

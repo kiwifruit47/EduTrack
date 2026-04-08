@@ -26,7 +26,7 @@ public class Student {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schoolid", nullable = false)
+    @JoinColumn(name = "schoolid", nullable = true)
     private School school;
 
     /** Nullable — a student may be enrolled in a school without a class assignment yet. */

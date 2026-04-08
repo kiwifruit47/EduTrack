@@ -266,6 +266,17 @@
       "fail": "Fail (2.00–2.99)"
     }
   },
+  "students": {
+    "enroll": "Enroll",
+    "enrollTitle": "Enroll Student",
+    "noAvailable": "No unassigned students available.",
+    "fetchAvailableError": "Failed to load available students.",
+    "enrollError": "Failed to enroll student.",
+    "expel": "Expel",
+    "expelTitle": "Expel Student",
+    "expelConfirm": "Are you sure you want to expel {{name}} from the school? They will lose access to school data.",
+    "expelError": "Failed to expel student."
+  },
   "welcome": {
     "ADMIN": "Welcome, Admin, {{name}}!",
     "HEADMASTER": "Welcome, Headmaster, {{name}}!",
