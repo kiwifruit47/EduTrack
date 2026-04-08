@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -19,10 +18,10 @@ import java.util.Set;
  * (127.0.0.1 or ::1), as long as no authentication has already been
  * established by a prior filter (e.g. a valid JWT still takes precedence).
  *
- * Runs before {@link JwtAuthenticationFilter} so that JWT tokens sent
- * from localhost are still honoured when present.
+ * NOT annotated with @Component — registered explicitly inside the Spring
+ * Security filter chain via SecurityConfig.addFilterBefore(), so it runs
+ * after SecurityContextHolderFilter initialises the context.
  */
-@Component
 public class LocalhostAdminFilter extends OncePerRequestFilter {
 
     private static final Set<String> LOOPBACK = Set.of("127.0.0.1", "0:0:0:0:0:0:0:1", "::1");
