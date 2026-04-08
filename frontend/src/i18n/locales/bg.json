@@ -138,7 +138,12 @@
     "noHeadmaster": "Няма",
     "updateError": "Грешка при обновяване на училище.",
     "deleteConfirmTitle": "Изтриване на училище",
-    "deleteConfirmMessage": "Сигурни ли сте, че искате да изтриете \"{{name}}\"? Това действие е необратимо."
+    "deleteConfirmMessage": "Сигурни ли сте, че искате да изтриете \"{{name}}\"? Това действие е необратимо.",
+    "studentLimit": "Лимит на ученици",
+    "studentLimitLabel": "Максимален брой ученици",
+    "studentLimitPlaceholder": "Без ограничение",
+    "limitSaved": "Лимитът е запазен.",
+    "limitSaveError": "Грешка при запазване на лимита."
   },
   "entryTypes": {
     "LECTURE": "Час",

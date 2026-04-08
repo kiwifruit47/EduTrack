@@ -14,6 +14,7 @@ public class SchoolDto {
     private String       type;           // SchoolType name, nullable
     private String       headmasterName; // null if no headmaster assigned
     private List<ProfileDto> profiles;
+    private Integer      studentLimit;   // null means no limit
 
     @Getter
     @AllArgsConstructor

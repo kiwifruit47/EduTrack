@@ -33,4 +33,8 @@ public class School {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "directorid")
     private User director;
+
+    /** Maximum number of students allowed in this school. Null means no limit. */
+    @Column(name = "student_limit")
+    private Integer studentLimit;
 }

@@ -46,6 +46,12 @@ function HeadmasterSchool() {
   const [termError, setTermError]     = useState(null);
   const [termSuccess, setTermSuccess] = useState(false);
 
+  // Student limit
+  const [studentLimit,        setStudentLimit]        = useState('');
+  const [limitSaving,         setLimitSaving]         = useState(false);
+  const [limitError,          setLimitError]          = useState(null);
+  const [limitSuccess,        setLimitSuccess]        = useState(false);
+
   useEffect(() => {
     api.get('/api/profile')
       .then(res => {
@@ -62,6 +68,7 @@ function HeadmasterSchool() {
         setSchool(schoolRes.data);
         setEntries(schedRes.data);
         setTermConfig(termRes.data);
+        setStudentLimit(schoolRes.data.studentLimit != null ? String(schoolRes.data.studentLimit) : '');
       })
       .catch(() => setError(t('schools.fetchError')))
       .finally(() => setLoading(false));
@@ -75,6 +82,17 @@ function HeadmasterSchool() {
       .then(() => setTermSuccess(true))
       .catch(() => setTermError(t('termConfig.saveError')))
       .finally(() => setTermSaving(false));
+  };
+
+  const handleLimitSave = () => {
+    setLimitSaving(true);
+    setLimitError(null);
+    setLimitSuccess(false);
+    const payload = { studentLimit: studentLimit === '' ? null : parseInt(studentLimit, 10) };
+    api.put(`/api/schools/${schoolId}/student-limit`, payload)
+      .then(() => setLimitSuccess(true))
+      .catch(() => setLimitError(t('schools.limitSaveError')))
+      .finally(() => setLimitSaving(false));
   };
 
   const openAdd = () => { setEditingId(null); setForm(emptyEntry); setSaveError(null); setShowForm(true); };
@@ -227,6 +245,37 @@ function HeadmasterSchool() {
               {t('common.save')}
             </Button>
           </Box>
+        </Box>
+
+        {/* ── Student Limit ──────────────────────────────────────────────── */}
+        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" sx={{ mb: 1.5 }}>{t('schools.studentLimit')}</Typography>
+
+        {limitError   && <Alert severity="error"   sx={{ mb: 1 }} onClose={() => setLimitError(null)}>{limitError}</Alert>}
+        {limitSuccess && <Alert severity="success" sx={{ mb: 1 }} onClose={() => setLimitSuccess(false)}>{t('schools.limitSaved')}</Alert>}
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, maxWidth: 360 }}>
+          <TextField
+            size="small"
+            label={t('schools.studentLimitLabel')}
+            value={studentLimit}
+            placeholder={t('schools.studentLimitPlaceholder')}
+            type="number"
+            inputProps={{ min: 0 }}
+            onChange={e => setStudentLimit(e.target.value)}
+            fullWidth
+            {...fieldProps}
+          />
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleLimitSave}
+            disabled={limitSaving}
+            size="small"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            {t('common.save')}
+          </Button>
         </Box>
 
         {showForm && (

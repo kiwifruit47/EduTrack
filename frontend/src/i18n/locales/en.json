@@ -138,7 +138,12 @@
     "noHeadmaster": "None",
     "updateError": "Failed to update school.",
     "deleteConfirmTitle": "Delete School",
-    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+    "studentLimit": "Student Limit",
+    "studentLimitLabel": "Maximum students",
+    "studentLimitPlaceholder": "No limit",
+    "limitSaved": "Student limit saved.",
+    "limitSaveError": "Failed to save student limit."
   },
   "entryTypes": {
     "LECTURE": "Lecture",

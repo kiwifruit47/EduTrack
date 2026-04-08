@@ -244,6 +244,25 @@ public class SchoolController {
         return ResponseEntity.ok(req);
     }
 
+    // ── Student Limit ─────────────────────────────────────────────────────────
+
+    @PutMapping("/{schoolId}/student-limit")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public ResponseEntity<Void> updateStudentLimit(
+            @PathVariable Long schoolId,
+            @RequestBody StudentLimitRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        checkHeadmasterSchoolAccess(principal, schoolId);
+
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+
+        school.setStudentLimit(req.getStudentLimit());
+        schoolRepository.save(school);
+        return ResponseEntity.noContent().build();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /**
@@ -301,7 +320,7 @@ public class SchoolController {
         List<SchoolDto.ProfileDto> profiles = profileRepository.findAllBySchool_Id(s.getId()).stream()
                 .map(p -> new SchoolDto.ProfileDto(p.getId(), p.getName()))
                 .toList();
-        return new SchoolDto(s.getId(), s.getName(), s.getAddress(), type, headmasterName, profiles);
+        return new SchoolDto(s.getId(), s.getName(), s.getAddress(), type, headmasterName, profiles, s.getStudentLimit());
     }
 
     private SchoolScheduleEntryDto toScheduleDto(SchoolScheduleEntry e) {
@@ -323,5 +342,11 @@ public class SchoolController {
     public static class ProfileRequest {
         @NotBlank @Size(max = 100)
         private String name;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class StudentLimitRequest {
+        private Integer studentLimit; // null removes the limit
     }
 }

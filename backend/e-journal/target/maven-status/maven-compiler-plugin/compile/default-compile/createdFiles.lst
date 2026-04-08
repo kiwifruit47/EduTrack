@@ -11,6 +11,7 @@ com/edutrack/e_journal/repository/AbsenceRepository.class
 com/edutrack/e_journal/repository/GradeRepository.class
 com/edutrack/e_journal/dto/SchoolClassDto.class
 com/edutrack/e_journal/controller/ComplaintController.class
+com/edutrack/e_journal/controller/SchoolController$StudentLimitRequest.class
 com/edutrack/e_journal/repository/ClassRepository.class
 com/edutrack/e_journal/repository/SchoolTermConfigRepository.class
 com/edutrack/e_journal/entity/Absence$AbsenceBuilder.class
@@ -20,6 +21,7 @@ com/edutrack/e_journal/entity/RoleEnum.class
 com/edutrack/e_journal/dto/SchoolDto$ProfileDto.class
 com/edutrack/e_journal/controller/AuthController.class
 com/edutrack/e_journal/repository/SubjectRepository.class
+com/edutrack/e_journal/controller/TeacherController.class
 com/edutrack/e_journal/config/SecurityConfig.class
 com/edutrack/e_journal/controller/AbsenceController.class
 com/edutrack/e_journal/entity/User.class
