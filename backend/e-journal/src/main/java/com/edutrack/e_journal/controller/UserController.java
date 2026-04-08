@@ -168,6 +168,6 @@ public class UserController {
         }
 
         return new UserDto(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),
-                u.getRole().getName().name(), schoolId, schoolName);
+                u.getRole().getName().name(), schoolId, schoolName, u.getBio());
     }
 }

@@ -23,6 +23,7 @@ com/edutrack/e_journal/config/SecurityConfig.class
 com/edutrack/e_journal/controller/AbsenceController.class
 com/edutrack/e_journal/entity/User.class
 com/edutrack/e_journal/entity/Teacher$TeacherBuilder.class
+com/edutrack/e_journal/controller/UserController.class
 com/edutrack/e_journal/dto/SchoolScheduleEntryRequest.class
 com/edutrack/e_journal/entity/Teacher.class
 com/edutrack/e_journal/entity/School$SchoolBuilder.class
@@ -49,6 +50,7 @@ com/edutrack/e_journal/entity/Absence.class
 com/edutrack/e_journal/repository/SchoolProfileRepository.class
 com/edutrack/e_journal/dto/ComplaintRequest.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
+com/edutrack/e_journal/security/RequestLoggingFilter.class
 com/edutrack/e_journal/controller/SchoolController$ProfileRequest.class
 com/edutrack/e_journal/dto/SchoolRequest.class
 com/edutrack/e_journal/entity/Subject.class
@@ -58,6 +60,7 @@ com/edutrack/e_journal/entity/Complaint$ComplaintBuilder.class
 com/edutrack/e_journal/dto/GradeRequest.class
 com/edutrack/e_journal/security/CustomUserDetailsService.class
 com/edutrack/e_journal/dto/SchoolDto.class
+com/edutrack/e_journal/dto/CreateUserRequest.class
 com/edutrack/e_journal/repository/ScheduleRepository.class
 com/edutrack/e_journal/controller/ClassController.class
 com/edutrack/e_journal/security/JwtAuthenticationFilter.class
@@ -65,8 +68,10 @@ com/edutrack/e_journal/entity/SchoolClass$SchoolClassBuilder.class
 com/edutrack/e_journal/entity/SchoolProfile$SchoolProfileBuilder.class
 com/edutrack/e_journal/entity/SchoolClass.class
 com/edutrack/e_journal/repository/TeacherRepository.class
+com/edutrack/e_journal/repository/RoleRepository.class
 com/edutrack/e_journal/dto/ScheduleDto.class
 com/edutrack/e_journal/EJournalApplication.class
+com/edutrack/e_journal/dto/UpdateUserRequest.class
 com/edutrack/e_journal/controller/SubjectController.class
 com/edutrack/e_journal/security/JwtUtils.class
 com/edutrack/e_journal/dto/ChangePasswordRequest.class
