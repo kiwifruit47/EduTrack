@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     List<Teacher> findAllBySchool_Id(Long schoolId);
+    List<Teacher> findAllBySchoolIsNull();
 }

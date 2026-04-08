@@ -8,9 +8,15 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
+
+const DEFAULT_TERM_CONFIG = {
+  startDate: '09-15', term2Start: '02-01',
+  elementaryEnd: '06-01', progymnasiumEnd: '06-15', gymnasiumEnd: '07-01',
+};
 
 const ENTRY_TYPES = ['LECTURE', 'BREAK', 'SPECIAL_EVENT'];
 const ENTRY_TYPE_COLORS = { LECTURE: 'primary', BREAK: 'success', SPECIAL_EVENT: 'warning' };
@@ -25,6 +31,7 @@ function HeadmasterSchool() {
   const { t } = useTranslation();
 
   const [school, setSchool]           = useState(null);
+  const [schoolId, setSchoolId]       = useState(null);
   const [entries, setEntries]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
@@ -33,23 +40,42 @@ function HeadmasterSchool() {
   const [editingId, setEditingId]     = useState(null);
   const [saveError, setSaveError]     = useState(null);
 
+  // Term config
+  const [termConfig, setTermConfig]   = useState(DEFAULT_TERM_CONFIG);
+  const [termSaving, setTermSaving]   = useState(false);
+  const [termError, setTermError]     = useState(null);
+  const [termSuccess, setTermSuccess] = useState(false);
+
   useEffect(() => {
     api.get('/api/profile')
       .then(res => {
-        const schoolId = res.data.schoolId;
-        if (!schoolId) throw new Error('No school');
+        const sid = res.data.schoolId;
+        if (!sid) throw new Error('No school');
+        setSchoolId(sid);
         return Promise.all([
-          api.get(`/api/schools/${schoolId}`),
-          api.get(`/api/schools/${schoolId}/schedule`),
+          api.get(`/api/schools/${sid}`),
+          api.get(`/api/schools/${sid}/schedule`),
+          api.get(`/api/schools/${sid}/term-config`),
         ]);
       })
-      .then(([schoolRes, schedRes]) => {
+      .then(([schoolRes, schedRes, termRes]) => {
         setSchool(schoolRes.data);
         setEntries(schedRes.data);
+        setTermConfig(termRes.data);
       })
       .catch(() => setError(t('schools.fetchError')))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleTermSave = () => {
+    setTermSaving(true);
+    setTermError(null);
+    setTermSuccess(false);
+    api.put(`/api/schools/${schoolId}/term-config`, termConfig)
+      .then(() => setTermSuccess(true))
+      .catch(() => setTermError(t('termConfig.saveError')))
+      .finally(() => setTermSaving(false));
+  };
 
   const openAdd = () => { setEditingId(null); setForm(emptyEntry); setSaveError(null); setShowForm(true); };
   const openEdit = (e) => {
@@ -163,6 +189,45 @@ function HeadmasterSchool() {
             </ListItem>
           ))}
         </List>
+
+        {/* ── Term Configuration ─────────────────────────────────────── */}
+        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" sx={{ mb: 1.5 }}>{t('termConfig.title')}</Typography>
+
+        {termError   && <Alert severity="error"   sx={{ mb: 1 }} onClose={() => setTermError(null)}>{termError}</Alert>}
+        {termSuccess && <Alert severity="success" sx={{ mb: 1 }} onClose={() => setTermSuccess(false)}>{t('termConfig.saved')}</Alert>}
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, maxWidth: 360 }}>
+          {[
+            { key: 'startDate',       label: t('termConfig.startDate') },
+            { key: 'term2Start',      label: t('termConfig.term2Start') },
+            { key: 'elementaryEnd',   label: t('termConfig.elementaryEnd') },
+            { key: 'progymnasiumEnd', label: t('termConfig.progymnasiumEnd') },
+            { key: 'gymnasiumEnd',    label: t('termConfig.gymnasiumEnd') },
+          ].map(({ key, label }) => (
+            <TextField
+              key={key}
+              size="small"
+              label={label}
+              value={termConfig[key]}
+              placeholder="MM-dd"
+              onChange={e => setTermConfig(c => ({ ...c, [key]: e.target.value }))}
+              fullWidth
+              {...fieldProps}
+            />
+          ))}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleTermSave}
+              disabled={termSaving}
+              size="small"
+            >
+              {t('common.save')}
+            </Button>
+          </Box>
+        </Box>
 
         {showForm && (
           <Box sx={{ mt: 1, p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>

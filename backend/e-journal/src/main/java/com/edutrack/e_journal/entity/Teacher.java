@@ -29,7 +29,7 @@ public class Teacher {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schoolid", nullable = false)
+    @JoinColumn(name = "schoolid", nullable = true)
     private School school;
 
     @ManyToMany(fetch = FetchType.LAZY)

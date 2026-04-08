@@ -22,4 +22,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.role.name = com.edutrack.e_journal.entity.RoleEnum.STUDENT " +
            "AND u.id NOT IN (SELECT s.id FROM Student s WHERE s.school IS NOT NULL)")
     List<User> findAvailableStudents();
+
+    /** TEACHER-role users not yet assigned to any school (no teacher record or school is null). */
+    @Query("SELECT u FROM User u WHERE u.role.name = com.edutrack.e_journal.entity.RoleEnum.TEACHER " +
+           "AND u.id NOT IN (SELECT t.id FROM Teacher t WHERE t.school IS NOT NULL)")
+    List<User> findAvailableTeachers();
 }

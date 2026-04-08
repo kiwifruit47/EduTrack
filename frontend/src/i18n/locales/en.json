@@ -46,6 +46,7 @@
     "term2": "Term 2",
     "addEntry": "Add Entry",
     "noEntries": "No entries.",
+    "notInSession": "No active school term today.",
     "fetchError": "Failed to load schedule.",
     "createError": "Failed to add entry.",
     "deleteError": "Failed to delete entry."
@@ -266,6 +267,16 @@
       "fail": "Fail (2.00–2.99)"
     }
   },
+  "termConfig": {
+    "title": "Term Date Configuration",
+    "startDate": "School Year Start (MM-dd)",
+    "term2Start": "Term 2 Start (MM-dd)",
+    "elementaryEnd": "Elementary End — Grades 1–4 (MM-dd)",
+    "progymnasiumEnd": "Progymnasium End — Grades 5–7 (MM-dd)",
+    "gymnasiumEnd": "Gymnasium End — Grades 8–12 (MM-dd)",
+    "saved": "Term configuration saved.",
+    "saveError": "Failed to save term configuration."
+  },
   "students": {
     "enroll": "Enroll",
     "enrollTitle": "Enroll Student",
@@ -276,6 +287,17 @@
     "expelTitle": "Expel Student",
     "expelConfirm": "Are you sure you want to expel {{name}} from the school? They will lose access to school data.",
     "expelError": "Failed to expel student."
+  },
+  "teachers": {
+    "hire": "Hire",
+    "hireTitle": "Hire Teacher",
+    "noAvailable": "No unassigned teachers available.",
+    "fetchAvailableError": "Failed to load available teachers.",
+    "hireError": "Failed to hire teacher.",
+    "fire": "Fire",
+    "fireTitle": "Fire Teacher",
+    "fireConfirm": "Are you sure you want to remove {{name}} from the school? They will lose access to school data.",
+    "fireError": "Failed to fire teacher."
   },
   "welcome": {
     "ADMIN": "Welcome, Admin, {{name}}!",

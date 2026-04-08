@@ -4,10 +4,12 @@ import com.edutrack.e_journal.dto.SchoolDto;
 import com.edutrack.e_journal.dto.SchoolRequest;
 import com.edutrack.e_journal.dto.SchoolScheduleEntryDto;
 import com.edutrack.e_journal.dto.SchoolScheduleEntryRequest;
+import com.edutrack.e_journal.dto.SchoolTermConfigDto;
 import com.edutrack.e_journal.entity.*;
 import com.edutrack.e_journal.repository.SchoolProfileRepository;
 import com.edutrack.e_journal.repository.SchoolRepository;
 import com.edutrack.e_journal.repository.SchoolScheduleEntryRepository;
+import com.edutrack.e_journal.repository.SchoolTermConfigRepository;
 import com.edutrack.e_journal.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -32,10 +34,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SchoolController {
 
-    private final SchoolRepository             schoolRepository;
-    private final UserRepository               userRepository;
-    private final SchoolProfileRepository      profileRepository;
+    private final SchoolRepository              schoolRepository;
+    private final UserRepository                userRepository;
+    private final SchoolProfileRepository       profileRepository;
     private final SchoolScheduleEntryRepository scheduleEntryRepository;
+    private final SchoolTermConfigRepository    termConfigRepository;
+
+    private static final SchoolTermConfigDto DEFAULT_TERM_CONFIG =
+            new SchoolTermConfigDto("09-15", "02-01", "06-01", "06-15", "07-01");
 
     // ── Schools ──────────────────────────────────────────────────────────────
 
@@ -197,6 +203,45 @@ public class SchoolController {
 
         scheduleEntryRepository.deleteById(entryId);
         return ResponseEntity.noContent().build();
+    }
+
+    // ── Term Config ───────────────────────────────────────────────────────────
+
+    @GetMapping("/{schoolId}/term-config")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
+    public SchoolTermConfigDto getTermConfig(@PathVariable Long schoolId) {
+        return termConfigRepository.findById(schoolId)
+                .map(c -> new SchoolTermConfigDto(c.getStartDate(), c.getTerm2Start(),
+                        c.getElementaryEnd(), c.getProgymnasiumEnd(), c.getGymnasiumEnd()))
+                .orElse(DEFAULT_TERM_CONFIG);
+    }
+
+    @PutMapping("/{schoolId}/term-config")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public ResponseEntity<SchoolTermConfigDto> updateTermConfig(
+            @PathVariable Long schoolId,
+            @RequestBody SchoolTermConfigDto req,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        checkHeadmasterSchoolAccess(principal, schoolId);
+
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+
+        SchoolTermConfig config = termConfigRepository.findById(schoolId).orElse(
+                SchoolTermConfig.builder().id(schoolId).school(school)
+                        .startDate("09-15").term2Start("02-01")
+                        .elementaryEnd("06-01").progymnasiumEnd("06-15").gymnasiumEnd("07-01")
+                        .build());
+
+        config.setStartDate(req.getStartDate());
+        config.setTerm2Start(req.getTerm2Start());
+        config.setElementaryEnd(req.getElementaryEnd());
+        config.setProgymnasiumEnd(req.getProgymnasiumEnd());
+        config.setGymnasiumEnd(req.getGymnasiumEnd());
+
+        termConfigRepository.save(config);
+        return ResponseEntity.ok(req);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
