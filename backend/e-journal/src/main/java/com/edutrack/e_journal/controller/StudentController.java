@@ -8,6 +8,12 @@ import com.edutrack.e_journal.entity.User;
 import com.edutrack.e_journal.repository.SchoolRepository;
 import com.edutrack.e_journal.repository.StudentRepository;
 import com.edutrack.e_journal.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +28,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
+@Tag(name = "Students", description = "Headmaster operations — enroll and expel students from the school")
+@SecurityRequirement(name = "bearerAuth")
 public class StudentController {
 
     private final StudentRepository studentRepository;
     private final UserRepository    userRepository;
     private final SchoolRepository  schoolRepository;
 
-    /** HEADMASTER: list STUDENT-role users not currently enrolled in any school. */
+    @Operation(summary = "List available students", description = "Returns STUDENT-role users not currently enrolled in any school. HEADMASTER only.")
+    @ApiResponse(responseCode = "200", description = "Available student list returned")
     @GetMapping("/available")
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
@@ -38,11 +47,16 @@ public class StudentController {
                 .toList();
     }
 
-    /** HEADMASTER: enroll a STUDENT-role user into the headmaster's school. */
+    @Operation(summary = "Enroll a student", description = "Assigns the student to the headmaster's school. Creates a student record if one does not exist yet. HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Student enrolled, updated profile returned"),
+        @ApiResponse(responseCode = "400", description = "User is not a student or headmaster has no school"),
+        @ApiResponse(responseCode = "409", description = "Student is already enrolled in a school")
+    })
     @PostMapping("/{userId}/enroll")
     @PreAuthorize("hasRole('HEADMASTER')")
     public ResponseEntity<UserDto> enroll(
-            @PathVariable Long userId,
+            @Parameter(description = "User ID of the student to enroll") @PathVariable Long userId,
             @AuthenticationPrincipal UserDetails principal) {
 
         User headmaster = userRepository.findByEmail(principal.getUsername())
@@ -81,11 +95,16 @@ public class StudentController {
                 user.getBio()));
     }
 
-    /** HEADMASTER: expel (ban) a student from the headmaster's school. */
+    @Operation(summary = "Expel a student", description = "Removes the student from the headmaster's school (sets school to null). HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Student expelled"),
+        @ApiResponse(responseCode = "403", description = "Student does not belong to this headmaster's school"),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
     @DeleteMapping("/{studentId}/expel")
     @PreAuthorize("hasRole('HEADMASTER')")
     public ResponseEntity<Void> expel(
-            @PathVariable Long studentId,
+            @Parameter(description = "Student user ID") @PathVariable Long studentId,
             @AuthenticationPrincipal UserDetails principal) {
 
         User headmaster = userRepository.findByEmail(principal.getUsername())

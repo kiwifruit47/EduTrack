@@ -8,6 +8,12 @@ import com.edutrack.e_journal.entity.User;
 import com.edutrack.e_journal.repository.SchoolRepository;
 import com.edutrack.e_journal.repository.TeacherRepository;
 import com.edutrack.e_journal.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +28,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/teachers")
 @RequiredArgsConstructor
+@Tag(name = "Teachers", description = "Headmaster operations — hire and fire teachers at the school")
+@SecurityRequirement(name = "bearerAuth")
 public class TeacherController {
 
     private final TeacherRepository teacherRepository;
     private final UserRepository    userRepository;
     private final SchoolRepository  schoolRepository;
 
-    /** HEADMASTER: list TEACHER-role users not currently assigned to any school. */
+    @Operation(summary = "List available teachers", description = "Returns TEACHER-role users not currently assigned to any school. HEADMASTER only.")
+    @ApiResponse(responseCode = "200", description = "Available teacher list returned")
     @GetMapping("/available")
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
@@ -38,11 +47,16 @@ public class TeacherController {
                 .toList();
     }
 
-    /** HEADMASTER: hire a TEACHER-role user into the headmaster's school. */
+    @Operation(summary = "Hire a teacher", description = "Assigns the teacher to the headmaster's school. Creates a teacher record if one does not exist yet. HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Teacher hired, updated profile returned"),
+        @ApiResponse(responseCode = "400", description = "User is not a teacher or headmaster has no school"),
+        @ApiResponse(responseCode = "409", description = "Teacher is already assigned to a school")
+    })
     @PostMapping("/{userId}/hire")
     @PreAuthorize("hasRole('HEADMASTER')")
     public ResponseEntity<UserDto> hire(
-            @PathVariable Long userId,
+            @Parameter(description = "User ID of the teacher to hire") @PathVariable Long userId,
             @AuthenticationPrincipal UserDetails principal) {
 
         User headmaster = userRepository.findByEmail(principal.getUsername())
@@ -81,11 +95,16 @@ public class TeacherController {
                 user.getBio()));
     }
 
-    /** HEADMASTER: fire (remove) a teacher from the headmaster's school. */
+    @Operation(summary = "Fire a teacher", description = "Removes the teacher from the headmaster's school (sets school to null). HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Teacher fired"),
+        @ApiResponse(responseCode = "403", description = "Teacher does not belong to this headmaster's school"),
+        @ApiResponse(responseCode = "404", description = "Teacher not found")
+    })
     @DeleteMapping("/{teacherId}/fire")
     @PreAuthorize("hasRole('HEADMASTER')")
     public ResponseEntity<Void> fire(
-            @PathVariable Long teacherId,
+            @Parameter(description = "Teacher user ID") @PathVariable Long teacherId,
             @AuthenticationPrincipal UserDetails principal) {
 
         User headmaster = userRepository.findByEmail(principal.getUsername())

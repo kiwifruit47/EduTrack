@@ -10,6 +10,12 @@ import com.edutrack.e_journal.repository.GradeRepository;
 import com.edutrack.e_journal.repository.ScheduleRepository;
 import com.edutrack.e_journal.repository.StudentRepository;
 import com.edutrack.e_journal.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +33,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/grades")
 @RequiredArgsConstructor
+@Tag(name = "Grades", description = "Record and query student grades (Bulgarian scale 2–6)")
+@SecurityRequirement(name = "bearerAuth")
 public class GradeController {
 
     private static final Set<BigDecimal> VALID_VALUES = Set.of(
@@ -42,13 +50,18 @@ public class GradeController {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository     userRepository;
 
+    @Operation(summary = "List grades for a class", description = "Returns all grades for every student in the given class. Accessible by ADMIN, HEADMASTER, and TEACHER.")
+    @ApiResponse(responseCode = "200", description = "Grade list returned")
     @GetMapping("/class/{classId}")
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
-    public List<GradeDto> getByClass(@PathVariable Long classId) {
+    public List<GradeDto> getByClass(
+            @Parameter(description = "Class ID") @PathVariable Long classId) {
         return gradeRepository.findAllBySchedule_SchoolClass_Id(classId).stream()
                 .map(this::toDto).toList();
     }
 
+    @Operation(summary = "Get my grades", description = "Returns grades for the authenticated student.")
+    @ApiResponse(responseCode = "200", description = "Grade list returned")
     @GetMapping("/student/me")
     @PreAuthorize("hasRole('STUDENT')")
     public List<GradeDto> getMyGrades(@AuthenticationPrincipal UserDetails principal) {
@@ -57,13 +70,21 @@ public class GradeController {
                 .map(this::toDto).toList();
     }
 
+    @Operation(summary = "List grades for a student", description = "Returns all grades for a specific student. Accessible by PARENT, ADMIN, HEADMASTER, and TEACHER.")
+    @ApiResponse(responseCode = "200", description = "Grade list returned")
     @GetMapping("/student/{studentId}")
     @PreAuthorize("hasAnyRole('PARENT','ADMIN','HEADMASTER','TEACHER')")
-    public List<GradeDto> getByStudent(@PathVariable Long studentId) {
+    public List<GradeDto> getByStudent(
+            @Parameter(description = "Student user ID") @PathVariable Long studentId) {
         return gradeRepository.findAllByStudent_Id(studentId).stream()
                 .map(this::toDto).toList();
     }
 
+    @Operation(summary = "Add a grade", description = "Records a new grade. Value must be one of: 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6. Accessible by TEACHER, ADMIN, and HEADMASTER.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Grade recorded"),
+        @ApiResponse(responseCode = "400", description = "Invalid grade value, student, or schedule ID")
+    })
     @PostMapping
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<GradeDto> create(@Valid @RequestBody GradeRequest req) {
@@ -82,9 +103,15 @@ public class GradeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(gradeRepository.save(grade)));
     }
 
+    @Operation(summary = "Delete a grade", description = "Permanently removes a grade record. Accessible by TEACHER, ADMIN, and HEADMASTER.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Grade deleted"),
+        @ApiResponse(responseCode = "404", description = "Grade not found")
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Grade ID") @PathVariable Long id) {
         if (!gradeRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not found");
         }

@@ -5,6 +5,10 @@ import com.edutrack.e_journal.dto.LoginRequest;
 import com.edutrack.e_journal.entity.User;
 import com.edutrack.e_journal.repository.UserRepository;
 import com.edutrack.e_journal.security.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,13 +23,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
-
 import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Login, token refresh, and logout")
 public class AuthController {
 
     private static final String REFRESH_COOKIE = "refreshToken";
@@ -35,6 +39,11 @@ public class AuthController {
     private final UserRepository        userRepository;
     private final JwtUtils              jwtUtils;
 
+    @Operation(summary = "Log in", description = "Authenticate with email and password. Returns a short-lived access token in the body and sets a 7-day HttpOnly refresh cookie.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Authenticated — access token returned"),
+        @ApiResponse(responseCode = "401", description = "Invalid email or password")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    HttpServletResponse response) {
@@ -58,6 +67,11 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(accessToken));
     }
 
+    @Operation(summary = "Refresh access token", description = "Uses the HttpOnly refresh cookie to issue a new access token. No request body needed.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "New access token returned"),
+        @ApiResponse(responseCode = "401", description = "Refresh token missing or expired")
+    })
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(HttpServletRequest request) {
         String refreshToken = extractRefreshCookie(request)
@@ -74,6 +88,8 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(jwtUtils.generateAccessToken(user)));
     }
 
+    @Operation(summary = "Log out", description = "Clears the refresh cookie. The access token expires naturally (24 h).")
+    @ApiResponse(responseCode = "200", description = "Logged out")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         clearRefreshCookie(response);
