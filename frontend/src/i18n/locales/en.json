@@ -312,6 +312,22 @@
     "qualError": "Failed to save qualifications.",
     "classesTooltip": "Classes assigned"
   },
+  "parents": {
+    "linkTitle": "Link Parent to Student",
+    "link": "Link",
+    "unlink": "Unlink",
+    "unlinkTitle": "Remove Parent Link",
+    "unlinkConfirm": "Remove {{parentName}} as parent of {{studentName}}?",
+    "editTitle": "Edit Parent",
+    "children": "Children",
+    "selectParent": "Parent",
+    "selectStudent": "Student",
+    "fetchError": "Failed to load parents.",
+    "fetchAvailableError": "Failed to load available users.",
+    "linkError": "Failed to link parent.",
+    "unlinkError": "Failed to unlink parent.",
+    "editError": "Failed to update parent."
+  },
   "welcome": {
     "ADMIN": "Welcome, Admin, {{name}}!",
     "HEADMASTER": "Welcome, Headmaster, {{name}}!",
