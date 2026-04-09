@@ -12,8 +12,8 @@ import useAuth from '../../hooks/useAuth';
 const GRADE_COLOR = v => {
   const n = parseFloat(v);
   if (n >= 5.5) return 'success';
-  if (n >= 4.5) return 'primary';
-  if (n >= 3.5) return 'warning';
+  if (n >= 4) return 'primary';
+  if (n <= 3) return 'warning';
   return 'error';
 };
 

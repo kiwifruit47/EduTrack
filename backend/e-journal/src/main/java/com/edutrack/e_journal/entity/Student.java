@@ -38,4 +38,9 @@ public class Student {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profileid")
     private SchoolProfile profile;
+
+    /** Nullable — the parent account shared by the student's family. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parentid")
+    private User parent;
 }

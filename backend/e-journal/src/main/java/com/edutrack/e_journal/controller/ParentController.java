@@ -27,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/parents")
@@ -43,17 +46,38 @@ public class ParentController {
     // ── List parents at a school ──────────────────────────────────────────────
 
     @Operation(summary = "List parents at a school",
-               description = "Returns parents with their children filtered to the given school. HEADMASTER (own school) or ADMIN.")
+               description = "Returns parents with their children (filtered to the given school). One student has at most one parent. HEADMASTER (own school) or ADMIN.")
     @ApiResponse(responseCode = "200", description = "Parent list returned")
     @GetMapping("/school/{schoolId}")
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
-    @Transactional(readOnly = true)
     public List<ParentDto> getBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @AuthenticationPrincipal UserDetails principal) {
         checkHeadmasterSchoolAccess(principal, schoolId);
-        return userRepository.findAllByChildren_School_Id(schoolId).stream()
-                .map(p -> toDto(p, schoolId))
+
+        List<Student> studentsWithParent = studentRepository.findAllBySchool_IdAndParentIsNotNull(schoolId);
+
+        // Group students by parent, preserving first-seen order
+        Map<Long, User>                    parentById   = new LinkedHashMap<>();
+        Map<Long, List<ParentDto.StudentItem>> childrenById = new LinkedHashMap<>();
+
+        for (Student s : studentsWithParent) {
+            User parent = s.getParent();
+            parentById.put(parent.getId(), parent);
+            childrenById
+                .computeIfAbsent(parent.getId(), k -> new ArrayList<>())
+                .add(new ParentDto.StudentItem(
+                        s.getId(),
+                        s.getUser().getFirstName() + " " + s.getUser().getLastName()));
+        }
+
+        return parentById.entrySet().stream()
+                .map(e -> {
+                    User p = e.getValue();
+                    List<ParentDto.StudentItem> children = childrenById.get(e.getKey());
+                    children.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                    return new ParentDto(p.getId(), p.getFirstName(), p.getLastName(), p.getEmail(), children);
+                })
                 .toList();
     }
 
@@ -74,7 +98,7 @@ public class ParentController {
     // ── Link parent → student ─────────────────────────────────────────────────
 
     @Operation(summary = "Link a parent to a student",
-               description = "Creates the parent-student relationship. The student must belong to the headmaster's school. HEADMASTER only.")
+               description = "Sets the student's parent to the given user. Replaces any existing parent link. The student must belong to the headmaster's school. HEADMASTER only.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Linked — updated ParentDto returned"),
         @ApiResponse(responseCode = "400", description = "User is not a parent"),
@@ -83,7 +107,6 @@ public class ParentController {
     })
     @PostMapping("/{parentId}/link/{studentId}")
     @PreAuthorize("hasRole('HEADMASTER')")
-    @Transactional
     public ResponseEntity<ParentDto> link(
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @Parameter(description = "Student user ID") @PathVariable Long studentId,
@@ -91,15 +114,15 @@ public class ParentController {
 
         User parent     = resolveParent(parentId);
         Student student = resolveOwnStudent(studentId, principal);
-        parent.getChildren().add(student);
-        userRepository.save(parent);
+        student.setParent(parent);
+        studentRepository.save(student);
         return ResponseEntity.ok(toDto(parent, student.getSchool().getId()));
     }
 
     // ── Unlink parent → student ───────────────────────────────────────────────
 
     @Operation(summary = "Unlink a parent from a student",
-               description = "Removes the parent-student relationship. The student must belong to the headmaster's school. HEADMASTER only.")
+               description = "Clears the student's parent field. The student must belong to the headmaster's school. HEADMASTER only.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Unlinked successfully"),
         @ApiResponse(responseCode = "403", description = "Student does not belong to headmaster's school"),
@@ -107,16 +130,15 @@ public class ParentController {
     })
     @DeleteMapping("/{parentId}/unlink/{studentId}")
     @PreAuthorize("hasRole('HEADMASTER')")
-    @Transactional
     public ResponseEntity<Void> unlink(
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @Parameter(description = "Student user ID") @PathVariable Long studentId,
             @AuthenticationPrincipal UserDetails principal) {
 
-        User parent     = resolveParent(parentId);
+        resolveParent(parentId); // validate it's a parent user
         Student student = resolveOwnStudent(studentId, principal);
-        parent.getChildren().removeIf(s -> s.getId().equals(student.getId()));
-        userRepository.save(parent);
+        student.setParent(null);
+        studentRepository.save(student);
         return ResponseEntity.noContent().build();
     }
 
@@ -130,7 +152,6 @@ public class ParentController {
     })
     @PutMapping("/{parentId}")
     @PreAuthorize("hasRole('HEADMASTER')")
-    @Transactional
     public ResponseEntity<ParentDto> update(
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @RequestBody UpdateParentRequest req,
@@ -191,7 +212,7 @@ public class ParentController {
     }
 
     private ParentDto toDto(User parent, Long schoolId) {
-        List<ParentDto.StudentItem> children = parent.getChildren().stream()
+        List<ParentDto.StudentItem> children = studentRepository.findAllByParent_Id(parent.getId()).stream()
                 .filter(s -> s.getSchool() != null && s.getSchool().getId().equals(schoolId))
                 .map(s -> new ParentDto.StudentItem(
                         s.getId(),

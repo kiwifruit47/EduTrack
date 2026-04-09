@@ -10,7 +10,6 @@ DROP TABLE IF EXISTS Grades              CASCADE;
 DROP TABLE IF EXISTS Schedules           CASCADE;
 DROP TABLE IF EXISTS Teacher_Qualifications CASCADE;
 DROP TABLE IF EXISTS Subjects            CASCADE;
-DROP TABLE IF EXISTS Parent_Student      CASCADE;
 DROP TABLE IF EXISTS Students            CASCADE;
 DROP TABLE IF EXISTS Teachers            CASCADE;
 DROP TABLE IF EXISTS Classes             CASCADE;
@@ -80,20 +79,11 @@ CREATE TABLE Students (
     UserId   INT PRIMARY KEY,
     SchoolId INT,
     ClassId  INT,
+    ParentId INT,
     FOREIGN KEY (UserId)   REFERENCES Users(Id)    ON DELETE CASCADE,
     FOREIGN KEY (SchoolId) REFERENCES Schools(Id)  ON DELETE CASCADE,
-    FOREIGN KEY (ClassId)  REFERENCES Classes(Id)  ON DELETE SET NULL
-);
-
--- -------------------------------------------------------------
--- 7. Parent_Student
--- -------------------------------------------------------------
-CREATE TABLE Parent_Student (
-    ParentId  INT NOT NULL,
-    StudentId INT NOT NULL,
-    PRIMARY KEY (ParentId, StudentId),
-    FOREIGN KEY (ParentId)  REFERENCES Users(Id)         ON DELETE CASCADE,
-    FOREIGN KEY (StudentId) REFERENCES Students(UserId)  ON DELETE CASCADE
+    FOREIGN KEY (ClassId)  REFERENCES Classes(Id)  ON DELETE SET NULL,
+    FOREIGN KEY (ParentId) REFERENCES Users(Id)    ON DELETE SET NULL
 );
 
 -- -------------------------------------------------------------

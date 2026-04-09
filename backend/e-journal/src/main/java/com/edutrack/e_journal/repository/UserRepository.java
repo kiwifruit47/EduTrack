@@ -16,8 +16,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User> findAllByRole_Name(RoleEnum role);
 
-    List<User> findAllByChildren_School_Id(Long schoolId);
-
     /** STUDENT-role users not yet enrolled in any school (no student record or school is null). */
     @Query("SELECT u FROM User u WHERE u.role.name = com.edutrack.e_journal.entity.RoleEnum.STUDENT " +
            "AND u.id NOT IN (SELECT s.id FROM Student s WHERE s.school IS NOT NULL)")

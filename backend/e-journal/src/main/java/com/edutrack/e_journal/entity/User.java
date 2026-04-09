@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Table(name = "users")
 @Getter
@@ -55,16 +52,4 @@ public class User {
     @Column(name = "bio", length = 500)
     private String bio;
 
-    /**
-     * Populated only for users with role PARENT.
-     * Maps the parent_student junction table.
-     */
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "parent_student",
-        joinColumns = @JoinColumn(name = "parentid"),
-        inverseJoinColumns = @JoinColumn(name = "studentid")
-    )
-    @Builder.Default
-    private Set<Student> children = new HashSet<>();
 }

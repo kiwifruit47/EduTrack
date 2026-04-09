@@ -13,21 +13,22 @@ import api from '../../api/axiosInstance';
 
 function ViewStudents() {
   const { t } = useTranslation();
-  const [students, setStudents]           = useState([]);
-  const [schoolId, setSchoolId]           = useState(null);
-  const [schoolName, setSchoolName]       = useState('');
-  const [loading, setLoading]             = useState(true);
-  const [error, setError]                 = useState(null);
+  const [students,   setStudents]   = useState([]);
+  const [schoolId,   setSchoolId]   = useState(null);
+  const [schoolName, setSchoolName] = useState('');
+  const [parentMap,  setParentMap]  = useState({}); // studentId → parentName
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
 
   // Enroll dialog
-  const [enrollOpen, setEnrollOpen]       = useState(false);
-  const [available, setAvailable]         = useState([]);
-  const [availLoading, setAvailLoading]   = useState(false);
-  const [enrollError, setEnrollError]     = useState(null);
+  const [enrollOpen,    setEnrollOpen]    = useState(false);
+  const [available,     setAvailable]     = useState([]);
+  const [availLoading,  setAvailLoading]  = useState(false);
+  const [enrollError,   setEnrollError]   = useState(null);
 
   // Expel confirmation dialog
-  const [expelTarget, setExpelTarget]     = useState(null); // { id, name }
-  const [expelError, setExpelError]       = useState(null);
+  const [expelTarget, setExpelTarget] = useState(null); // { id, name }
+  const [expelError,  setExpelError]  = useState(null);
 
   useEffect(() => {
     api.get('/api/profile')
@@ -35,9 +36,22 @@ function ViewStudents() {
         const sid = res.data.schoolId;
         setSchoolId(sid);
         setSchoolName(res.data.schoolName || '');
-        return api.get(`/api/users/students/school/${sid}`);
+        return Promise.all([
+          api.get(`/api/users/students/school/${sid}`),
+          api.get(`/api/parents/school/${sid}`),
+        ]);
       })
-      .then(res => setStudents(res.data))
+      .then(([studentRes, parentRes]) => {
+        setStudents(studentRes.data);
+        // Build studentId → parentName map from ParentDto list
+        const map = {};
+        parentRes.data.forEach(p => {
+          p.children.forEach(c => {
+            map[c.id] = `${p.firstName} ${p.lastName}`;
+          });
+        });
+        setParentMap(map);
+      })
       .catch(() => setError(t('users.fetchError')))
       .finally(() => setLoading(false));
   }, []);
@@ -54,7 +68,7 @@ function ViewStudents() {
       .finally(() => setAvailLoading(false));
   };
 
-  const handleEnroll = (userId, name) => {
+  const handleEnroll = (userId) => {
     api.post(`/api/students/${userId}/enroll`)
       .then(res => {
         setStudents(prev => [...prev, res.data]);
@@ -90,7 +104,7 @@ function ViewStudents() {
           </Button>
         </Box>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error      && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {expelError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setExpelError(null)}>{expelError}</Alert>}
 
         {loading ? (
@@ -103,13 +117,14 @@ function ViewStudents() {
                   <TableCell sx={{ width: 56 }} />
                   <TableCell>{t('users.firstName')} {t('users.lastName')}</TableCell>
                   <TableCell>{t('users.email')}</TableCell>
+                  <TableCell>{t('nav.parents')}</TableCell>
                   <TableCell align="center">{t('schools.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {students.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center">{t('users.noUsers')}</TableCell>
+                    <TableCell colSpan={5} align="center">{t('users.noUsers')}</TableCell>
                   </TableRow>
                 ) : (
                   students.map(s => (
@@ -119,6 +134,11 @@ function ViewStudents() {
                       </TableCell>
                       <TableCell>{s.firstName} {s.lastName}</TableCell>
                       <TableCell>{s.email}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color={parentMap[s.id] ? 'text.primary' : 'text.disabled'}>
+                          {parentMap[s.id] ?? '—'}
+                        </Typography>
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton
                           size="small"
@@ -164,11 +184,7 @@ function ViewStudents() {
                       <TableCell>{u.firstName} {u.lastName}</TableCell>
                       <TableCell>{u.email}</TableCell>
                       <TableCell align="right">
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleEnroll(u.id, `${u.firstName} ${u.lastName}`)}
-                        >
+                        <Button size="small" variant="outlined" onClick={() => handleEnroll(u.id)}>
                           {t('students.enroll')}
                         </Button>
                       </TableCell>

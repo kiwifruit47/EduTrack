@@ -80,7 +80,9 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<UserDto> getParentsBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
-        return userRepository.findAllByChildren_School_Id(schoolId).stream()
+        return studentRepository.findAllBySchool_IdAndParentIsNotNull(schoolId).stream()
+                .map(s -> s.getParent())
+                .distinct()
                 .map(this::toDto)
                 .toList();
     }
