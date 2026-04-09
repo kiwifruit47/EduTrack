@@ -47,6 +47,16 @@
     "addEntry": "Add Entry",
     "noEntries": "No entries.",
     "notInSession": "No active school term today.",
+    "dayOfWeek": "Day",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "days": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday"
+    },
     "fetchError": "Failed to load schedule.",
     "createError": "Failed to add entry.",
     "deleteError": "Failed to delete entry."

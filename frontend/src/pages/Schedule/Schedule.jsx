@@ -3,46 +3,57 @@ import {
   Alert, Box, Button, CircularProgress, Dialog, DialogActions,
   DialogContent, DialogTitle, Divider, FormControl, IconButton,
   InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Typography,
+  TableContainer, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon    from '@mui/icons-material/Add';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
 import useAuth from '../../hooks/useAuth';
 
-const selectSx = { color: 'black' };
-const labelSx  = { color: 'black' };
+const fmtTime = t => (t ? t.slice(0, 5) : '');
 
 function TermTable({ entries, canEdit, onDelete, t }) {
+  const sorted = [...entries].sort((a, b) =>
+    a.dayOfWeek !== b.dayOfWeek
+      ? a.dayOfWeek - b.dayOfWeek
+      : fmtTime(a.startTime).localeCompare(fmtTime(b.startTime))
+  );
+
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
       <Table size="small">
         <TableHead>
           <TableRow>
+            <TableCell>{t('schedule.dayOfWeek')}</TableCell>
+            <TableCell>{t('schedule.startTime')}</TableCell>
+            <TableCell>{t('schedule.endTime')}</TableCell>
             <TableCell>{t('schedule.subject')}</TableCell>
             <TableCell>{t('schedule.teacher')}</TableCell>
-            {canEdit && <TableCell align="center" width={60} />}
+            {canEdit && <TableCell sx={{ width: 48 }} />}
           </TableRow>
         </TableHead>
         <TableBody>
-          {entries.length === 0 ? (
+          {sorted.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={canEdit ? 3 : 2} align="center">
+              <TableCell colSpan={canEdit ? 6 : 5} align="center">
                 {t('schedule.noEntries')}
               </TableCell>
             </TableRow>
           ) : (
-            entries.map(e => (
+            sorted.map(e => (
               <TableRow key={e.id} hover>
+                <TableCell>{t(`schedule.days.${e.dayOfWeek}`)}</TableCell>
+                <TableCell>{fmtTime(e.startTime)}</TableCell>
+                <TableCell>{fmtTime(e.endTime)}</TableCell>
                 <TableCell>{e.subjectName}</TableCell>
                 <TableCell>{e.teacherName}</TableCell>
                 {canEdit && (
                   <TableCell align="center">
                     <IconButton size="small" onClick={() => onDelete(e.id)}>
-                      <DeleteIcon fontSize="small" sx={{ color: 'red' }} />
+                      <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
                     </IconButton>
                   </TableCell>
                 )}
@@ -55,23 +66,24 @@ function TermTable({ entries, canEdit, onDelete, t }) {
   );
 }
 
+const EMPTY_FORM = { subjectId: '', teacherId: '', term: '', dayOfWeek: '', startTime: '', endTime: '' };
+
 function Schedule() {
-  const { t }              = useTranslation();
-  const { classId }        = useParams();
-  const { user }           = useAuth();
-  const canEdit            = user?.role === 'ADMIN' || user?.role === 'HEADMASTER';
+  const { t }       = useTranslation();
+  const { classId } = useParams();
+  const { user }    = useAuth();
+  const canEdit     = user?.role === 'ADMIN' || user?.role === 'HEADMASTER';
 
-  const [classInfo, setClassInfo]   = useState(null);
-  const [entries, setEntries]       = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
+  const [classInfo, setClassInfo] = useState(null);
+  const [entries,   setEntries]   = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState(null);
 
-  // Add dialog
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [subjects, setSubjects]     = useState([]);
-  const [teachers, setTeachers]     = useState([]);
-  const [form, setForm]             = useState({ subjectId: '', teacherId: '', term: '' });
-  const [saving, setSaving]         = useState(false);
+  const [subjects,   setSubjects]   = useState([]);
+  const [teachers,   setTeachers]   = useState([]);
+  const [form,       setForm]       = useState(EMPTY_FORM);
+  const [saving,     setSaving]     = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -94,6 +106,7 @@ function Schedule() {
     ]).then(([subRes, teachRes]) => {
       setSubjects(subRes.data);
       setTeachers(teachRes.data);
+      setForm(EMPTY_FORM);
       setDialogOpen(true);
     });
   };
@@ -105,21 +118,26 @@ function Schedule() {
       subjectId: Number(form.subjectId),
       teacherId: Number(form.teacherId),
       term:      Number(form.term),
+      dayOfWeek: Number(form.dayOfWeek),
+      startTime: form.startTime,
+      endTime:   form.endTime,
     })
       .then(res => {
         setEntries(prev => [...prev, res.data]);
         setDialogOpen(false);
-        setForm({ subjectId: '', teacherId: '', term: '' });
       })
       .catch(() => setError(t('schedule.createError')))
       .finally(() => setSaving(false));
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = id => {
     api.delete(`/api/schedules/${id}`)
       .then(() => setEntries(prev => prev.filter(e => e.id !== id)))
       .catch(() => setError(t('schedule.deleteError')));
   };
+
+  const canSubmit = form.subjectId && form.teacherId && form.term &&
+                    form.dayOfWeek && form.startTime && form.endTime && !saving;
 
   const term1 = entries.filter(e => e.term === 1);
   const term2 = entries.filter(e => e.term === 2);
@@ -128,9 +146,7 @@ function Schedule() {
     <Layout>
       <Box sx={{ p: 3 }}>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
         ) : (
           <>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -166,33 +182,81 @@ function Schedule() {
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{t('schedule.addEntry')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-          <FormControl fullWidth required>
-            <InputLabel sx={labelSx}>{t('schedule.subject')}</InputLabel>
-            <Select value={form.subjectId} onChange={e => setForm(f => ({ ...f, subjectId: e.target.value }))}
-              label={t('schedule.subject')} sx={selectSx}>
+          <FormControl fullWidth size="small" required>
+            <InputLabel>{t('schedule.subject')}</InputLabel>
+            <Select
+              value={form.subjectId}
+              label={t('schedule.subject')}
+              onChange={e => setForm(f => ({ ...f, subjectId: e.target.value }))}
+            >
               {subjects.map(s => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)}
             </Select>
           </FormControl>
-          <FormControl fullWidth required>
-            <InputLabel sx={labelSx}>{t('schedule.teacher')}</InputLabel>
-            <Select value={form.teacherId} onChange={e => setForm(f => ({ ...f, teacherId: e.target.value }))}
-              label={t('schedule.teacher')} sx={selectSx}>
-              {teachers.map(t => <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>)}
+
+          <FormControl fullWidth size="small" required>
+            <InputLabel>{t('schedule.teacher')}</InputLabel>
+            <Select
+              value={form.teacherId}
+              label={t('schedule.teacher')}
+              onChange={e => setForm(f => ({ ...f, teacherId: e.target.value }))}
+            >
+              {teachers.map(tc => <MenuItem key={tc.id} value={tc.id}>{tc.name}</MenuItem>)}
             </Select>
           </FormControl>
-          <FormControl fullWidth required>
-            <InputLabel sx={labelSx}>{t('schedule.term')}</InputLabel>
-            <Select value={form.term} onChange={e => setForm(f => ({ ...f, term: e.target.value }))}
-              label={t('schedule.term')} sx={selectSx}>
-              <MenuItem value={1}>{t('schedule.term1')}</MenuItem>
-              <MenuItem value={2}>{t('schedule.term2')}</MenuItem>
-            </Select>
-          </FormControl>
+
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <FormControl fullWidth size="small" required>
+              <InputLabel>{t('schedule.term')}</InputLabel>
+              <Select
+                value={form.term}
+                label={t('schedule.term')}
+                onChange={e => setForm(f => ({ ...f, term: e.target.value }))}
+              >
+                <MenuItem value={1}>{t('schedule.term1')}</MenuItem>
+                <MenuItem value={2}>{t('schedule.term2')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small" required>
+              <InputLabel>{t('schedule.dayOfWeek')}</InputLabel>
+              <Select
+                value={form.dayOfWeek}
+                label={t('schedule.dayOfWeek')}
+                onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value }))}
+              >
+                {[1, 2, 3, 4, 5].map(d => (
+                  <MenuItem key={d} value={d}>{t(`schedule.days.${d}`)}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              required
+              type="time"
+              label={t('schedule.startTime')}
+              value={form.startTime}
+              onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              fullWidth
+              size="small"
+              required
+              type="time"
+              label={t('schedule.endTime')}
+              value={form.endTime}
+              onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleAdd}
-            disabled={!form.subjectId || !form.teacherId || !form.term || saving}>
+          <Button variant="contained" onClick={handleAdd} disabled={!canSubmit}>
             {t('common.save')}
           </Button>
         </DialogActions>

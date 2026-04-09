@@ -126,24 +126,37 @@ function TeacherSchedule() {
             <Table size="small">
               <TableHead>
                 <TableRow>
+                  <TableCell>{t('schedule.dayOfWeek')}</TableCell>
+                  <TableCell>{t('schedule.startTime')}</TableCell>
+                  <TableCell>{t('schedule.endTime')}</TableCell>
                   <TableCell>{t('schedule.class')}</TableCell>
                   <TableCell>{t('schedule.subject')}</TableCell>
                   <TableCell>{t('schedule.school')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {activeEntries.map(e => (
-                  <TableRow
-                    key={e.id}
-                    hover
-                    sx={{ cursor: 'pointer', bgcolor: '#f1f8e9' }}
-                    onClick={() => navigate(`/schedule/${e.classId}`)}
-                  >
-                    <TableCell sx={{ color: 'success.dark', fontWeight: 500 }}>{e.className}</TableCell>
-                    <TableCell sx={{ color: 'success.dark' }}>{e.subjectName}</TableCell>
-                    <TableCell sx={{ color: 'success.dark' }}>{e.schoolName}</TableCell>
-                  </TableRow>
-                ))}
+                {[...activeEntries]
+                  .sort((a, b) =>
+                    a.dayOfWeek !== b.dayOfWeek
+                      ? a.dayOfWeek - b.dayOfWeek
+                      : (a.startTime ?? '').localeCompare(b.startTime ?? '')
+                  )
+                  .map(e => (
+                    <TableRow
+                      key={e.id}
+                      hover
+                      sx={{ cursor: 'pointer', bgcolor: '#f1f8e9' }}
+                      onClick={() => navigate(`/schedule/${e.classId}`)}
+                    >
+                      <TableCell sx={{ color: 'success.dark' }}>{t(`schedule.days.${e.dayOfWeek}`)}</TableCell>
+                      <TableCell sx={{ color: 'success.dark' }}>{e.startTime?.slice(0, 5)}</TableCell>
+                      <TableCell sx={{ color: 'success.dark' }}>{e.endTime?.slice(0, 5)}</TableCell>
+                      <TableCell sx={{ color: 'success.dark', fontWeight: 500 }}>{e.className}</TableCell>
+                      <TableCell sx={{ color: 'success.dark' }}>{e.subjectName}</TableCell>
+                      <TableCell sx={{ color: 'success.dark' }}>{e.schoolName}</TableCell>
+                    </TableRow>
+                  ))
+                }
               </TableBody>
             </Table>
           </TableContainer>
