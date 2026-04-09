@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Alert, Box, Button, CircularProgress, Dialog, DialogContent,
-  DialogTitle, IconButton, List, ListItem, ListItemText, Paper,
+  Alert, Box, Button, Chip, CircularProgress, Dialog, DialogContent,
+  DialogTitle, FormGroup, FormControlLabel, Checkbox, IconButton,
+  InputAdornment, List, ListItem, ListItemText, Paper, Stack,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Typography,
+  TextField, Tooltip, Typography,
 } from '@mui/material';
-import BlockIcon from '@mui/icons-material/Block';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import BlockIcon      from '@mui/icons-material/Block';
+import EditIcon       from '@mui/icons-material/Edit';
+import PersonAddIcon  from '@mui/icons-material/PersonAdd';
+import SchoolIcon     from '@mui/icons-material/School';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import UserAvatar from '../../components/UserAvatar';
@@ -18,19 +21,34 @@ function ViewTeachers() {
   const [teachers,    setTeachers]    = useState([]);
   const [schoolId,    setSchoolId]    = useState(null);
   const [schoolName,  setSchoolName]  = useState('');
+  const [subjects,    setSubjects]    = useState([]); // all subjects for qualif. dialog
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState(null);
 
-  // Hire dialog
+  // ── Hire dialog ────────────────────────────────────────────────────────────
   const [hireOpen,     setHireOpen]     = useState(false);
   const [available,    setAvailable]    = useState([]);
   const [availLoading, setAvailLoading] = useState(false);
   const [availError,   setAvailError]   = useState(null);
   const [hireError,    setHireError]    = useState(null);
 
-  // Fire dialog
+  // ── Fire dialog ────────────────────────────────────────────────────────────
   const [fireTarget, setFireTarget] = useState(null); // { id, name }
   const [fireError,  setFireError]  = useState(null);
+
+  // ── Salary dialog ──────────────────────────────────────────────────────────
+  const [salaryTarget, setSalaryTarget] = useState(null); // { id, name, salary }
+  const [salaryInput,  setSalaryInput]  = useState('');
+  const [salaryError,  setSalaryError]  = useState(null);
+  const [salarySaving, setSalarySaving] = useState(false);
+
+  // ── Qualifications dialog ──────────────────────────────────────────────────
+  const [qualTarget,  setQualTarget]  = useState(null); // teacher object
+  const [qualChecked, setQualChecked] = useState(new Set());
+  const [qualError,   setQualError]   = useState(null);
+  const [qualSaving,  setQualSaving]  = useState(false);
+
+  // ── Load ───────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     api.get('/api/profile')
@@ -38,14 +56,20 @@ function ViewTeachers() {
         const sid = res.data.schoolId;
         setSchoolId(sid);
         setSchoolName(res.data.schoolName || '');
-        return api.get(`/api/users/teachers/school/${sid}`);
+        return Promise.all([
+          api.get(`/api/teachers/school/${sid}`),
+          api.get('/api/subjects'),
+        ]);
       })
-      .then(res => setTeachers(res.data))
+      .then(([teacherRes, subjectRes]) => {
+        setTeachers(teacherRes.data);
+        setSubjects(subjectRes.data);
+      })
       .catch(() => setError(t('users.fetchError')))
       .finally(() => setLoading(false));
   }, []);
 
-  // ── Hire ──────────────────────────────────────────────────────────────────
+  // ── Hire ───────────────────────────────────────────────────────────────────
 
   const openHire = () => {
     setHireOpen(true);
@@ -58,17 +82,20 @@ function ViewTeachers() {
       .finally(() => setAvailLoading(false));
   };
 
-  const handleHire = (userId, name) => {
+  const handleHire = (userId, firstName, lastName, email) => {
     setHireError(null);
     api.post(`/api/teachers/${userId}/hire`)
       .then(() => {
         setAvailable(prev => prev.filter(u => u.id !== userId));
-        setTeachers(prev => [...prev, { id: userId, name }]);
+        const name = `${firstName} ${lastName}`;
+        setTeachers(prev => [...prev, {
+          id: userId, name, email, salary: null, qualifications: [], classCount: 0,
+        }]);
       })
       .catch(() => setHireError(t('teachers.hireError')));
   };
 
-  // ── Fire ──────────────────────────────────────────────────────────────────
+  // ── Fire ───────────────────────────────────────────────────────────────────
 
   const handleFire = () => {
     if (!fireTarget) return;
@@ -81,7 +108,56 @@ function ViewTeachers() {
       .catch(() => setFireError(t('teachers.fireError')));
   };
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // ── Salary ─────────────────────────────────────────────────────────────────
+
+  const openSalary = (teacher) => {
+    setSalaryTarget(teacher);
+    setSalaryInput(teacher.salary != null ? String(teacher.salary) : '');
+    setSalaryError(null);
+  };
+
+  const handleSalarySave = () => {
+    setSalarySaving(true);
+    setSalaryError(null);
+    const payload = { salary: salaryInput === '' ? null : parseFloat(salaryInput) };
+    api.put(`/api/teachers/${salaryTarget.id}/salary`, payload)
+      .then(res => {
+        setTeachers(prev => prev.map(t => t.id === salaryTarget.id ? res.data : t));
+        setSalaryTarget(null);
+      })
+      .catch(() => setSalaryError(t('teachers.salaryError')))
+      .finally(() => setSalarySaving(false));
+  };
+
+  // ── Qualifications ─────────────────────────────────────────────────────────
+
+  const openQual = (teacher) => {
+    setQualTarget(teacher);
+    setQualChecked(new Set(teacher.qualifications.map(q => q.id)));
+    setQualError(null);
+  };
+
+  const toggleQual = (id) => {
+    setQualChecked(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handleQualSave = () => {
+    setQualSaving(true);
+    setQualError(null);
+    api.put(`/api/teachers/${qualTarget.id}/qualifications`, { subjectIds: [...qualChecked] })
+      .then(res => {
+        setTeachers(prev => prev.map(t => t.id === qualTarget.id ? res.data : t));
+        setQualTarget(null);
+      })
+      .catch(() => setQualError(t('teachers.qualError')))
+      .finally(() => setQualSaving(false));
+  };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <Layout>
@@ -107,15 +183,22 @@ function ViewTeachers() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ width: 56 }} />
+                  <TableCell sx={{ width: 48 }} />
                   <TableCell>{t('users.firstName')} {t('users.lastName')}</TableCell>
-                  <TableCell sx={{ width: 56 }} />
+                  <TableCell>{t('teachers.qualifications')}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title={t('teachers.classesTooltip')}>
+                      <span><SchoolIcon fontSize="small" sx={{ verticalAlign: 'middle' }} /></span>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell>{t('teachers.salary')}</TableCell>
+                  <TableCell sx={{ width: 100 }} />
                 </TableRow>
               </TableHead>
               <TableBody>
                 {teachers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center">{t('users.noUsers')}</TableCell>
+                    <TableCell colSpan={6} align="center">{t('users.noUsers')}</TableCell>
                   </TableRow>
                 ) : (
                   teachers.map(teacher => (
@@ -123,15 +206,45 @@ function ViewTeachers() {
                       <TableCell>
                         <UserAvatar userId={teacher.id} name={teacher.name} size={36} />
                       </TableCell>
-                      <TableCell>{teacher.name}</TableCell>
                       <TableCell>
-                        <IconButton
-                          size="small"
-                          title={t('teachers.fire')}
-                          onClick={() => { setFireTarget({ id: teacher.id, name: teacher.name }); setFireError(null); }}
-                        >
-                          <BlockIcon fontSize="small" sx={{ color: 'error.main' }} />
-                        </IconButton>
+                        <Typography variant="body2" fontWeight={500}>{teacher.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{teacher.email}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                          {teacher.qualifications.length === 0 ? (
+                            <Typography variant="caption" color="text.disabled">—</Typography>
+                          ) : (
+                            teacher.qualifications.map(q => (
+                              <Chip key={q.id} label={q.name} size="small" />
+                            ))
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">{teacher.classCount}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {teacher.salary != null ? `${teacher.salary} лв.` : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Tooltip title={t('teachers.editSalary')}>
+                          <IconButton size="small" onClick={() => openSalary(teacher)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('teachers.editQualifications')}>
+                          <IconButton size="small" onClick={() => openQual(teacher)}>
+                            <SchoolIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('teachers.fire')}>
+                          <IconButton size="small" onClick={() => { setFireTarget({ id: teacher.id, name: teacher.name }); setFireError(null); }}>
+                            <BlockIcon fontSize="small" sx={{ color: 'error.main' }} />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))
@@ -141,12 +254,12 @@ function ViewTeachers() {
           </TableContainer>
         )}
 
-        {/* ── Hire dialog ────────────────────────────────────────────────── */}
+        {/* ── Hire dialog ──────────────────────────────────────────────────── */}
         <Dialog open={hireOpen} onClose={() => setHireOpen(false)} maxWidth="xs" fullWidth>
           <DialogTitle>{t('teachers.hireTitle')}</DialogTitle>
           <DialogContent>
-            {hireError  && <Alert severity="error"   sx={{ mb: 1 }}>{hireError}</Alert>}
-            {availError && <Alert severity="error"   sx={{ mb: 1 }}>{availError}</Alert>}
+            {hireError  && <Alert severity="error" sx={{ mb: 1 }}>{hireError}</Alert>}
+            {availError && <Alert severity="error" sx={{ mb: 1 }}>{availError}</Alert>}
             {availLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}><CircularProgress /></Box>
             ) : available.length === 0 ? (
@@ -159,7 +272,8 @@ function ViewTeachers() {
                     disablePadding
                     sx={{ mb: 0.5 }}
                     secondaryAction={
-                      <Button size="small" variant="contained" onClick={() => handleHire(u.id, `${u.firstName} ${u.lastName}`)}>
+                      <Button size="small" variant="contained"
+                        onClick={() => handleHire(u.id, u.firstName, u.lastName, u.email)}>
                         {t('teachers.hire')}
                       </Button>
                     }
@@ -172,7 +286,7 @@ function ViewTeachers() {
           </DialogContent>
         </Dialog>
 
-        {/* ── Fire confirmation dialog ────────────────────────────────────── */}
+        {/* ── Fire confirmation ─────────────────────────────────────────────── */}
         <Dialog open={!!fireTarget} onClose={() => setFireTarget(null)} maxWidth="xs" fullWidth>
           <DialogTitle>{t('teachers.fireTitle')}</DialogTitle>
           <DialogContent>
@@ -184,6 +298,66 @@ function ViewTeachers() {
               <Button size="small" onClick={() => setFireTarget(null)}>{t('common.cancel')}</Button>
               <Button size="small" variant="contained" color="error" onClick={handleFire}>
                 {t('teachers.fire')}
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Salary dialog ─────────────────────────────────────────────────── */}
+        <Dialog open={!!salaryTarget} onClose={() => setSalaryTarget(null)} maxWidth="xs" fullWidth>
+          <DialogTitle>{t('teachers.editSalary')} — {salaryTarget?.name}</DialogTitle>
+          <DialogContent>
+            {salaryError && <Alert severity="error" sx={{ mb: 1 }}>{salaryError}</Alert>}
+            <TextField
+              autoFocus
+              size="small"
+              fullWidth
+              type="number"
+              inputProps={{ min: 0, step: 0.01 }}
+              label={t('teachers.salary')}
+              placeholder={t('teachers.salaryPlaceholder')}
+              value={salaryInput}
+              onChange={e => setSalaryInput(e.target.value)}
+              InputProps={{ endAdornment: <InputAdornment position="end">лв.</InputAdornment> }}
+              sx={{ mt: 1 }}
+            />
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+              <Button size="small" onClick={() => setSalaryTarget(null)}>{t('common.cancel')}</Button>
+              <Button size="small" variant="contained" onClick={handleSalarySave} disabled={salarySaving}>
+                {t('common.save')}
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Qualifications dialog ─────────────────────────────────────────── */}
+        <Dialog open={!!qualTarget} onClose={() => setQualTarget(null)} maxWidth="xs" fullWidth>
+          <DialogTitle>{t('teachers.editQualifications')} — {qualTarget?.name}</DialogTitle>
+          <DialogContent>
+            {qualError && <Alert severity="error" sx={{ mb: 1 }}>{qualError}</Alert>}
+            {subjects.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">{t('subjects.noSubjects')}</Typography>
+            ) : (
+              <FormGroup>
+                {subjects.map(s => (
+                  <FormControlLabel
+                    key={s.id}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={qualChecked.has(s.id)}
+                        onChange={() => toggleQual(s.id)}
+                      />
+                    }
+                    label={s.name}
+                  />
+                ))}
+              </FormGroup>
+            )}
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+              <Button size="small" onClick={() => setQualTarget(null)}>{t('common.cancel')}</Button>
+              <Button size="small" variant="contained" onClick={handleQualSave} disabled={qualSaving}>
+                {t('common.save')}
               </Button>
             </Box>
           </DialogContent>

@@ -1,6 +1,7 @@
 package com.edutrack.e_journal.config;
 
 import com.edutrack.e_journal.security.JwtAuthenticationFilter;
+import com.edutrack.e_journal.security.LocalhostAdminFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

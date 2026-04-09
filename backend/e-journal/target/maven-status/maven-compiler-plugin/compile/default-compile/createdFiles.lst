@@ -21,7 +21,9 @@ com/edutrack/e_journal/dto/SubjectDto.class
 com/edutrack/e_journal/entity/RoleEnum.class
 com/edutrack/e_journal/dto/SchoolDto$ProfileDto.class
 com/edutrack/e_journal/controller/AuthController.class
+com/edutrack/e_journal/controller/TeacherController$QualificationsRequest.class
 com/edutrack/e_journal/repository/SubjectRepository.class
+com/edutrack/e_journal/dto/TeacherDto$SubjectItem.class
 com/edutrack/e_journal/controller/TeacherController.class
 com/edutrack/e_journal/config/SecurityConfig.class
 com/edutrack/e_journal/controller/AbsenceController.class
@@ -45,6 +47,7 @@ com/edutrack/e_journal/entity/User$UserBuilder.class
 com/edutrack/e_journal/entity/Schedule.class
 com/edutrack/e_journal/dto/UserDto.class
 com/edutrack/e_journal/repository/SchoolRepository.class
+com/edutrack/e_journal/dto/TeacherDto.class
 com/edutrack/e_journal/entity/Role.class
 com/edutrack/e_journal/entity/SchoolType.class
 com/edutrack/e_journal/dto/AuthResponse.class
@@ -79,6 +82,7 @@ com/edutrack/e_journal/entity/SchoolClass.class
 com/edutrack/e_journal/repository/TeacherRepository.class
 com/edutrack/e_journal/repository/RoleRepository.class
 com/edutrack/e_journal/dto/ScheduleDto.class
+com/edutrack/e_journal/controller/TeacherController$SalaryRequest.class
 com/edutrack/e_journal/EJournalApplication.class
 com/edutrack/e_journal/dto/UpdateUserRequest.class
 com/edutrack/e_journal/controller/SubjectController.class

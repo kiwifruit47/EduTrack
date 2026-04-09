@@ -3,6 +3,8 @@ package com.edutrack.e_journal.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +33,10 @@ public class Teacher {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schoolid", nullable = true)
     private School school;
+
+    /** Monthly gross salary in BGN. Null if not set. */
+    @Column(name = "salary", precision = 10, scale = 2)
+    private BigDecimal salary;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

@@ -33,6 +33,7 @@
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/SchoolTermConfigDto.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/SubjectDto.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/SubjectRequest.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/TeacherDto.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/UpdateUserRequest.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/UserDto.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/dto/UserSummaryDto.java
