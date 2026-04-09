@@ -66,8 +66,9 @@ CREATE TABLE Classes (
 -- 5. Teachers
 -- -------------------------------------------------------------
 CREATE TABLE Teachers (
-    UserId   INT PRIMARY KEY,
-    SchoolId INT NOT NULL,
+    UserId   INT            PRIMARY KEY,
+    SchoolId INT,
+    Salary   DECIMAL(10,2),
     FOREIGN KEY (UserId)   REFERENCES Users(Id)   ON DELETE CASCADE,
     FOREIGN KEY (SchoolId) REFERENCES Schools(Id)  ON DELETE CASCADE
 );
@@ -77,7 +78,7 @@ CREATE TABLE Teachers (
 -- -------------------------------------------------------------
 CREATE TABLE Students (
     UserId   INT PRIMARY KEY,
-    SchoolId INT NOT NULL,
+    SchoolId INT,
     ClassId  INT,
     FOREIGN KEY (UserId)   REFERENCES Users(Id)    ON DELETE CASCADE,
     FOREIGN KEY (SchoolId) REFERENCES Schools(Id)  ON DELETE CASCADE,

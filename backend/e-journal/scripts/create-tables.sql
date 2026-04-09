@@ -39,16 +39,17 @@ CREATE TABLE Classes (
 
 -- 3. Специфични профили и връзки
 CREATE TABLE Teachers (
-                          UserId INT PRIMARY KEY,
-                          SchoolId INT NOT NULL,
-                          FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+                          UserId   INT            PRIMARY KEY,
+                          SchoolId INT,
+                          Salary   DECIMAL(10,2),
+                          FOREIGN KEY (UserId)   REFERENCES Users(Id)   ON DELETE CASCADE,
                           FOREIGN KEY (SchoolId) REFERENCES Schools(Id) ON DELETE CASCADE
 );
 
 CREATE TABLE Students (
-                          UserId INT PRIMARY KEY,
-                          SchoolId INT NOT NULL,
-                          ClassId INT,
+                          UserId   INT PRIMARY KEY,
+                          SchoolId INT,
+                          ClassId  INT,
                           FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
                           FOREIGN KEY (SchoolId) REFERENCES Schools(Id) ON DELETE CASCADE,
                           FOREIGN KEY (ClassId) REFERENCES Classes(Id) ON DELETE SET NULL
