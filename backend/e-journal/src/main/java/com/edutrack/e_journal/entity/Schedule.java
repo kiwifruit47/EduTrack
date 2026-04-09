@@ -56,4 +56,18 @@ public class Schedule {
     @NotNull
     @Column(name = "endtime", nullable = false)
     private LocalTime endTime;
+
+    /** STANDARD, SIP, or EXTRACURRICULAR. Defaults to STANDARD. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lecture_type", length = 20, nullable = false)
+    @Builder.Default
+    private LectureType lectureType = LectureType.STANDARD;
+
+    /**
+     * Whether absences are recorded for this entry.
+     * Always true for STANDARD and SIP; can be false for EXTRACURRICULAR.
+     */
+    @Column(name = "track_attendance", nullable = false)
+    @Builder.Default
+    private Boolean trackAttendance = true;
 }

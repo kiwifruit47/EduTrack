@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Alert, Box, Button, CircularProgress, Dialog, DialogActions,
-  DialogContent, DialogTitle, Divider, FormControl, IconButton,
-  InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField, Typography,
+  Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions,
+  DialogContent, DialogTitle, Divider, FormControl, FormControlLabel,
+  IconButton, InputLabel, MenuItem, Paper, Select, Switch, Table,
+  TableBody, TableCell, TableContainer, TableHead, TableRow, TextField,
+  Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon    from '@mui/icons-material/Add';
+
+const TYPE_COLORS = { STANDARD: 'default', SIP: 'info', EXTRACURRICULAR: 'secondary' };
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
@@ -32,13 +35,14 @@ function TermTable({ entries, canEdit, onDelete, t }) {
             <TableCell>{t('schedule.endTime')}</TableCell>
             <TableCell>{t('schedule.subject')}</TableCell>
             <TableCell>{t('schedule.teacher')}</TableCell>
+            <TableCell>{t('schedule.lectureType')}</TableCell>
             {canEdit && <TableCell sx={{ width: 48 }} />}
           </TableRow>
         </TableHead>
         <TableBody>
           {sorted.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={canEdit ? 6 : 5} align="center">
+              <TableCell colSpan={canEdit ? 7 : 6} align="center">
                 {t('schedule.noEntries')}
               </TableCell>
             </TableRow>
@@ -50,6 +54,13 @@ function TermTable({ entries, canEdit, onDelete, t }) {
                 <TableCell>{fmtTime(e.endTime)}</TableCell>
                 <TableCell>{e.subjectName}</TableCell>
                 <TableCell>{e.teacherName}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={t(`lectureTypes.${e.lectureType || 'STANDARD'}`)}
+                    size="small"
+                    color={TYPE_COLORS[e.lectureType] || 'default'}
+                  />
+                </TableCell>
                 {canEdit && (
                   <TableCell align="center">
                     <IconButton size="small" onClick={() => onDelete(e.id)}>
@@ -66,7 +77,10 @@ function TermTable({ entries, canEdit, onDelete, t }) {
   );
 }
 
-const EMPTY_FORM = { subjectId: '', teacherId: '', term: '', dayOfWeek: '', startTime: '', endTime: '' };
+const EMPTY_FORM = {
+  subjectId: '', teacherId: '', term: '', dayOfWeek: '',
+  startTime: '', endTime: '', lectureType: 'STANDARD', trackAttendance: true,
+};
 
 function Schedule() {
   const { t }       = useTranslation();
@@ -114,13 +128,15 @@ function Schedule() {
   const handleAdd = () => {
     setSaving(true);
     api.post('/api/schedules', {
-      classId:   Number(classId),
-      subjectId: Number(form.subjectId),
-      teacherId: Number(form.teacherId),
-      term:      Number(form.term),
-      dayOfWeek: Number(form.dayOfWeek),
-      startTime: form.startTime,
-      endTime:   form.endTime,
+      classId:         Number(classId),
+      subjectId:       Number(form.subjectId),
+      teacherId:       Number(form.teacherId),
+      term:            Number(form.term),
+      dayOfWeek:       Number(form.dayOfWeek),
+      startTime:       form.startTime,
+      endTime:         form.endTime,
+      lectureType:     form.lectureType,
+      trackAttendance: form.lectureType === 'EXTRACURRICULAR' ? form.trackAttendance : true,
     })
       .then(res => {
         setEntries(prev => [...prev, res.data]);
@@ -253,6 +269,31 @@ function Schedule() {
               InputLabelProps={{ shrink: true }}
             />
           </Box>
+
+          <FormControl fullWidth size="small">
+            <InputLabel>{t('schedule.lectureType')}</InputLabel>
+            <Select
+              value={form.lectureType}
+              label={t('schedule.lectureType')}
+              onChange={e => setForm(f => ({ ...f, lectureType: e.target.value }))}
+            >
+              {['STANDARD', 'SIP', 'EXTRACURRICULAR'].map(lt => (
+                <MenuItem key={lt} value={lt}>{t(`lectureTypes.${lt}`)}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {form.lectureType === 'EXTRACURRICULAR' && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={form.trackAttendance}
+                  onChange={e => setForm(f => ({ ...f, trackAttendance: e.target.checked }))}
+                />
+              }
+              label={t('schedule.trackAttendance')}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>

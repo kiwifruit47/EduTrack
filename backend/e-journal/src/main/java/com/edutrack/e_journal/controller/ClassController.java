@@ -38,6 +38,17 @@ public class ClassController {
                 .toList();
     }
 
+    @Operation(summary = "List classes at a school", description = "Returns all classes belonging to the given school. Accessible by ADMIN and HEADMASTER.")
+    @ApiResponse(responseCode = "200", description = "Class list returned")
+    @GetMapping("/school/{schoolId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public List<SchoolClassDto> getBySchool(
+            @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        return classRepository.findAllBySchool_Id(schoolId).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
     @Operation(summary = "Get a class by ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Class found"),

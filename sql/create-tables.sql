@@ -116,8 +116,10 @@ CREATE TABLE Schedules (
     TeacherId INT NOT NULL,
     Term      INT  NOT NULL CHECK (Term IN (1, 2)),
     DayOfWeek INT  NOT NULL CHECK (DayOfWeek BETWEEN 1 AND 5),  -- 1=Mon … 5=Fri
-    StartTime TIME NOT NULL,
-    EndTime   TIME NOT NULL,
+    StartTime        TIME         NOT NULL,
+    EndTime          TIME         NOT NULL,
+    lecture_type     VARCHAR(20)  NOT NULL DEFAULT 'STANDARD',
+    track_attendance BOOLEAN      NOT NULL DEFAULT TRUE,
     FOREIGN KEY (SchoolId)  REFERENCES Schools(Id)       ON DELETE CASCADE,
     FOREIGN KEY (ClassId)   REFERENCES Classes(Id)       ON DELETE CASCADE,
     FOREIGN KEY (SubjectId) REFERENCES Subjects(Id)      ON DELETE CASCADE,

@@ -20,6 +20,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.edutrack.e_journal.entity.LectureType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalTime;
 import java.util.List;
 
@@ -74,6 +78,9 @@ public class ScheduleController {
         Teacher teacher = teacherRepository.findById(req.getTeacherId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Teacher not found"));
 
+        LectureType lectureType = req.getLectureType() != null ? req.getLectureType() : LectureType.STANDARD;
+        boolean trackAttendance = req.getTrackAttendance() != null ? req.getTrackAttendance() : true;
+
         Schedule schedule = Schedule.builder()
                 .school(schoolClass.getSchool())
                 .schoolClass(schoolClass)
@@ -83,9 +90,29 @@ public class ScheduleController {
                 .dayOfWeek(req.getDayOfWeek())
                 .startTime(LocalTime.parse(req.getStartTime()))
                 .endTime(LocalTime.parse(req.getEndTime()))
+                .lectureType(lectureType)
+                .trackAttendance(trackAttendance)
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(scheduleRepository.save(schedule)));
+    }
+
+    @Operation(summary = "Update lecture type and attendance tracking",
+               description = "Changes the lecture type (STANDARD / SIP / EXTRACURRICULAR) and whether absences are tracked. ADMIN and HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Entry updated"),
+        @ApiResponse(responseCode = "404", description = "Entry not found")
+    })
+    @PatchMapping("/{id}/type")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public ResponseEntity<ScheduleDto> patchType(
+            @Parameter(description = "Schedule entry ID") @PathVariable Long id,
+            @RequestBody TypePatchRequest req) {
+        Schedule s = scheduleRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
+        if (req.getLectureType() != null)   s.setLectureType(req.getLectureType());
+        if (req.getTrackAttendance() != null) s.setTrackAttendance(req.getTrackAttendance());
+        return ResponseEntity.ok(toDto(scheduleRepository.save(s)));
     }
 
     @Operation(summary = "Delete a schedule entry", description = "Removes a curriculum entry. Accessible by ADMIN and HEADMASTER.")
@@ -121,7 +148,17 @@ public class ScheduleController {
                 s.getTerm(),
                 s.getDayOfWeek(),
                 s.getStartTime().toString(),
-                s.getEndTime().toString()
+                s.getEndTime().toString(),
+                s.getLectureType().name(),
+                s.getTrackAttendance()
         );
+    }
+
+    // ── Inline request DTO ────────────────────────────────────────────────────
+
+    @Getter @NoArgsConstructor
+    public static class TypePatchRequest {
+        private LectureType lectureType;
+        private Boolean trackAttendance;
     }
 }

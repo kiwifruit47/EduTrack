@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import ClassTimetable from './ClassTimetable';
 import api from '../../api/axiosInstance';
 
 const DEFAULT_TERM_CONFIG = {
@@ -157,6 +158,12 @@ function HeadmasterSchool() {
           </>
         )}
 
+        {/* ── Class Weekly Timetable ───────────────────────────────────────── */}
+        <Divider sx={{ my: 2 }} />
+        <Typography variant="h6" sx={{ mb: 2 }}>{t('schedule.classTimetable')}</Typography>
+        {schoolId && <ClassTimetable schoolId={schoolId} canEdit={true} />}
+
+        {/* ── Daily Schedule ──────────────────────────────────────────────── */}
         <Divider sx={{ my: 2 }} />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>

@@ -59,7 +59,19 @@
     },
     "fetchError": "Грешка при зареждане на разписанието.",
     "createError": "Грешка при добавяне на запис.",
-    "deleteError": "Грешка при изтриване на запис."
+    "deleteError": "Грешка при изтриване на запис.",
+    "selectClass": "Избери клас",
+    "selectClassPrompt": "Изберете клас за да видите седмичното му разписание",
+    "optional": "Незадължителен",
+    "editType": "Редактирай тип",
+    "lectureType": "Тип час",
+    "trackAttendance": "Следи присъствия",
+    "classTimetable": "Седмично разписание на клас"
+  },
+  "lectureTypes": {
+    "STANDARD": "Стандартен",
+    "SIP": "СИП",
+    "EXTRACURRICULAR": "Извънкласен"
   },
   "selectClass": {
     "title": "Избери клас",

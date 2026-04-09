@@ -59,7 +59,19 @@
     },
     "fetchError": "Failed to load schedule.",
     "createError": "Failed to add entry.",
-    "deleteError": "Failed to delete entry."
+    "deleteError": "Failed to delete entry.",
+    "selectClass": "Select Class",
+    "selectClassPrompt": "Select a class to view its timetable",
+    "optional": "Optional",
+    "editType": "Edit Type",
+    "lectureType": "Lecture Type",
+    "trackAttendance": "Track Attendance",
+    "classTimetable": "Class Weekly Timetable"
+  },
+  "lectureTypes": {
+    "STANDARD": "Standard",
+    "SIP": "СИП",
+    "EXTRACURRICULAR": "Extracurricular"
   },
   "selectClass": {
     "title": "Select a Class",

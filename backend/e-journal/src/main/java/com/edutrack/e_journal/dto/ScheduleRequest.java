@@ -1,5 +1,6 @@
 package com.edutrack.e_journal.dto;
 
+import com.edutrack.e_journal.entity.LectureType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -31,4 +32,10 @@ public class ScheduleRequest {
 
     @NotBlank
     private String endTime;    // "HH:mm"
+
+    /** Optional — defaults to STANDARD if null. */
+    private LectureType lectureType;
+
+    /** Optional — defaults to true if null. Relevant only for EXTRACURRICULAR. */
+    private Boolean trackAttendance;
 }
