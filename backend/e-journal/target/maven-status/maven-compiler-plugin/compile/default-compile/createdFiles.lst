@@ -22,6 +22,7 @@ com/edutrack/e_journal/entity/User.class
 com/edutrack/e_journal/entity/Teacher$TeacherBuilder.class
 com/edutrack/e_journal/dto/SchoolScheduleEntryRequest.class
 com/edutrack/e_journal/entity/Teacher.class
+com/edutrack/e_journal/entity/LectureType.class
 com/edutrack/e_journal/entity/School$SchoolBuilder.class
 com/edutrack/e_journal/controller/GradeController.class
 com/edutrack/e_journal/repository/ComplaintRepository.class
@@ -35,6 +36,7 @@ com/edutrack/e_journal/entity/Role.class
 com/edutrack/e_journal/entity/SchoolType.class
 com/edutrack/e_journal/dto/ComplaintDto.class
 com/edutrack/e_journal/repository/UserRepository.class
+com/edutrack/e_journal/controller/ScheduleController$TypePatchRequest.class
 com/edutrack/e_journal/repository/SchoolProfileRepository.class
 com/edutrack/e_journal/dto/ComplaintRequest.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
