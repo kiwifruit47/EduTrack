@@ -161,6 +161,10 @@ function ViewParents() {
           </Button>
         </Box>
 
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Един ученик може да има само един родител/настойник! (родителите споделят един профил)
+        </Alert>
+
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         {loading ? (
@@ -251,20 +255,31 @@ function ViewParents() {
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t('parents.selectStudent')}</InputLabel>
-                  <Select
-                    value={linkStudentId}
-                    label={t('parents.selectStudent')}
-                    onChange={e => setLinkStudentId(e.target.value)}
-                  >
-                    {students.map(s => (
-                      <MenuItem key={s.id} value={s.id}>
-                        {s.firstName} {s.lastName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                {(() => {
+                  const unlinked = students.filter(
+                    s => !parents.some(p => p.children.some(c => c.id === s.id))
+                  );
+                  return unlinked.length === 0 ? (
+                    <Alert severity="success">
+                      Всички ученически профили са свързани с родителски такива.
+                    </Alert>
+                  ) : (
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t('parents.selectStudent')}</InputLabel>
+                      <Select
+                        value={linkStudentId}
+                        label={t('parents.selectStudent')}
+                        onChange={e => setLinkStudentId(e.target.value)}
+                      >
+                        {unlinked.map(s => (
+                          <MenuItem key={s.id} value={s.id}>
+                            {s.firstName} {s.lastName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  );
+                })()}
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                   <Button size="small" onClick={() => setLinkOpen(false)}>{t('common.cancel')}</Button>
                   <Button

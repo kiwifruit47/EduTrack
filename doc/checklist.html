@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Чеклист — Уеб базиран електронен дневник</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 24px;
+      background: #f9f9f9;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; margin-top: 32px; margin-bottom: 12px; border-bottom: 2px solid #ccc; padding-bottom: 4px; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+    }
+    .icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .done   { border-left: 4px solid #4caf50; }
+    .undone { border-left: 4px solid #f44336; }
+    .subtitle { font-size: 0.85rem; color: #555; margin-top: 2px; }
+    .summary {
+      margin-top: 36px;
+      padding: 14px 18px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .summary span { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>Уеб базиран електронен дневник</h1>
+<p style="color:#555;margin-top:0">Чеклист за изпълнение на функционалните и технологичните изисквания</p>
+
+<h2>Функционални изисквания</h2>
+<ul>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Възможност за задаване на роли на потребителите (администратор, директор, учител, родител, ученик)</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Регистриране на потребители и вход в системата</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Средства за персонализиране на изгледа за всяка от ролите в системата</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Въвеждане на данни за училище (име и адрес)</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Възможност за записване (отписване) на учениците в определен клас в дадено училище</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Въвеждане, редактиране и изтриване на данни за директор (лични данни) на дадено училище</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Въвеждане, редактиране и изтриване на данни за преподавател (лични данни + предмети, по които има квалификация да преподава) в дадено училище</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Въвеждане, редактиране и изтриване на данни за ученик в дадено училище: лични данни + класа, в който е записан</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Въвеждане, редактиране и изтриване на данни за родител: лични данни + на кой/и ученик/ученици е родител</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Задаване на учебна програма за срока, в която има списък с предмети и преподаватели</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Всеки учител може да въвежда, редактира и изтрива оценките и да регистрира отсъствия само за учениците, на които преподава</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Всеки родител може да вижда само оценките и отсъствията на децата си</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Всеки директор вижда цялата информация за всички предмети, учители, ученици и родители + статистика за разпределението на оценките по предмети, учители, обобщена за цялото училище и др.</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Администраторът въвежда данните за потребителите и ролите им и може да редактира цялата информация в системата. Той може да вижда статистическа информация за разпределението на оценките и отсъствията във всички училища, във всички предмети и по отделни училища и предмети.</div>
+  </li>
+
+  <li class="undone">
+    <span class="icon">❌</span>
+    <div>
+      Необходимо е данните, с които се работи, да бъдат валидирани и да бъдат направени unit тестове (80% покритие)
+      <div class="subtitle">Съществува само един празен <code>contextLoads()</code> тест — без реално покритие.</div>
+    </div>
+  </li>
+
+</ul>
+
+<h2>Технологични изисквания</h2>
+<ul>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Електронният дневник трябва да бъде уеб базиран, с възможност за визуализиране в най-популярните браузъри (Chrome, Mozilla Firefox, Internet Explorer)</div>
+  </li>
+
+  <li class="done">
+    <span class="icon">✅</span>
+    <div>Дизайнът му трябва да бъде респонсив (подходящ за визуализиране и на мобилни устройства)</div>
+  </li>
+
+  <li class="undone">
+    <span class="icon">❌</span>
+    <div>
+      Кодът трябва да включва подробни коментари
+      <div class="subtitle">Кодът почти не съдържа inline коментари.</div>
+    </div>
+  </li>
+
+  <li class="undone">
+    <span class="icon">❌</span>
+    <div>
+      Документацията трябва да се състои от детайлно описание на функционалностите на системата, включително екрани, на които ясно се вижда коя част от програмата за какво се използва
+      <div class="subtitle">Липсва детайлна документация със скрийншоти.</div>
+    </div>
+  </li>
+
+  <li class="undone">
+    <span class="icon">❌</span>
+    <div>
+      Необходимо е да се посочат задачите, които са били изпълнени от всеки от участниците в екипа
+      <div class="subtitle">Няма документ за индивидуален принос.</div>
+    </div>
+  </li>
+
+</ul>
+
+<div class="summary">
+  <span>Резултат: 14 / 19 изпълнени</span><br/>
+  ✅ Изпълнено: 14 &nbsp;&nbsp; ❌ Неизпълнено: 5
+</div>
+
+</body>
+</html>

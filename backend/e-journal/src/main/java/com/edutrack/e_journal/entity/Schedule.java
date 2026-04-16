@@ -41,7 +41,7 @@ public class Schedule {
     private Teacher teacher;
 
     @Min(1) @Max(2)
-    @Column(nullable = false, columnDefinition = "INTEGER CHECK (term IN (1, 2))")
+    @Column(nullable = false)
     private Integer term;
 
     /** Day of week: 1 = Monday … 5 = Friday */
@@ -59,7 +59,7 @@ public class Schedule {
 
     /** STANDARD, SIP, or EXTRACURRICULAR. Defaults to STANDARD. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "lecture_type", length = 20, nullable = false)
+    @Column(name = "lecture_type", length = 20, nullable = false, columnDefinition = "varchar(20) default 'STANDARD'")
     @Builder.Default
     private LectureType lectureType = LectureType.STANDARD;
 
@@ -67,7 +67,7 @@ public class Schedule {
      * Whether absences are recorded for this entry.
      * Always true for STANDARD and SIP; can be false for EXTRACURRICULAR.
      */
-    @Column(name = "track_attendance", nullable = false)
+    @Column(name = "track_attendance", nullable = false, columnDefinition = "boolean default true")
     @Builder.Default
     private Boolean trackAttendance = true;
 }

@@ -67,6 +67,9 @@ public class ParentService {
     public ParentDto link(Long parentId, Long studentId, UserDetails principal) {
         User parent     = resolveParent(parentId);
         Student student = resolveOwnStudent(studentId, principal);
+        if (student.getParent() != null)
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Student already has a parent — unlink first");
         student.setParent(parent);
         studentRepository.save(student);
         return toDto(parent, student.getSchool().getId());
