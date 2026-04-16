@@ -5,12 +5,7 @@ import com.edutrack.e_journal.dto.SchoolRequest;
 import com.edutrack.e_journal.dto.SchoolScheduleEntryDto;
 import com.edutrack.e_journal.dto.SchoolScheduleEntryRequest;
 import com.edutrack.e_journal.dto.SchoolTermConfigDto;
-import com.edutrack.e_journal.entity.*;
-import com.edutrack.e_journal.repository.SchoolProfileRepository;
-import com.edutrack.e_journal.repository.SchoolRepository;
-import com.edutrack.e_journal.repository.SchoolScheduleEntryRepository;
-import com.edutrack.e_journal.repository.SchoolTermConfigRepository;
-import com.edutrack.e_journal.repository.UserRepository;
+import com.edutrack.e_journal.service.SchoolService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,10 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -42,23 +34,16 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class SchoolController {
 
-    private final SchoolRepository              schoolRepository;
-    private final UserRepository                userRepository;
-    private final SchoolProfileRepository       profileRepository;
-    private final SchoolScheduleEntryRepository scheduleEntryRepository;
-    private final SchoolTermConfigRepository    termConfigRepository;
+    private final SchoolService schoolService;
 
-    private static final SchoolTermConfigDto DEFAULT_TERM_CONFIG =
-            new SchoolTermConfigDto("09-15", "02-01", "06-01", "06-15", "07-01");
-
-    // ── Schools ──────────────────────────────────────────────────────────────
+    // ── Schools ───────────────────────────────────────────────────────────────
 
     @Operation(summary = "List all schools", description = "Returns every school with its headmaster and profiles. ADMIN only.")
     @ApiResponse(responseCode = "200", description = "School list returned")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SchoolDto> getAll() {
-        return schoolRepository.findAll().stream().map(this::toDto).toList();
+        return schoolService.getAllSchools();
     }
 
     @Operation(summary = "Get a school by ID", description = "Returns a single school. Accessible by ADMIN, HEADMASTER, and TEACHER.")
@@ -70,9 +55,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public SchoolDto getById(
             @Parameter(description = "School ID") @PathVariable Long id) {
-        return schoolRepository.findById(id)
-                .map(this::toDto)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+        return schoolService.getSchoolById(id);
     }
 
     @Operation(summary = "Create a school", description = "Creates a new school, optionally assigning a headmaster. ADMIN only.")
@@ -83,13 +66,7 @@ public class SchoolController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolDto> create(@Valid @RequestBody SchoolRequest req) {
-        School school = School.builder()
-                .name(req.getName())
-                .address(req.getAddress())
-                .type(resolveType(req.getType()))
-                .director(resolveHeadmaster(req.getHeadmasterId()))
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(schoolRepository.save(school)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(schoolService.createSchool(req));
     }
 
     @Operation(summary = "Update a school", description = "Updates name, address, type, and headmaster. ADMIN only.")
@@ -102,13 +79,7 @@ public class SchoolController {
     public ResponseEntity<SchoolDto> update(
             @Parameter(description = "School ID") @PathVariable Long id,
             @Valid @RequestBody SchoolRequest req) {
-        School school = schoolRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
-        school.setName(req.getName());
-        school.setAddress(req.getAddress());
-        school.setType(resolveType(req.getType()));
-        school.setDirector(resolveHeadmaster(req.getHeadmasterId()));
-        return ResponseEntity.ok(toDto(schoolRepository.save(school)));
+        return ResponseEntity.ok(schoolService.updateSchool(id, req));
     }
 
     @Operation(summary = "Delete a school", description = "Permanently deletes a school. ADMIN only.")
@@ -120,24 +91,19 @@ public class SchoolController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "School ID") @PathVariable Long id) {
-        if (!schoolRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found");
-        }
-        schoolRepository.deleteById(id);
+        schoolService.deleteSchool(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ── Profiles ─────────────────────────────────────────────────────────────
+    // ── Profiles ──────────────────────────────────────────────────────────────
 
-    @Operation(summary = "List school profiles", description = "Returns the specialisation profiles defined for a school (e.g. 'Natural Sciences'). Accessible by ADMIN, HEADMASTER, and TEACHER.")
+    @Operation(summary = "List school profiles", description = "Returns the specialisation profiles defined for a school. Accessible by ADMIN, HEADMASTER, and TEACHER.")
     @ApiResponse(responseCode = "200", description = "Profile list returned")
     @GetMapping("/{schoolId}/profiles")
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<SchoolDto.ProfileDto> getProfiles(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
-        return profileRepository.findAllBySchool_Id(schoolId).stream()
-                .map(p -> new SchoolDto.ProfileDto(p.getId(), p.getName()))
-                .toList();
+        return schoolService.getProfiles(schoolId);
     }
 
     @Operation(summary = "Add a profile to a school", description = "Adds a new specialisation profile. ADMIN only.")
@@ -150,17 +116,7 @@ public class SchoolController {
     public ResponseEntity<SchoolDto.ProfileDto> addProfile(
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @Valid @RequestBody ProfileRequest req) {
-
-        School school = schoolRepository.findById(schoolId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
-
-        SchoolProfile profile = SchoolProfile.builder()
-                .name(req.getName())
-                .school(school)
-                .build();
-        SchoolProfile saved = profileRepository.save(profile);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new SchoolDto.ProfileDto(saved.getId(), saved.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(schoolService.addProfile(schoolId, req.getName()));
     }
 
     @Operation(summary = "Delete a school profile", description = "Removes a specialisation profile. ADMIN only.")
@@ -172,24 +128,19 @@ public class SchoolController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProfile(
             @Parameter(description = "Profile ID") @PathVariable Long profileId) {
-        if (!profileRepository.existsById(profileId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found");
-        }
-        profileRepository.deleteById(profileId);
+        schoolService.deleteProfile(profileId);
         return ResponseEntity.noContent().build();
     }
 
     // ── Daily Schedule ────────────────────────────────────────────────────────
 
-    @Operation(summary = "Get school daily schedule", description = "Returns the ordered list of LECTURE/BREAK/SPECIAL_EVENT entries for the school day. Accessible by ADMIN, HEADMASTER, and TEACHER.")
+    @Operation(summary = "Get school daily schedule", description = "Returns the ordered list of LECTURE/BREAK/SPECIAL_EVENT entries. Accessible by ADMIN, HEADMASTER, and TEACHER.")
     @ApiResponse(responseCode = "200", description = "Daily schedule returned")
     @GetMapping("/{schoolId}/schedule")
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<SchoolScheduleEntryDto> getSchedule(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
-        return scheduleEntryRepository.findAllBySchool_IdOrderBySortOrder(schoolId).stream()
-                .map(this::toScheduleDto)
-                .toList();
+        return schoolService.getSchedule(schoolId);
     }
 
     @Operation(summary = "Add a daily schedule entry", description = "Appends a new entry to the school's daily schedule. Accessible by ADMIN and the school's own HEADMASTER.")
@@ -204,25 +155,8 @@ public class SchoolController {
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @Valid @RequestBody SchoolScheduleEntryRequest req,
             @AuthenticationPrincipal UserDetails principal) {
-
-        checkHeadmasterSchoolAccess(principal, schoolId);
-
-        School school = schoolRepository.findById(schoolId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
-
-        int nextOrder = scheduleEntryRepository.findAllBySchool_IdOrderBySortOrder(schoolId).size();
-
-        SchoolScheduleEntry entry = SchoolScheduleEntry.builder()
-                .school(school)
-                .type(resolveEntryType(req.getType()))
-                .label(req.getLabel())
-                .startTime(LocalTime.parse(req.getStartTime()))
-                .endTime(LocalTime.parse(req.getEndTime()))
-                .eventDate(parseDate(req.getEventDate()))
-                .sortOrder(req.getSortOrder() != null ? req.getSortOrder() : nextOrder)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(toScheduleDto(scheduleEntryRepository.save(entry)));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(schoolService.addScheduleEntry(schoolId, req, principal));
     }
 
     @Operation(summary = "Update a daily schedule entry", description = "Edits an existing school day entry. Accessible by ADMIN and the school's own HEADMASTER.")
@@ -237,20 +171,7 @@ public class SchoolController {
             @Parameter(description = "Schedule entry ID") @PathVariable Long entryId,
             @Valid @RequestBody SchoolScheduleEntryRequest req,
             @AuthenticationPrincipal UserDetails principal) {
-
-        SchoolScheduleEntry entry = scheduleEntryRepository.findById(entryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
-
-        checkHeadmasterSchoolAccess(principal, entry.getSchool().getId());
-
-        entry.setType(resolveEntryType(req.getType()));
-        entry.setLabel(req.getLabel());
-        entry.setStartTime(LocalTime.parse(req.getStartTime()));
-        entry.setEndTime(LocalTime.parse(req.getEndTime()));
-        entry.setEventDate(parseDate(req.getEventDate()));
-        if (req.getSortOrder() != null) entry.setSortOrder(req.getSortOrder());
-
-        return ResponseEntity.ok(toScheduleDto(scheduleEntryRepository.save(entry)));
+        return ResponseEntity.ok(schoolService.updateScheduleEntry(entryId, req, principal));
     }
 
     @Operation(summary = "Delete a daily schedule entry", description = "Removes an entry from the school day schedule. Accessible by ADMIN and the school's own HEADMASTER.")
@@ -264,13 +185,7 @@ public class SchoolController {
     public ResponseEntity<Void> deleteScheduleEntry(
             @Parameter(description = "Schedule entry ID") @PathVariable Long entryId,
             @AuthenticationPrincipal UserDetails principal) {
-
-        SchoolScheduleEntry entry = scheduleEntryRepository.findById(entryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
-
-        checkHeadmasterSchoolAccess(principal, entry.getSchool().getId());
-
-        scheduleEntryRepository.deleteById(entryId);
+        schoolService.deleteScheduleEntry(entryId, principal);
         return ResponseEntity.noContent().build();
     }
 
@@ -282,10 +197,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public SchoolTermConfigDto getTermConfig(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
-        return termConfigRepository.findById(schoolId)
-                .map(c -> new SchoolTermConfigDto(c.getStartDate(), c.getTerm2Start(),
-                        c.getElementaryEnd(), c.getProgymnasiumEnd(), c.getGymnasiumEnd()))
-                .orElse(DEFAULT_TERM_CONFIG);
+        return schoolService.getTermConfig(schoolId);
     }
 
     @Operation(summary = "Update term configuration", description = "Saves custom term dates for a school. All dates use MM-dd format (e.g. '09-15'). Accessible by ADMIN and the school's own HEADMASTER.")
@@ -300,26 +212,7 @@ public class SchoolController {
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @RequestBody SchoolTermConfigDto req,
             @AuthenticationPrincipal UserDetails principal) {
-
-        checkHeadmasterSchoolAccess(principal, schoolId);
-
-        School school = schoolRepository.findById(schoolId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
-
-        SchoolTermConfig config = termConfigRepository.findById(schoolId).orElse(
-                SchoolTermConfig.builder().id(schoolId).school(school)
-                        .startDate("09-15").term2Start("02-01")
-                        .elementaryEnd("06-01").progymnasiumEnd("06-15").gymnasiumEnd("07-01")
-                        .build());
-
-        config.setStartDate(req.getStartDate());
-        config.setTerm2Start(req.getTerm2Start());
-        config.setElementaryEnd(req.getElementaryEnd());
-        config.setProgymnasiumEnd(req.getProgymnasiumEnd());
-        config.setGymnasiumEnd(req.getGymnasiumEnd());
-
-        termConfigRepository.save(config);
-        return ResponseEntity.ok(req);
+        return ResponseEntity.ok(schoolService.updateTermConfig(schoolId, req, principal));
     }
 
     // ── Student Limit ─────────────────────────────────────────────────────────
@@ -336,87 +229,8 @@ public class SchoolController {
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @RequestBody StudentLimitRequest req,
             @AuthenticationPrincipal UserDetails principal) {
-
-        checkHeadmasterSchoolAccess(principal, schoolId);
-
-        School school = schoolRepository.findById(schoolId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
-
-        school.setStudentLimit(req.getStudentLimit());
-        schoolRepository.save(school);
+        schoolService.updateStudentLimit(schoolId, req.getStudentLimit(), principal);
         return ResponseEntity.noContent().build();
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    /**
-     * If the caller is a HEADMASTER, verify they own the given school.
-     * ADMIN users bypass this check.
-     */
-    private void checkHeadmasterSchoolAccess(UserDetails principal, Long schoolId) {
-        boolean isAdmin = principal.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) {
-            User headmaster = userRepository.findByEmail(principal.getUsername())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-            School headmasterSchool = schoolRepository.findByDirector_Id(headmaster.getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
-                            "No school assigned to this headmaster"));
-            if (!headmasterSchool.getId().equals(schoolId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Access denied to this school's schedule");
-            }
-        }
-    }
-
-    private SchoolType resolveType(String type) {
-        if (type == null || type.isBlank()) return null;
-        try {
-            return SchoolType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid school type: " + type);
-        }
-    }
-
-    private ScheduleEntryType resolveEntryType(String type) {
-        try {
-            return ScheduleEntryType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid entry type: " + type);
-        }
-    }
-
-    private LocalDate parseDate(String date) {
-        return (date != null && !date.isBlank()) ? LocalDate.parse(date) : null;
-    }
-
-    private User resolveHeadmaster(Long id) {
-        if (id == null) return null;
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Headmaster user not found"));
-    }
-
-    private SchoolDto toDto(School s) {
-        String headmasterName = s.getDirector() != null
-                ? s.getDirector().getFirstName() + " " + s.getDirector().getLastName()
-                : null;
-        String type = s.getType() != null ? s.getType().name() : null;
-        List<SchoolDto.ProfileDto> profiles = profileRepository.findAllBySchool_Id(s.getId()).stream()
-                .map(p -> new SchoolDto.ProfileDto(p.getId(), p.getName()))
-                .toList();
-        return new SchoolDto(s.getId(), s.getName(), s.getAddress(), type, headmasterName, profiles, s.getStudentLimit());
-    }
-
-    private SchoolScheduleEntryDto toScheduleDto(SchoolScheduleEntry e) {
-        return new SchoolScheduleEntryDto(
-                e.getId(),
-                e.getType().name(),
-                e.getLabel(),
-                e.getStartTime().toString(),
-                e.getEndTime().toString(),
-                e.getEventDate() != null ? e.getEventDate().toString() : null,
-                e.getSortOrder()
-        );
     }
 
     // ── Inline request DTOs ───────────────────────────────────────────────────
@@ -431,6 +245,6 @@ public class SchoolController {
     @Getter
     @NoArgsConstructor
     public static class StudentLimitRequest {
-        private Integer studentLimit; // null removes the limit
+        private Integer studentLimit;
     }
 }

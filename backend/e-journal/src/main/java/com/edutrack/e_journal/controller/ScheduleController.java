@@ -2,8 +2,8 @@ package com.edutrack.e_journal.controller;
 
 import com.edutrack.e_journal.dto.ScheduleDto;
 import com.edutrack.e_journal.dto.ScheduleRequest;
-import com.edutrack.e_journal.entity.*;
-import com.edutrack.e_journal.repository.*;
+import com.edutrack.e_journal.entity.LectureType;
+import com.edutrack.e_journal.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import com.edutrack.e_journal.entity.LectureType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -34,11 +30,7 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class ScheduleController {
 
-    private final ScheduleRepository scheduleRepository;
-    private final ClassRepository    classRepository;
-    private final SubjectRepository  subjectRepository;
-    private final TeacherRepository  teacherRepository;
-    private final UserRepository     userRepository;
+    private final ScheduleService scheduleService;
 
     @Operation(summary = "List schedules for a class", description = "Returns all curriculum entries for the given class. Accessible by all authenticated roles.")
     @ApiResponse(responseCode = "200", description = "Schedule list returned")
@@ -46,9 +38,7 @@ public class ScheduleController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER','PARENT','STUDENT')")
     public List<ScheduleDto> getByClass(
             @Parameter(description = "Class ID") @PathVariable Long classId) {
-        return scheduleRepository.findAllBySchoolClass_Id(classId).stream()
-                .map(this::toDto)
-                .toList();
+        return scheduleService.getByClass(classId);
     }
 
     @Operation(summary = "Get my schedule", description = "Returns the full curriculum schedule for the currently authenticated teacher.")
@@ -56,11 +46,7 @@ public class ScheduleController {
     @GetMapping("/teacher/me")
     @PreAuthorize("hasRole('TEACHER')")
     public List<ScheduleDto> getMySchedule(@AuthenticationPrincipal UserDetails principal) {
-        User user = userRepository.findByEmail(principal.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-        return scheduleRepository.findAllByTeacher_Id(user.getId()).stream()
-                .map(this::toDto)
-                .toList();
+        return scheduleService.getMySchedule(principal);
     }
 
     @Operation(summary = "Create a schedule entry", description = "Assigns a teacher to teach a subject to a class for a given term. Accessible by ADMIN and HEADMASTER.")
@@ -71,30 +57,7 @@ public class ScheduleController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<ScheduleDto> create(@Valid @RequestBody ScheduleRequest req) {
-        SchoolClass schoolClass = classRepository.findById(req.getClassId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Class not found"));
-        Subject subject = subjectRepository.findById(req.getSubjectId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subject not found"));
-        Teacher teacher = teacherRepository.findById(req.getTeacherId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Teacher not found"));
-
-        LectureType lectureType = req.getLectureType() != null ? req.getLectureType() : LectureType.STANDARD;
-        boolean trackAttendance = req.getTrackAttendance() != null ? req.getTrackAttendance() : true;
-
-        Schedule schedule = Schedule.builder()
-                .school(schoolClass.getSchool())
-                .schoolClass(schoolClass)
-                .subject(subject)
-                .teacher(teacher)
-                .term(req.getTerm())
-                .dayOfWeek(req.getDayOfWeek())
-                .startTime(LocalTime.parse(req.getStartTime()))
-                .endTime(LocalTime.parse(req.getEndTime()))
-                .lectureType(lectureType)
-                .trackAttendance(trackAttendance)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(scheduleRepository.save(schedule)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(req));
     }
 
     @Operation(summary = "Update lecture type and attendance tracking",
@@ -108,11 +71,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleDto> patchType(
             @Parameter(description = "Schedule entry ID") @PathVariable Long id,
             @RequestBody TypePatchRequest req) {
-        Schedule s = scheduleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found"));
-        if (req.getLectureType() != null)   s.setLectureType(req.getLectureType());
-        if (req.getTrackAttendance() != null) s.setTrackAttendance(req.getTrackAttendance());
-        return ResponseEntity.ok(toDto(scheduleRepository.save(s)));
+        return ResponseEntity.ok(scheduleService.patchType(id, req.getLectureType(), req.getTrackAttendance()));
     }
 
     @Operation(summary = "Delete a schedule entry", description = "Removes a curriculum entry. Accessible by ADMIN and HEADMASTER.")
@@ -124,34 +83,8 @@ public class ScheduleController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Schedule entry ID") @PathVariable Long id) {
-        if (!scheduleRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule entry not found");
-        }
-        scheduleRepository.deleteById(id);
+        scheduleService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // -------------------------------------------------------------------------
-
-    private ScheduleDto toDto(Schedule s) {
-        String teacherName = s.getTeacher().getUser().getFirstName()
-                + " " + s.getTeacher().getUser().getLastName();
-        return new ScheduleDto(
-                s.getId(),
-                s.getSubject().getId(),
-                s.getSubject().getName(),
-                s.getTeacher().getId(),
-                teacherName,
-                s.getSchoolClass().getId(),
-                s.getSchoolClass().getName(),
-                s.getSchool().getName(),
-                s.getTerm(),
-                s.getDayOfWeek(),
-                s.getStartTime().toString(),
-                s.getEndTime().toString(),
-                s.getLectureType().name(),
-                s.getTrackAttendance()
-        );
     }
 
     // ── Inline request DTO ────────────────────────────────────────────────────

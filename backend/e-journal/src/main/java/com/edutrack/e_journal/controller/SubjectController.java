@@ -2,8 +2,7 @@ package com.edutrack.e_journal.controller;
 
 import com.edutrack.e_journal.dto.SubjectDto;
 import com.edutrack.e_journal.dto.SubjectRequest;
-import com.edutrack.e_journal.entity.Subject;
-import com.edutrack.e_journal.repository.SubjectRepository;
+import com.edutrack.e_journal.service.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,16 +25,14 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class SubjectController {
 
-    private final SubjectRepository subjectRepository;
+    private final SubjectService subjectService;
 
     @Operation(summary = "List all subjects", description = "Returns every subject. Accessible by ADMIN and HEADMASTER.")
     @ApiResponse(responseCode = "200", description = "Subject list returned")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<SubjectDto> getAll() {
-        return subjectRepository.findAll().stream()
-                .map(s -> new SubjectDto(s.getId(), s.getName()))
-                .toList();
+        return subjectService.getAll();
     }
 
     @Operation(summary = "Create a subject", description = "Creates a new subject. ADMIN only.")
@@ -47,8 +43,7 @@ public class SubjectController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubjectDto> create(@Valid @RequestBody SubjectRequest req) {
-        Subject saved = subjectRepository.save(Subject.builder().name(req.getName()).build());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SubjectDto(saved.getId(), saved.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(subjectService.create(req));
     }
 
     @Operation(summary = "Update a subject", description = "Renames an existing subject. ADMIN only.")
@@ -61,11 +56,7 @@ public class SubjectController {
     public ResponseEntity<SubjectDto> update(
             @Parameter(description = "Subject ID") @PathVariable Long id,
             @Valid @RequestBody SubjectRequest req) {
-        Subject subject = subjectRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not found"));
-        subject.setName(req.getName());
-        Subject saved = subjectRepository.save(subject);
-        return ResponseEntity.ok(new SubjectDto(saved.getId(), saved.getName()));
+        return ResponseEntity.ok(subjectService.update(id, req));
     }
 
     @Operation(summary = "Delete a subject", description = "Permanently deletes a subject. ADMIN only.")
@@ -77,10 +68,7 @@ public class SubjectController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Subject ID") @PathVariable Long id) {
-        if (!subjectRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not found");
-        }
-        subjectRepository.deleteById(id);
+        subjectService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
