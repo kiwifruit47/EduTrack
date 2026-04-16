@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Alert, Box, Button, Chip, CircularProgress, Dialog, DialogContent,
   DialogTitle, FormGroup, FormControlLabel, Checkbox, IconButton,
-  InputAdornment, List, ListItem, ListItemText, Paper, Stack,
+  InputAdornment, Paper, Stack,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TextField, Tooltip, Typography,
 } from '@mui/material';
@@ -26,11 +26,13 @@ function ViewTeachers() {
   const [error,       setError]       = useState(null);
 
   // ── Hire dialog ────────────────────────────────────────────────────────────
-  const [hireOpen,     setHireOpen]     = useState(false);
-  const [available,    setAvailable]    = useState([]);
-  const [availLoading, setAvailLoading] = useState(false);
-  const [availError,   setAvailError]   = useState(null);
-  const [hireError,    setHireError]    = useState(null);
+  const [hireOpen,    setHireOpen]    = useState(false);
+  const [hireFirst,   setHireFirst]   = useState('');
+  const [hireLast,    setHireLast]    = useState('');
+  const [hireEmail,   setHireEmail]   = useState('');
+  const [hirePass,    setHirePass]    = useState('');
+  const [hireError,   setHireError]   = useState(null);
+  const [hireSaving,  setHireSaving]  = useState(false);
 
   // ── Fire dialog ────────────────────────────────────────────────────────────
   const [fireTarget, setFireTarget] = useState(null); // { id, name }
@@ -72,27 +74,23 @@ function ViewTeachers() {
   // ── Hire ───────────────────────────────────────────────────────────────────
 
   const openHire = () => {
-    setHireOpen(true);
-    setAvailError(null);
+    setHireFirst(''); setHireLast(''); setHireEmail(''); setHirePass('');
     setHireError(null);
-    setAvailLoading(true);
-    api.get('/api/teachers/available')
-      .then(res => setAvailable(res.data))
-      .catch(() => setAvailError(t('teachers.fetchAvailableError')))
-      .finally(() => setAvailLoading(false));
+    setHireOpen(true);
   };
 
-  const handleHire = (userId, firstName, lastName, email) => {
+  const handleHire = () => {
+    setHireSaving(true);
     setHireError(null);
-    api.post(`/api/teachers/${userId}/hire`)
-      .then(() => {
-        setAvailable(prev => prev.filter(u => u.id !== userId));
-        const name = `${firstName} ${lastName}`;
-        setTeachers(prev => [...prev, {
-          id: userId, name, email, salary: null, qualifications: [], classCount: 0,
-        }]);
+    api.post('/api/teachers/create-and-hire', {
+      firstName: hireFirst, lastName: hireLast, email: hireEmail, password: hirePass,
+    })
+      .then(res => {
+        setTeachers(prev => [...prev, res.data]);
+        setHireOpen(false);
       })
-      .catch(() => setHireError(t('teachers.hireError')));
+      .catch(() => setHireError(t('teachers.hireError')))
+      .finally(() => setHireSaving(false));
   };
 
   // ── Fire ───────────────────────────────────────────────────────────────────
@@ -258,31 +256,47 @@ function ViewTeachers() {
         <Dialog open={hireOpen} onClose={() => setHireOpen(false)} maxWidth="xs" fullWidth>
           <DialogTitle>{t('teachers.hireTitle')}</DialogTitle>
           <DialogContent>
-            {hireError  && <Alert severity="error" sx={{ mb: 1 }}>{hireError}</Alert>}
-            {availError && <Alert severity="error" sx={{ mb: 1 }}>{availError}</Alert>}
-            {availLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}><CircularProgress /></Box>
-            ) : available.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">{t('teachers.noAvailable')}</Typography>
-            ) : (
-              <List dense disablePadding>
-                {available.map(u => (
-                  <ListItem
-                    key={u.id}
-                    disablePadding
-                    sx={{ mb: 0.5 }}
-                    secondaryAction={
-                      <Button size="small" variant="contained"
-                        onClick={() => handleHire(u.id, u.firstName, u.lastName, u.email)}>
-                        {t('teachers.hire')}
-                      </Button>
-                    }
-                  >
-                    <ListItemText primary={`${u.firstName} ${u.lastName}`} secondary={u.email} />
-                  </ListItem>
-                ))}
-              </List>
-            )}
+            {hireError && <Alert severity="error" sx={{ mb: 1 }}>{hireError}</Alert>}
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  autoFocus size="small" fullWidth
+                  label={t('users.firstName')}
+                  value={hireFirst}
+                  onChange={e => setHireFirst(e.target.value)}
+                />
+                <TextField
+                  size="small" fullWidth
+                  label={t('users.lastName')}
+                  value={hireLast}
+                  onChange={e => setHireLast(e.target.value)}
+                />
+              </Box>
+              <TextField
+                size="small" fullWidth
+                label={t('users.email')}
+                type="email"
+                value={hireEmail}
+                onChange={e => setHireEmail(e.target.value)}
+              />
+              <TextField
+                size="small" fullWidth
+                label={t('users.password')}
+                type="password"
+                value={hirePass}
+                onChange={e => setHirePass(e.target.value)}
+              />
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button size="small" onClick={() => setHireOpen(false)}>{t('common.cancel')}</Button>
+                <Button
+                  size="small" variant="contained"
+                  disabled={!hireFirst || !hireLast || !hireEmail || !hirePass || hireSaving}
+                  onClick={handleHire}
+                >
+                  {t('teachers.hire')}
+                </Button>
+              </Box>
+            </Stack>
           </DialogContent>
         </Dialog>
 

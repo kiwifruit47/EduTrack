@@ -7,6 +7,7 @@ import com.edutrack.e_journal.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,10 +22,12 @@ public class TeacherService {
 
     private final TeacherRepository  teacherRepository;
     private final UserRepository     userRepository;
+    private final RoleRepository     roleRepository;
     private final SchoolRepository   schoolRepository;
     private final ScheduleRepository scheduleRepository;
     private final SubjectRepository  subjectRepository;
     private final SchoolService      schoolService;
+    private final PasswordEncoder    passwordEncoder;
 
     public List<TeacherDto> getBySchool(Long schoolId, UserDetails principal) {
         schoolService.checkHeadmasterSchoolAccess(principal, schoolId);
@@ -37,6 +40,32 @@ public class TeacherService {
                 .map(u -> new UserDto(u.getId(), u.getFirstName(), u.getLastName(),
                         u.getEmail(), u.getRole().getName().name(), null, null, u.getBio()))
                 .toList();
+    }
+
+    public TeacherDto createAndHire(String firstName, String lastName, String email,
+                                    String password, UserDetails principal) {
+        if (userRepository.existsByEmail(email))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+
+        User headmaster = resolveUser(principal);
+        School school   = schoolService.resolveHeadmasterSchool(headmaster);
+
+        Role teacherRole = roleRepository.findByName(RoleEnum.TEACHER)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "TEACHER role not found"));
+
+        User user = User.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .passwordHash(passwordEncoder.encode(password))
+                .role(teacherRole)
+                .build();
+        userRepository.save(user);
+
+        Teacher teacher = Teacher.builder().id(user.getId()).user(user).school(school).build();
+        teacherRepository.save(teacher);
+
+        return toDto(teacher);
     }
 
     public UserDto hire(Long userId, UserDetails principal) {

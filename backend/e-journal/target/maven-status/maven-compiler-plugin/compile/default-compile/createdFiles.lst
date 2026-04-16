@@ -44,6 +44,7 @@ com/edutrack/e_journal/service/ComplaintService.class
 com/edutrack/e_journal/service/StudentService.class
 com/edutrack/e_journal/repository/SchoolProfileRepository.class
 com/edutrack/e_journal/dto/ComplaintRequest.class
+com/edutrack/e_journal/controller/TeacherController$CreateTeacherRequest.class
 com/edutrack/e_journal/entity/Role$RoleBuilder.class
 com/edutrack/e_journal/security/RequestLoggingFilter.class
 com/edutrack/e_journal/dto/SchoolRequest.class

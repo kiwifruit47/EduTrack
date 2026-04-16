@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +49,21 @@ public class TeacherController {
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
         return teacherService.getAvailable();
+    }
+
+    @Operation(summary = "Create and hire a teacher", description = "Creates a new TEACHER-role user and immediately assigns them to the headmaster's school. HEADMASTER only.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Teacher created and hired"),
+        @ApiResponse(responseCode = "409", description = "Email already in use")
+    })
+    @PostMapping("/create-and-hire")
+    @PreAuthorize("hasRole('HEADMASTER')")
+    public ResponseEntity<TeacherDto> createAndHire(
+            @Valid @RequestBody CreateTeacherRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.status(201)
+                .body(teacherService.createAndHire(req.getFirstName(), req.getLastName(),
+                        req.getEmail(), req.getPassword(), principal));
     }
 
     @Operation(summary = "Hire a teacher", description = "Assigns a TEACHER-role user to the headmaster's school. HEADMASTER only.")
@@ -106,7 +124,15 @@ public class TeacherController {
         return ResponseEntity.ok(teacherService.updateQualifications(teacherId, req.getSubjectIds(), principal));
     }
 
-    // ── Inline request DTOs ───────────────────────────────────────────────────
+    // ── Inline request DTOs ──────────────────────────────────────────────────
+
+    @Getter @NoArgsConstructor
+    public static class CreateTeacherRequest {
+        @NotBlank private String firstName;
+        @NotBlank private String lastName;
+        @NotBlank @Email private String email;
+        @NotBlank private String password;
+    }
 
     @Getter @NoArgsConstructor
     public static class SalaryRequest {
