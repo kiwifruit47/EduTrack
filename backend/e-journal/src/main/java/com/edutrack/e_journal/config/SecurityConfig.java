@@ -3,6 +3,7 @@ package com.edutrack.e_journal.config;
 import com.edutrack.e_journal.security.JwtAuthenticationFilter;
 import com.edutrack.e_journal.security.LocalhostAdminFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +30,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Value("${app.security.allow-localhost:true}")
+    private boolean allowLocalhost;
 
     /**
      * Exposes BCryptPasswordEncoder as a bean.
@@ -59,7 +63,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(new LocalhostAdminFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new LocalhostAdminFilter(allowLocalhost), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter,   UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

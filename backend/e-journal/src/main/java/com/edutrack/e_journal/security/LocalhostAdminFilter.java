@@ -14,39 +14,47 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Grants ADMIN authority to any request that originates from localhost
- * (127.0.0.1 or ::1), as long as no authentication has already been
- * established by a prior filter (e.g. a valid JWT still takes precedence).
+ * When {@code app.security.allow-localhost=true} (the default), any request
+ * from 127.0.0.1 / ::1 that carries no JWT is automatically authenticated with
+ * every role, bypassing all {@code @PreAuthorize} checks.
  *
- * NOT annotated with @Component — registered explicitly inside the Spring
- * Security filter chain via SecurityConfig.addFilterBefore(), so it runs
- * after SecurityContextHolderFilter initialises the context.
+ * Set {@code app.security.allow-localhost=false} to disable this behaviour
+ * (e.g. in staging / production).
+ *
+ * NOT annotated with @Component — registered explicitly in SecurityConfig.
  */
 public class LocalhostAdminFilter extends OncePerRequestFilter {
 
     private static final Set<String> LOOPBACK = Set.of("127.0.0.1", "0:0:0:0:0:0:0:1", "::1");
+
+    private static final List<SimpleGrantedAuthority> ALL_ROLES = List.of(
+            new SimpleGrantedAuthority("ROLE_ADMIN"),
+            new SimpleGrantedAuthority("ROLE_HEADMASTER"),
+            new SimpleGrantedAuthority("ROLE_TEACHER"),
+            new SimpleGrantedAuthority("ROLE_STUDENT"),
+            new SimpleGrantedAuthority("ROLE_PARENT")
+    );
+
+    private final boolean enabled;
+
+    public LocalhostAdminFilter(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
-        if (SecurityContextHolder.getContext().getAuthentication() == null
-                && isLocalhost(request)) {
+        if (enabled
+                && SecurityContextHolder.getContext().getAuthentication() == null
+                && LOOPBACK.contains(request.getRemoteAddr())) {
 
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    "localhost-admin",
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken("localhost-admin", null, ALL_ROLES)
             );
-            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         chain.doFilter(request, response);
-    }
-
-    private boolean isLocalhost(HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        return LOOPBACK.contains(ip);
     }
 }
