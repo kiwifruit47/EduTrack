@@ -76,3 +76,15 @@
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/security/JwtUtils.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/security/LocalhostAdminFilter.java
 /mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/security/RequestLoggingFilter.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/AbsenceService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/ClassService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/ComplaintService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/GradeService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/ParentService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/ProfileService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/ScheduleService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/SchoolService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/StudentService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/SubjectService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/TeacherService.java
+/mnt/storage/mysrc/EduTrack/backend/e-journal/src/main/java/com/edutrack/e_journal/service/UserService.java
