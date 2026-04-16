@@ -248,26 +248,8 @@ function Schedule() {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              fullWidth
-              size="small"
-              required
-              type="time"
-              label={t('schedule.startTime')}
-              value={form.startTime}
-              onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              fullWidth
-              size="small"
-              required
-              type="time"
-              label={t('schedule.endTime')}
-              value={form.endTime}
-              onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
-              InputLabelProps={{ shrink: true }}
-            />
+            <ArrowDropDown/>
+
           </Box>
 
           <FormControl fullWidth size="small">

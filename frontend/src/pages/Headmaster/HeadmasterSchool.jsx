@@ -47,6 +47,13 @@ function HeadmasterSchool() {
   const [termError, setTermError]     = useState(null);
   const [termSuccess, setTermSuccess] = useState(false);
 
+  // School info edit
+  const [editName,    setEditName]    = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [infoSaving,  setInfoSaving]  = useState(false);
+  const [infoError,   setInfoError]   = useState(null);
+  const [infoSuccess, setInfoSuccess] = useState(false);
+
   // Student limit
   const [studentLimit,        setStudentLimit]        = useState('');
   const [limitSaving,         setLimitSaving]         = useState(false);
@@ -67,6 +74,8 @@ function HeadmasterSchool() {
       })
       .then(([schoolRes, schedRes, termRes]) => {
         setSchool(schoolRes.data);
+        setEditName(schoolRes.data.name || '');
+        setEditAddress(schoolRes.data.address || '');
         setEntries(schedRes.data);
         setTermConfig(termRes.data);
         setStudentLimit(schoolRes.data.studentLimit != null ? String(schoolRes.data.studentLimit) : '');
@@ -74,6 +83,19 @@ function HeadmasterSchool() {
       .catch(() => setError(t('schools.fetchError')))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleInfoSave = () => {
+    setInfoSaving(true);
+    setInfoError(null);
+    setInfoSuccess(false);
+    api.patch(`/api/schools/${schoolId}/info`, { name: editName, address: editAddress })
+      .then(res => {
+        setSchool(res.data);
+        setInfoSuccess(true);
+      })
+      .catch(() => setInfoError(t('schools.infoSaveError')))
+      .finally(() => setInfoSaving(false));
+  };
 
   const handleTermSave = () => {
     setTermSaving(true);
@@ -144,19 +166,67 @@ function HeadmasterSchool() {
   return (
     <Layout>
       <Box sx={{ p: 3 }}>
-        {school && (
-          <>
-            <Typography variant="h5" sx={{ mb: 0.5 }}>{school.name}</Typography>
-            {school.address && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{school.address}</Typography>
-            )}
-            {school.type && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t(`schoolTypes.${school.type}`)}
-              </Typography>
-            )}
-          </>
-        )}
+        <Typography variant="h5" sx={{ mb: 2 }}>{t('nav.mySchool')}</Typography>
+
+        {/* ── School Info ──────────────────────────────────────────────────── */}
+        {infoError   && <Alert severity="error"   sx={{ mb: 1 }} onClose={() => setInfoError(null)}>{infoError}</Alert>}
+        {infoSuccess && <Alert severity="success" sx={{ mb: 1 }} onClose={() => setInfoSuccess(false)}>{t('schools.infoSaved')}</Alert>}
+
+        <TableContainer component={Paper} sx={{ mb: 1, maxWidth: 560 }}>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ width: 160, fontWeight: 600 }}>{t('schools.name')}</TableCell>
+                <TableCell>
+                  <TextField
+                    size="small" fullWidth
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    {...fieldProps}
+                  />
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600 }}>{t('schools.address')}</TableCell>
+                <TableCell>
+                  <TextField
+                    size="small" fullWidth
+                    value={editAddress}
+                    onChange={e => setEditAddress(e.target.value)}
+                    {...fieldProps}
+                  />
+                </TableCell>
+              </TableRow>
+              {school?.type && (
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('schools.type')}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2">{t(`schoolTypes.${school.type}`)}</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {school?.headmasterName && (
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('schools.headmaster')}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2">{school.headmasterName}</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, maxWidth: 560 }}>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<SaveIcon />}
+            onClick={handleInfoSave}
+            disabled={infoSaving || !editName.trim()}
+          >
+            {t('common.save')}
+          </Button>
+        </Box>
 
         {/* ── Class Weekly Timetable ───────────────────────────────────────── */}
         <Divider sx={{ my: 2 }} />

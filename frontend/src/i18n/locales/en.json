@@ -165,7 +165,9 @@
     "studentLimitLabel": "Maximum students",
     "studentLimitPlaceholder": "No limit",
     "limitSaved": "Student limit saved.",
-    "limitSaveError": "Failed to save student limit."
+    "limitSaveError": "Failed to save student limit.",
+    "infoSaved": "School info saved.",
+    "infoSaveError": "Failed to save school info."
   },
   "entryTypes": {
     "LECTURE": "Lecture",

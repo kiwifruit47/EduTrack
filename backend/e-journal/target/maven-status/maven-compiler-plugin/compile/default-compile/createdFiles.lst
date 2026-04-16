@@ -100,6 +100,7 @@ com/edutrack/e_journal/entity/SchoolTermConfig$SchoolTermConfigBuilder.class
 com/edutrack/e_journal/dto/GradeRequest.class
 com/edutrack/e_journal/security/CustomUserDetailsService.class
 com/edutrack/e_journal/dto/CreateUserRequest.class
+com/edutrack/e_journal/controller/SchoolController$UpdateInfoRequest.class
 com/edutrack/e_journal/service/ParentService.class
 com/edutrack/e_journal/entity/SchoolProfile$SchoolProfileBuilder.class
 com/edutrack/e_journal/entity/SchoolClass.class

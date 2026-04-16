@@ -62,6 +62,16 @@ public class SchoolService {
         return toDto(schoolRepository.save(school));
     }
 
+    public SchoolDto updateSchoolInfo(Long schoolId, String name, String address,
+                                      UserDetails principal) {
+        checkHeadmasterSchoolAccess(principal, schoolId);
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found"));
+        school.setName(name);
+        school.setAddress(address);
+        return toDto(schoolRepository.save(school));
+    }
+
     public void deleteSchool(Long id) {
         if (!schoolRepository.existsById(id))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "School not found");

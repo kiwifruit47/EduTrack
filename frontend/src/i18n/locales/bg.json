@@ -165,7 +165,9 @@
     "studentLimitLabel": "Максимален брой ученици",
     "studentLimitPlaceholder": "Без ограничение",
     "limitSaved": "Лимитът е запазен.",
-    "limitSaveError": "Грешка при запазване на лимита."
+    "limitSaveError": "Грешка при запазване на лимита.",
+    "infoSaved": "Данните на училището са запазени.",
+    "infoSaveError": "Грешка при запазване на данните."
   },
   "entryTypes": {
     "LECTURE": "Час",

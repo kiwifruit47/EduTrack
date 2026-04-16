@@ -82,6 +82,28 @@ public class SchoolController {
         return ResponseEntity.ok(schoolService.updateSchool(id, req));
     }
 
+    @Operation(summary = "Update school name and address", description = "Allows a headmaster to update their own school's name and address. ADMIN can update any school.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "School info updated"),
+        @ApiResponse(responseCode = "403", description = "Not your school"),
+        @ApiResponse(responseCode = "404", description = "School not found")
+    })
+    @PatchMapping("/{id}/info")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public ResponseEntity<SchoolDto> updateInfo(
+            @Parameter(description = "School ID") @PathVariable Long id,
+            @Valid @RequestBody UpdateInfoRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(schoolService.updateSchoolInfo(id, req.getName(), req.getAddress(), principal));
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class UpdateInfoRequest {
+        @NotBlank @Size(max = 150) private String name;
+        private String address;
+    }
+
     @Operation(summary = "Delete a school", description = "Permanently deletes a school. ADMIN only.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "School deleted"),
