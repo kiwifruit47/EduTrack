@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +30,8 @@ public class ClassController {
     @ApiResponse(responseCode = "200", description = "Class list returned")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
-    public List<SchoolClassDto> getAll() {
-        return classService.getAll();
+    public List<SchoolClassDto> getAll(@AuthenticationPrincipal UserDetails principal) {
+        return classService.getAll(principal);
     }
 
     @Operation(summary = "List classes at a school", description = "Returns all classes belonging to the given school. Accessible by ADMIN and HEADMASTER.")
