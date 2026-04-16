@@ -28,6 +28,11 @@ public class ScheduleService {
                 .map(this::toDto).toList();
     }
 
+    public List<ScheduleDto> getByTeacher(Long teacherId) {
+        return scheduleRepository.findAllByTeacher_Id(teacherId).stream()
+                .map(this::toDto).toList();
+    }
+
     public List<ScheduleDto> getMySchedule(UserDetails principal) {
         User user = userRepository.findByEmail(principal.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));

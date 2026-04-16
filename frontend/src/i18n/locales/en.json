@@ -66,7 +66,11 @@
     "editType": "Edit Type",
     "lectureType": "Lecture Type",
     "trackAttendance": "Track Attendance",
-    "classTimetable": "Class Weekly Timetable"
+    "classTimetable": "Class Weekly Timetable",
+    "selectSlot": "Time Slot",
+    "slotClassBusy": "class has a lesson",
+    "slotTeacherBusy": "teacher is busy",
+    "noSlotsConfigured": "No time slots configured — set up the school daily schedule first"
   },
   "lectureTypes": {
     "STANDARD": "Standard",

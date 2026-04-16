@@ -41,6 +41,15 @@ public class ScheduleController {
         return scheduleService.getByClass(classId);
     }
 
+    @Operation(summary = "Get schedules for a teacher", description = "Returns all curriculum entries for the given teacher. Accessible by ADMIN and HEADMASTER.")
+    @ApiResponse(responseCode = "200", description = "Teacher schedule returned")
+    @GetMapping("/teacher/{teacherId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
+    public List<ScheduleDto> getByTeacher(
+            @Parameter(description = "Teacher user ID") @PathVariable Long teacherId) {
+        return scheduleService.getByTeacher(teacherId);
+    }
+
     @Operation(summary = "Get my schedule", description = "Returns the full curriculum schedule for the currently authenticated teacher.")
     @ApiResponse(responseCode = "200", description = "Teacher's schedule returned")
     @GetMapping("/teacher/me")

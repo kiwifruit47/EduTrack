@@ -93,11 +93,13 @@ function Schedule() {
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [subjects,   setSubjects]   = useState([]);
-  const [teachers,   setTeachers]   = useState([]);
-  const [form,       setForm]       = useState(EMPTY_FORM);
-  const [saving,     setSaving]     = useState(false);
+  const [dialogOpen,      setDialogOpen]      = useState(false);
+  const [subjects,        setSubjects]        = useState([]);
+  const [teachers,        setTeachers]        = useState([]);
+  const [schoolSlots,     setSchoolSlots]     = useState([]);   // LECTURE-type daily schedule entries
+  const [teacherSchedule, setTeacherSchedule] = useState([]);   // selected teacher's existing schedule
+  const [form,            setForm]            = useState(EMPTY_FORM);
+  const [saving,          setSaving]          = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -117,12 +119,24 @@ function Schedule() {
     Promise.all([
       api.get('/api/subjects'),
       api.get(`/api/users/teachers/school/${classInfo.schoolId}`),
-    ]).then(([subRes, teachRes]) => {
+      api.get(`/api/schools/${classInfo.schoolId}/schedule`),
+    ]).then(([subRes, teachRes, slotsRes]) => {
       setSubjects(subRes.data);
       setTeachers(teachRes.data);
+      setSchoolSlots(slotsRes.data.filter(s => s.type === 'LECTURE')
+        .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || '')));
+      setTeacherSchedule([]);
       setForm(EMPTY_FORM);
       setDialogOpen(true);
     });
+  };
+
+  const handleTeacherChange = teacherId => {
+    setForm(f => ({ ...f, teacherId, startTime: '', endTime: '' }));
+    if (!teacherId) { setTeacherSchedule([]); return; }
+    api.get(`/api/schedules/teacher/${teacherId}`)
+      .then(res => setTeacherSchedule(res.data))
+      .catch(() => setTeacherSchedule([]));
   };
 
   const handleAdd = () => {
@@ -214,7 +228,7 @@ function Schedule() {
             <Select
               value={form.teacherId}
               label={t('schedule.teacher')}
-              onChange={e => setForm(f => ({ ...f, teacherId: e.target.value }))}
+              onChange={e => handleTeacherChange(e.target.value)}
             >
               {teachers.map(tc => <MenuItem key={tc.id} value={tc.id}>{tc.name}</MenuItem>)}
             </Select>
@@ -226,7 +240,7 @@ function Schedule() {
               <Select
                 value={form.term}
                 label={t('schedule.term')}
-                onChange={e => setForm(f => ({ ...f, term: e.target.value }))}
+                onChange={e => setForm(f => ({ ...f, term: e.target.value, startTime: '', endTime: '' }))}
               >
                 <MenuItem value={1}>{t('schedule.term1')}</MenuItem>
                 <MenuItem value={2}>{t('schedule.term2')}</MenuItem>
@@ -238,7 +252,7 @@ function Schedule() {
               <Select
                 value={form.dayOfWeek}
                 label={t('schedule.dayOfWeek')}
-                onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value }))}
+                onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value, startTime: '', endTime: '' }))}
               >
                 {[1, 2, 3, 4, 5].map(d => (
                   <MenuItem key={d} value={d}>{t(`schedule.days.${d}`)}</MenuItem>
@@ -247,10 +261,53 @@ function Schedule() {
             </FormControl>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <ArrowDropDown/>
-
-          </Box>
+          {/* Time slot picker — requires term + day to be selected */}
+          {form.term && form.dayOfWeek && (
+            schoolSlots.length === 0 ? (
+              <Alert severity="warning" sx={{ py: 0.5 }}>{t('schedule.noSlotsConfigured')}</Alert>
+            ) : (
+              <FormControl fullWidth size="small" required>
+                <InputLabel>{t('schedule.selectSlot')}</InputLabel>
+                <Select
+                  value={form.startTime}
+                  label={t('schedule.selectSlot')}
+                  onChange={e => {
+                    const slot = schoolSlots.find(s => s.startTime === e.target.value);
+                    setForm(f => ({ ...f, startTime: slot.startTime, endTime: slot.endTime }));
+                  }}
+                >
+                  {schoolSlots.map(slot => {
+                    const classConflict = entries.some(e =>
+                      e.term === form.term &&
+                      e.dayOfWeek === form.dayOfWeek &&
+                      fmtTime(e.startTime) === slot.startTime
+                    );
+                    const teacherConflict = teacherSchedule.some(e =>
+                      e.term === form.term &&
+                      e.dayOfWeek === form.dayOfWeek &&
+                      fmtTime(e.startTime) === slot.startTime
+                    );
+                    const hint = classConflict
+                      ? ` · ${t('schedule.slotClassBusy')}`
+                      : teacherConflict
+                        ? ` · ${t('schedule.slotTeacherBusy')}`
+                        : '';
+                    return (
+                      <MenuItem
+                        key={slot.id}
+                        value={slot.startTime}
+                        disabled={classConflict || teacherConflict}
+                      >
+                        {slot.startTime}–{slot.endTime}
+                        {slot.label ? ` · ${slot.label}` : ''}
+                        {hint}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            )
+          )}
 
           <FormControl fullWidth size="small">
             <InputLabel>{t('schedule.lectureType')}</InputLabel>

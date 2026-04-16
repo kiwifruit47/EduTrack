@@ -226,7 +226,7 @@ function ViewTeachers() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {teacher.salary != null ? `${teacher.salary} лв.` : '—'}
+                          {teacher.salary != null ? `${teacher.salary} евро.` : '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
