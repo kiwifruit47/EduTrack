@@ -1,0 +1,48 @@
+  ---
+  Functional Requirements
+
+  ✅ User roles — ADMIN, HEADMASTER, TEACHER, PARENT, STUDENT all implemented with JWT + @PreAuthorize
+
+  ✅ User login — JWT auth at /auth/login with refresh token cookie
+
+  ✅ Role-personalized views — separate dashboards, sidebar menus, and routes per role
+
+  ✅ School data (name + address) — full School CRUD with type, headmaster, profiles
+
+  ✅ Enroll/expel students in a class at a school — StudentService.enroll() / expel(), class field on Student entity
+
+  ✅ Headmaster personal data (create/edit/delete) — via admin UserController
+
+  ✅ Teacher personal data + subject qualifications — TeacherController with hire/fire/qualifications endpoints
+
+  ✅ Student personal data + class assignment — Student entity has schoolClass FK, enrollment flow exists
+
+  ✅ Parent personal data + linked students — ParentController with link/unlink/update
+
+  ✅ Curriculum per term (subjects + teachers) — ScheduleController with term, dayOfWeek, subject, teacher
+
+  ✅ Teachers record grades and absences for their students — GradeController, AbsenceController, complaints
+
+  ✅ Parents see only their children's grades/absences — role-guarded endpoints, frontend parent routes
+
+  ✅ Headmaster sees all school data + grade statistics — headmaster routes + statistics pages in frontend
+
+  ✅ Admin manages all users/roles + statistics across all schools — full admin CRUD + AllSchoolsGrades/Absences/stats
+
+  ❌ Unit tests (80% coverage) — only one empty contextLoads() test exists, zero actual test coverage
+
+  ---
+  Technical Requirements
+
+  ✅ Web-based, major browser support — React SPA, standard HTML/CSS/JS
+
+  ✅ Responsive design — Material-UI is responsive by default
+
+  ❌ Detailed code comments — code has essentially no inline comments
+
+  ❌ Documentation with screenshots — only a brief glossary exists, no feature documentation with screenshots
+
+  ❌ Individual contribution notes per team member — not present
+
+  ---
+  Summary: 14/19 ✅ — 5/19 ❌
