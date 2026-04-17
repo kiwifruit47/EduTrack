@@ -96,6 +96,16 @@ function ClassGrades() {
     return m;
   }, [filteredGrades]);
 
+  // weeklyHoursMap[subjectId][term] = number of schedule slots = minimum required grades
+  const weeklyHoursMap = useMemo(() => {
+    const m = {};
+    schedules.forEach(s => {
+      if (!m[s.subjectId]) m[s.subjectId] = {};
+      m[s.subjectId][s.term] = (m[s.subjectId][s.term] ?? 0) + 1;
+    });
+    return m;
+  }, [schedules]);
+
   // For teachers, only expose subjects they personally teach in this class.
   const teacherSchedules = useMemo(() => {
     if (user?.role !== 'TEACHER') return schedules;
@@ -207,6 +217,11 @@ function ClassGrades() {
                     {subjectColumns.map(s => (
                       <TableCell key={s.subjectId} sx={{ fontWeight: 700 }}>
                         {s.subjectName}
+                        {termFilter && (weeklyHoursMap[s.subjectId]?.[termFilter] ?? 0) > 0 && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 400 }}>
+                            min {weeklyHoursMap[s.subjectId][termFilter]}
+                          </Typography>
+                        )}
                       </TableCell>
                     ))}
                     <TableCell sx={{ fontWeight: 700, minWidth: 90 }}>{t('grades.average')}</TableCell>
@@ -245,6 +260,19 @@ function ClassGrades() {
                                     />
                                   ))}
                                 </Box>
+                                {termFilter && (() => {
+                                  const required = weeklyHoursMap[subj.subjectId]?.[termFilter] ?? 0;
+                                  if (required === 0) return null;
+                                  const actual = cellGrades.length;
+                                  return (
+                                    <Typography
+                                      variant="caption"
+                                      sx={{ fontWeight: 600, color: actual >= required ? 'success.main' : 'warning.main' }}
+                                    >
+                                      {actual}/{required}
+                                    </Typography>
+                                  );
+                                })()}
                               </TableCell>
                             );
                           })}
