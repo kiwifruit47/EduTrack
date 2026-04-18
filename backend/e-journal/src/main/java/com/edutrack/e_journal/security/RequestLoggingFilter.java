@@ -22,15 +22,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain) throws ServletException, IOException {
-        // Capture the start time to calculate request latency
         long start = System.currentTimeMillis();
         try {
-            // Delegate the request to the next filter in the Spring Security chain
             chain.doFilter(req, res);
         } finally {
-            // Calculate total execution time
             long ms = System.currentTimeMillis() - start;
-            // Log the HTTP method, URI, response status, latency, and client IP for audit/monitoring
             log.info("{} {} → {} ({}ms) [{}]",
                     req.getMethod(),
                     req.getRequestURI(),
@@ -41,9 +37,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     }
 
     private String getClientIp(HttpServletRequest req) {
-        // Extract the client's IP address, accounting for proxy/load balancer headers
         String forwarded = req.getHeader("X-Forwarded-For");
-        // Use the first IP in the X-Forwarded-For chain if present, otherwise fallback to the direct remote address
         return (forwarded != null && !forwarded.isBlank())
                 ? forwarded.split(",")[0].trim()
                 : req.getRemoteAddr();
