@@ -18,7 +18,7 @@ A full-stack school management system with a Spring Boot backend and a React/Vit
 
 | Tool | Version | Notes |
 |------|---------|-------|
-| JDK  | 21+     | Temurin / OpenJDK |
+| JDK  | 21      | Temurin / OpenJDK |
 | Maven | 3.9+ | included via `mvnw` wrapper |
 | Node.js | 18+ | |
 | npm  | 9+      | bundled with Node |

@@ -85,15 +85,17 @@ apt-get install -y --no-install-recommends \
     git maven postgresql
 
 # ── Java 21 (temurin via Adoptium repo) ─────────────────────
-if ! java -version 2>&1 | grep -q "21"; then
-    info "Installing Eclipse Temurin JDK 21..."
+JAVA_VER=$(java -version 2>&1 | grep -oP '(?<=")\d+' | head -1 || echo "0")
+if [[ "$JAVA_VER" != "21" ]]; then
+    info "Installing Eclipse Temurin JDK 21 (project requires Java 21)..."
     curl -fsSL https://packages.adoptium.net/artifactory/api/gpg/key/public \
         | gpg --dearmor -o /etc/apt/trusted.gpg.d/adoptium.gpg
     echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" \
         > /etc/apt/sources.list.d/adoptium.list
     apt-get update -qq
     apt-get install -y temurin-21-jdk
-    success "JDK 21 installed."
+    update-java-alternatives -s temurin-21-amd64 2>/dev/null || true
+    success "JDK 21 installed and set as default."
 else
     success "JDK 21 already present."
 fi
