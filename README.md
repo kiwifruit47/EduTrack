@@ -8,7 +8,7 @@ A full-stack school management system with a Spring Boot backend and a React/Vit
 
 | Layer    | Technology                          |
 |----------|-------------------------------------|
-| Backend  | Java 21, Spring Boot, Spring Security (JWT), Spring Data JPA, Hibernate |
+| Backend  | Java 21, Spring Boot 3.5, Spring Security (JWT), Spring Data JPA, Hibernate |
 | Database | PostgreSQL                          |
 | Frontend | React 18, Vite, Material UI, i18next |
 

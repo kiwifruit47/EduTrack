@@ -86,30 +86,30 @@ apt-get install -y --no-install-recommends \
 
 # ── Java 21 (temurin via Adoptium repo) ─────────────────────
 JAVA_VER=$(java -version 2>&1 | grep -oP '(?<=")\d+' | head -1 || echo "0")
-if [[ "$JAVA_VER" != "25" ]]; then
-    info "Installing Eclipse Temurin JDK 25 (Spring Boot 4 requires Java 25)..."
+if [[ "$JAVA_VER" -lt "21" ]]; then
+    info "Installing Eclipse Temurin JDK 21 (Spring Boot 3.x requires Java 21)..."
     curl -fsSL https://packages.adoptium.net/artifactory/api/gpg/key/public \
         | gpg --dearmor -o /etc/apt/trusted.gpg.d/adoptium.gpg
     echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" \
         > /etc/apt/sources.list.d/adoptium.list
     apt-get update -qq
-    apt-get install -y temurin-25-jdk
-    update-java-alternatives -s temurin-25-amd64 2>/dev/null || true
-    success "JDK 25 installed and set as default."
+    apt-get install -y temurin-21-jdk
+    update-java-alternatives -s temurin-21-amd64 2>/dev/null || true
+    success "JDK 21 installed and set as default."
 else
-    success "JDK 25 already present."
+    success "JDK $JAVA_VER already present (≥ 21)."
 fi
 
-# ── Pin JAVA_HOME to JDK 25 so Maven uses the right JVM ──────
-JDK25_HOME=$(update-java-alternatives -l 2>/dev/null | awk '/temurin-25|java-25/{print $3; exit}')
-if [[ -z "$JDK25_HOME" ]]; then
-    JDK25_HOME=$(find /usr/lib/jvm -maxdepth 1 -name "*25*" -type d | head -1)
+# ── Pin JAVA_HOME to JDK 21 so Maven uses the right JVM ──────
+JDK21_HOME=$(update-java-alternatives -l 2>/dev/null | awk '/temurin-21|java-21/{print $3; exit}')
+if [[ -z "$JDK21_HOME" ]]; then
+    JDK21_HOME=$(find /usr/lib/jvm -maxdepth 1 -name "*21*" -type d | head -1)
 fi
-if [[ -n "$JDK25_HOME" ]]; then
-    export JAVA_HOME="$JDK25_HOME"
+if [[ -n "$JDK21_HOME" ]]; then
+    export JAVA_HOME="$JDK21_HOME"
     info "JAVA_HOME set to $JAVA_HOME"
 else
-    warn "Could not locate JDK 25 path — Maven will use system default"
+    warn "Could not locate JDK 21 path — Maven will use system default"
 fi
 
 # ── Node.js 22 (via NodeSource) ──────────────────────────────
