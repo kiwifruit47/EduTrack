@@ -20,6 +20,7 @@ const TYPE_COLORS = {
   EXTRACURRICULAR:'secondary',
 };
 
+// Formats a time string by extracting only the HH:mm portion
 const fmtTime = t => (t ? t.slice(0, 5) : '');
 
 const EMPTY_FORM = {

@@ -20,10 +20,13 @@ const fieldProps = {
 };
 
 function SubjectFormFields({ form, setForm, t }) {
+  // Render a single controlled input field for the subject name
   return (
     <TextField
       label={t('subjects.name')}
+      // Bind the input value to the subject name in the form state
       value={form.name}
+      // Update the subject name in the form state on every keystroke
       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
       required
       fullWidth

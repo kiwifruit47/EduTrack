@@ -35,6 +35,7 @@ public class GradeController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<GradeDto> getByClass(
             @Parameter(description = "Class ID") @PathVariable Long classId) {
+        // Retrieve the list of grade DTOs for the specified school class via the service layer
         return gradeService.getByClass(classId);
     }
 
@@ -43,6 +44,7 @@ public class GradeController {
     @GetMapping("/student/me")
     @PreAuthorize("hasRole('STUDENT')")
     public List<GradeDto> getMyGrades(@AuthenticationPrincipal UserDetails principal) {
+        // Retrieve the grade history for the currently authenticated student principal
         return gradeService.getByCurrentStudent(principal);
     }
 
@@ -52,6 +54,7 @@ public class GradeController {
     @PreAuthorize("hasAnyRole('PARENT','ADMIN','HEADMASTER','TEACHER')")
     public List<GradeDto> getByStudent(
             @Parameter(description = "Student user ID") @PathVariable Long studentId) {
+        // Fetch the grade history for the specified student via the service layer
         return gradeService.getByStudent(studentId);
     }
 
@@ -63,6 +66,7 @@ public class GradeController {
     @PostMapping
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<GradeDto> create(@Valid @RequestBody GradeRequest req) {
+        // Process the grade creation request and return the resulting DTO
         return ResponseEntity.status(HttpStatus.CREATED).body(gradeService.create(req));
     }
 
@@ -75,7 +79,9 @@ public class GradeController {
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Grade ID") @PathVariable Long id) {
+        // Remove the grade record from the database via the service layer
         gradeService.delete(id);
+        // Return 204 No Content to indicate successful deletion
         return ResponseEntity.noContent().build();
     }
 }

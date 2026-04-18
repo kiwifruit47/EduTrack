@@ -38,6 +38,7 @@ public class ScheduleController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER','PARENT','STUDENT')")
     public List<ScheduleDto> getByClass(
             @Parameter(description = "Class ID") @PathVariable Long classId) {
+        // Retrieve the curriculum schedule entries associated with the specified school class
         return scheduleService.getByClass(classId);
     }
 
@@ -47,6 +48,7 @@ public class ScheduleController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<ScheduleDto> getByTeacher(
             @Parameter(description = "Teacher user ID") @PathVariable Long teacherId) {
+        // Retrieve all schedule entries associated with the specified teacher
         return scheduleService.getByTeacher(teacherId);
     }
 
@@ -55,6 +57,7 @@ public class ScheduleController {
     @GetMapping("/teacher/me")
     @PreAuthorize("hasRole('TEACHER')")
     public List<ScheduleDto> getMySchedule(@AuthenticationPrincipal UserDetails principal) {
+        // Retrieve the schedule entries associated with the authenticated teacher's identity
         return scheduleService.getMySchedule(principal);
     }
 
@@ -66,6 +69,7 @@ public class ScheduleController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<ScheduleDto> create(@Valid @RequestBody ScheduleRequest req) {
+        // Persist the new schedule entry and return the created DTO
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(req));
     }
 
@@ -80,6 +84,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleDto> patchType(
             @Parameter(description = "Schedule entry ID") @PathVariable Long id,
             @RequestBody TypePatchRequest req) {
+        // Delegate the partial update to the service layer and return the updated schedule DTO
         return ResponseEntity.ok(scheduleService.patchType(id, req.getLectureType(), req.getTrackAttendance()));
     }
 
@@ -92,7 +97,9 @@ public class ScheduleController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Schedule entry ID") @PathVariable Long id) {
+        // Remove the schedule entry from the database via the service layer
         scheduleService.delete(id);
+        // Return 204 No Content to indicate successful deletion
         return ResponseEntity.noContent().build();
     }
 

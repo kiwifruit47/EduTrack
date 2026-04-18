@@ -31,6 +31,7 @@ public class ClassController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<SchoolClassDto> getAll(@AuthenticationPrincipal UserDetails principal) {
+        // Delegate to the service layer to retrieve classes filtered by the user's authority
         return classService.getAll(principal);
     }
 
@@ -40,6 +41,7 @@ public class ClassController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<SchoolClassDto> getBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Fetch all school classes associated with the specified school ID
         return classService.getBySchool(schoolId);
     }
 
@@ -52,6 +54,7 @@ public class ClassController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER','PARENT','STUDENT')")
     public SchoolClassDto getById(
             @Parameter(description = "Class ID") @PathVariable Long id) {
+        // Retrieve the school class details from the service layer
         return classService.getById(id);
     }
 
@@ -64,6 +67,7 @@ public class ClassController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<UserSummaryDto> getStudents(
             @Parameter(description = "Class ID") @PathVariable Long id) {
+        // Retrieve the list of student summaries for the specified school class
         return classService.getStudents(id);
     }
 }

@@ -10,10 +10,15 @@ import api from '../../api/axiosInstance';
 import useAuth from '../../hooks/useAuth';
 
 const GRADE_COLOR = v => {
+  // Map a numeric grade to a Material UI alert/text severity
   const n = parseFloat(v);
+  // High grades (5.5 - 6.0) use green success color
   if (n >= 5.5) return 'success';
+  // Good grades (4.0 - 5.0) use blue primary color
   if (n >= 4) return 'primary';
+  // Passing/Borderline grades (2.0 - 3.5) use orange warning color
   if (n <= 3) return 'warning';
+  // Failing grades (below 2.0) use red error color
   return 'error';
 };
 

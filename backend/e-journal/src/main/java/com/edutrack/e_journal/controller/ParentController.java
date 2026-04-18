@@ -37,6 +37,7 @@ public class ParentController {
     public List<ParentDto> getBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate to service to fetch parents and validate the headmaster's authority over the school
         return parentService.getBySchool(schoolId, principal);
     }
 
@@ -46,6 +47,7 @@ public class ParentController {
     @GetMapping("/available")
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
+        // Retrieve all users with the PARENT role for the school's headmaster
         return parentService.getAvailable();
     }
 
@@ -63,6 +65,7 @@ public class ParentController {
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @Parameter(description = "Student user ID") @PathVariable Long studentId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the linking logic to the service layer and return the updated parent DTO
         return ResponseEntity.ok(parentService.link(parentId, studentId, principal));
     }
 
@@ -79,7 +82,9 @@ public class ParentController {
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @Parameter(description = "Student user ID") @PathVariable Long studentId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the unlinking logic to the service layer, passing the authenticated principal for authority checks
         parentService.unlink(parentId, studentId, principal);
+        // Return 204 No Content to indicate a successful deletion/update with no response body
         return ResponseEntity.noContent().build();
     }
 
@@ -95,6 +100,7 @@ public class ParentController {
             @Parameter(description = "Parent user ID") @PathVariable Long parentId,
             @RequestBody UpdateParentRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the update logic to the service layer using the provided DTO and security principal
         return ResponseEntity.ok(parentService.update(
                 parentId, req.getFirstName(), req.getLastName(), req.getEmail(), principal));
     }

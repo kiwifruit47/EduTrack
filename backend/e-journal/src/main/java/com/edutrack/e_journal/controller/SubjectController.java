@@ -32,6 +32,7 @@ public class SubjectController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<SubjectDto> getAll() {
+        // Fetch all subject records from the service layer
         return subjectService.getAll();
     }
 
@@ -43,6 +44,7 @@ public class SubjectController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubjectDto> create(@Valid @RequestBody SubjectRequest req) {
+        // Validate the subject request DTO and delegate creation to the subject service
         return ResponseEntity.status(HttpStatus.CREATED).body(subjectService.create(req));
     }
 
@@ -56,6 +58,7 @@ public class SubjectController {
     public ResponseEntity<SubjectDto> update(
             @Parameter(description = "Subject ID") @PathVariable Long id,
             @Valid @RequestBody SubjectRequest req) {
+        // Delegate the subject update logic to the service layer and return the updated DTO
         return ResponseEntity.ok(subjectService.update(id, req));
     }
 
@@ -68,7 +71,9 @@ public class SubjectController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Subject ID") @PathVariable Long id) {
+        // Delegate subject removal to the service layer
         subjectService.delete(id);
+        // Return 204 No Content on successful deletion
         return ResponseEntity.noContent().build();
     }
 }

@@ -31,6 +31,7 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDto> getAll() {
+        // Retrieve the full list of users from the service layer
         return userService.getAllUsers();
     }
 
@@ -40,6 +41,7 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<UserSummaryDto> getTeachersBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Fetch a summary list of all users with the TEACHER role belonging to the specified school
         return userService.getTeachersBySchool(schoolId);
     }
 
@@ -49,6 +51,7 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<UserDto> getStudentsBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Fetch all student user profiles associated with the specified school
         return userService.getStudentsBySchool(schoolId);
     }
 
@@ -58,6 +61,7 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER')")
     public List<UserDto> getParentsBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Delegate to the user service to retrieve all parent profiles associated with the specified school
         return userService.getParentsBySchool(schoolId);
     }
 
@@ -66,6 +70,7 @@ public class UserController {
     @GetMapping("/headmasters")
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserSummaryDto> getHeadmasters() {
+        // Retrieve a summary list of all users identified as headmasters
         return userService.getHeadmasters();
     }
 
@@ -77,6 +82,7 @@ public class UserController {
     @GetMapping("/{id}/picture")
     public ResponseEntity<byte[]> getPicture(
             @Parameter(description = "User ID") @PathVariable Long id) {
+        // Delegate to the user service to retrieve the image bytes and appropriate media type
         return userService.getPicture(id);
     }
 
@@ -88,6 +94,7 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> create(@Valid @RequestBody CreateUserRequest req) {
+        // Validate the user creation request and persist the new user via the service layer
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(req));
     }
 
@@ -101,6 +108,7 @@ public class UserController {
     public ResponseEntity<UserDto> update(
             @Parameter(description = "User ID") @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest req) {
+        // Delegate the update logic to the service layer and return the updated user DTO
         return ResponseEntity.ok(userService.updateUser(id, req));
     }
 
@@ -113,7 +121,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "User ID") @PathVariable Long id) {
+        // Delegate user removal to the service layer
         userService.deleteUser(id);
+        // Return 204 No Content on successful deletion
         return ResponseEntity.noContent().build();
     }
 }

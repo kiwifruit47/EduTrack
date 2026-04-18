@@ -20,25 +20,36 @@ const fieldSx = {
 
 /** Returns the Monday–Friday dates of the week containing `date`. */
 function getWeekDays(date) {
+  // Initialize a new date object from the provided input to avoid mutating the original
   const d = new Date(date);
+  // Retrieve the day of the week (0 for Sunday, 1 for Monday, etc.)
   const day = d.getDay(); // 0=Sun…6=Sat
+  // Create a reference date for the start of the week
   const monday = new Date(d);
+  // Calculate and set the date to the most recent Monday
   monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  // Generate an array representing the first 5 weekdays (Monday to Friday)
   return Array.from({ length: 5 }, (_, i) => {
+    // Clone the Monday reference date for each iteration
     const dd = new Date(monday);
+    // Offset the date by the current index to traverse the week
     dd.setDate(monday.getDate() + i);
     return dd;
   });
 }
 
 /** Format a Date as "yyyy-MM-dd" */
+// Converts a Date object to a YYYY-MM-DD string format
 function toISODate(d) {
+  // Extract the date portion from the full ISO string
   return d.toISOString().slice(0, 10);
 }
 
 /** day-of-week index the DB uses: Mon=1…Fri=5 */
 function dbDayOfWeek(date) {
+  // Convert JavaScript 0-6 (Sun-Sat) to database-compatible 1-7 (Mon-Sun) format
   const js = date.getDay(); // 0=Sun…6=Sat
+  // Map Sunday from 0 to 7, leaving other days unchanged
   return js === 0 ? 7 : js; // Sun→7, Mon→1…Fri→5  (only 1-5 are valid)
 }
 

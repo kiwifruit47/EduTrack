@@ -33,6 +33,7 @@ public class ProfileController {
     @ApiResponse(responseCode = "200", description = "Profile returned")
     @GetMapping
     public ResponseEntity<UserDto> getProfile(@AuthenticationPrincipal UserDetails principal) {
+        // Retrieve the profile details for the currently authenticated user via the principal
         return ResponseEntity.ok(profileService.getProfile(principal));
     }
 
@@ -44,7 +45,9 @@ public class ProfileController {
     @PutMapping("/password")
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails principal,
                                             @Valid @RequestBody ChangePasswordRequest req) {
+        // Process the password change request using the authenticated user's principal
         profileService.changePassword(principal, req);
+        // Return a success response with a confirmation message
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
@@ -68,7 +71,9 @@ public class ProfileController {
     @PutMapping("/bio")
     public ResponseEntity<UserDto> updateBio(@AuthenticationPrincipal UserDetails principal,
                                              @RequestBody Map<String, String> body) {
+        // Update the authenticated user's bio using the value from the request body
         String bio = body.getOrDefault("bio", "");
+        // Delegate to the profile service and return the updated user profile DTO
         return ResponseEntity.ok(profileService.updateBio(principal, bio));
     }
 
@@ -76,7 +81,9 @@ public class ProfileController {
     @ApiResponse(responseCode = "204", description = "Picture deleted")
     @DeleteMapping("/picture")
     public ResponseEntity<Void> deletePicture(@AuthenticationPrincipal UserDetails principal) {
+        // Remove the profile picture for the currently authenticated user
         profileService.deletePicture(principal);
+        // Return 204 No Content to indicate successful deletion
         return ResponseEntity.noContent().build();
     }
 }

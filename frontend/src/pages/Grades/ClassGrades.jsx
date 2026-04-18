@@ -19,10 +19,15 @@ const fieldSx = {
 };
 
 const GRADE_COLOR = v => {
+  // Map a numeric grade to a Material UI severity color string
   const n = parseFloat(v);
+  // Return 'success' (green) for excellent grades (5.5 - 6.0)
   if (n >= 5.5) return 'success';
+  // Return 'primary' (blue) for good grades (4.5 - 5.0)
   if (n >= 4.5) return 'primary';
+  // Return 'warning' (orange) for passing grades (3.5 - 4.0)
   if (n >= 3.5) return 'warning';
+  // Return 'error' (red) for failing grades (2.0 - 3.0)
   return 'error';
 };
 

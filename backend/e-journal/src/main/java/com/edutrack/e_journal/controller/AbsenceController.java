@@ -35,6 +35,7 @@ public class AbsenceController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<AbsenceDto> getByClass(
             @Parameter(description = "Class ID") @PathVariable Long classId) {
+        // Retrieve the list of absence DTOs for the specified school class via the service layer
         return absenceService.getByClass(classId);
     }
 
@@ -43,6 +44,7 @@ public class AbsenceController {
     @GetMapping("/student/me")
     @PreAuthorize("hasRole('STUDENT')")
     public List<AbsenceDto> getMyAbsences(@AuthenticationPrincipal UserDetails principal) {
+        // Retrieve the absence history for the currently authenticated student principal
         return absenceService.getByCurrentStudent(principal);
     }
 
@@ -52,6 +54,7 @@ public class AbsenceController {
     @PreAuthorize("hasAnyRole('PARENT','ADMIN','HEADMASTER','TEACHER')")
     public List<AbsenceDto> getByStudent(
             @Parameter(description = "Student user ID") @PathVariable Long studentId) {
+        // Delegate to the service layer to retrieve the student's absence history
         return absenceService.getByStudent(studentId);
     }
 
@@ -63,6 +66,7 @@ public class AbsenceController {
     @PostMapping
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<AbsenceDto> create(@Valid @RequestBody AbsenceRequest req) {
+        // Process the absence request and return the created absence DTO
         return ResponseEntity.status(HttpStatus.CREATED).body(absenceService.create(req));
     }
 
@@ -75,6 +79,7 @@ public class AbsenceController {
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<AbsenceDto> toggleExcuse(
             @Parameter(description = "Absence ID") @PathVariable Long id) {
+        // Update the excused status of the specified absence and return the updated DTO
         return ResponseEntity.ok(absenceService.toggleExcuse(id));
     }
 
@@ -87,7 +92,9 @@ public class AbsenceController {
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "Absence ID") @PathVariable Long id) {
+        // Delegate the removal of the absence record to the service layer
         absenceService.delete(id);
+        // Return 204 No Content to indicate successful deletion without a response body
         return ResponseEntity.noContent().build();
     }
 }

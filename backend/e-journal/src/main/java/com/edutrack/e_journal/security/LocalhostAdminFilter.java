@@ -38,6 +38,7 @@ public class LocalhostAdminFilter extends OncePerRequestFilter {
     private final boolean enabled;
 
     public LocalhostAdminFilter(boolean enabled) {
+        // Initialize the filter with a toggle to bypass security checks during local development
         this.enabled = enabled;
     }
 
@@ -46,15 +47,18 @@ public class LocalhostAdminFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
+        // Check if the dev-bypass filter is active and the request is unauthenticated
         if (enabled
                 && SecurityContextHolder.getContext().getAuthentication() == null
                 && LOOPBACK.contains(request.getRemoteAddr())) {
 
+            // Grant full administrative authority to requests originating from localhost
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken("localhost-admin", null, ALL_ROLES)
             );
         }
 
+        // Continue the filter chain execution
         chain.doFilter(request, response);
     }
 }

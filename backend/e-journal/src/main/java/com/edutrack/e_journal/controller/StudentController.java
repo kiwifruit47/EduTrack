@@ -31,6 +31,7 @@ public class StudentController {
     @GetMapping("/available")
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
+        // Retrieve the list of student users who are not yet assigned to any school class
         return studentService.getAvailable();
     }
 
@@ -45,6 +46,7 @@ public class StudentController {
     public ResponseEntity<UserDto> enroll(
             @Parameter(description = "User ID of the student to enroll") @PathVariable Long userId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the enrollment logic to the student service and return the updated student DTO
         return ResponseEntity.ok(studentService.enroll(userId, principal));
     }
 
@@ -59,7 +61,9 @@ public class StudentController {
     public ResponseEntity<Void> expel(
             @Parameter(description = "Student user ID") @PathVariable Long studentId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Execute the expulsion logic by removing the student from the school context
         studentService.expel(studentId, principal);
+        // Return 204 No Content to indicate successful processing without a response body
         return ResponseEntity.noContent().build();
     }
 }

@@ -20,8 +20,11 @@ const DEFAULT_CONFIG = {
 };
 
 /** Parse a "MM-dd" string into a Date for the given year. */
+// Converts a month-day string into a full JavaScript Date object
 const parseMMDD = (mmdd, year) => {
+  // Split the "MM-DD" string by hyphen and convert parts to integers
   const [m, d] = mmdd.split('-').map(Number);
+  // Return a new Date using the provided year, zero-indexed month, and day
   return new Date(year, m - 1, d);
 };
 
@@ -29,9 +32,13 @@ const parseMMDD = (mmdd, year) => {
  * Return the calendar year in which the current school year STARTED.
  * School years straddle two calendar years (e.g. 2024/2025 starts in 2024).
  */
+// Determine the start year of the current school year based on a given start date
 const schoolYearStartYear = (today, startDate) => {
+  // Parse the month and day from the YYYY-MM-DD string format
   const [m, d] = startDate.split('-').map(Number);
+  // Get the current calendar year
   const y = today.getFullYear();
+  // If the current date has reached or passed the start date in the current year, return current year; otherwise, return the previous year
   return today >= new Date(y, m - 1, d) ? y : y - 1;
 };
 
@@ -40,23 +47,41 @@ const schoolYearStartYear = (today, startDate) => {
  * term2Start and end dates are always in startYear+1 (the "spring" half).
  */
 const getActiveTerm = (today, cfg) => {
+  // Determine which academic year the current date belongs to
   const sy = schoolYearStartYear(today, cfg.startDate);
+  // Calculate the start date of the first term for the current school year
   const start = parseMMDD(cfg.startDate, sy);
+  // Calculate the start date of the second term for the following school year
   const t2    = parseMMDD(cfg.term2Start, sy + 1);
+  // If the current date is before the start of the first term, no term is active
   if (today < start) return null;
+  // If the current date is before the start of the second term, we are in term 1
   if (today < t2)    return 1;
+  // Otherwise, the current date falls within the second term
   return 2;
 };
 
 /** True if the entry belongs to the active term and its grade level hasn't ended yet. */
+// Determines if a specific schedule entry is valid for the current academic term and date
 const isEntryActive = (entry, today, cfg, activeTerm) => {
+  // Validate that the entry belongs to the currently active school term
   if (activeTerm === null || entry.term !== activeTerm) return false;
+
+  // Extract the numeric grade level from the class name (e.g., "5.A" -> 5)
   const grade = parseInt(entry.className.match(/^(\d+)/)?.[1] ?? '0');
+
+  // Determine the academic year end date based on the student's grade level category
   const endStr = grade <= 4 ? cfg.elementaryEnd
                : grade <= 7 ? cfg.progymnasiumEnd
                : cfg.gymnasiumEnd;
+
+  // Calculate the start of the current school year
   const sy  = schoolYearStartYear(today, cfg.startDate);
+
+  // Parse the end date string using the calculated school year context
   const end = parseMMDD(endStr, sy + 1);
+
+  // The entry is active if the current date has not yet passed the term's end date
   return today <= end;
 };
 

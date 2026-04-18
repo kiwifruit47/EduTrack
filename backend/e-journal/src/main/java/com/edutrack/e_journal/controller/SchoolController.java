@@ -43,6 +43,7 @@ public class SchoolController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SchoolDto> getAll() {
+        // Retrieve the full list of schools with their associated profiles and headmasters
         return schoolService.getAllSchools();
     }
 
@@ -55,6 +56,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public SchoolDto getById(
             @Parameter(description = "School ID") @PathVariable Long id) {
+        // Retrieve the school details from the service layer using the provided ID
         return schoolService.getSchoolById(id);
     }
 
@@ -66,6 +68,7 @@ public class SchoolController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolDto> create(@Valid @RequestBody SchoolRequest req) {
+        // Delegate the school creation logic to the service layer and return the created DTO with 201 Created status
         return ResponseEntity.status(HttpStatus.CREATED).body(schoolService.createSchool(req));
     }
 
@@ -79,6 +82,7 @@ public class SchoolController {
     public ResponseEntity<SchoolDto> update(
             @Parameter(description = "School ID") @PathVariable Long id,
             @Valid @RequestBody SchoolRequest req) {
+        // Delegate the school update logic to the service layer and return the updated DTO
         return ResponseEntity.ok(schoolService.updateSchool(id, req));
     }
 
@@ -113,7 +117,9 @@ public class SchoolController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @Parameter(description = "School ID") @PathVariable Long id) {
+        // Delegate the deletion logic to the school service
         schoolService.deleteSchool(id);
+        // Return 204 No Content to indicate successful deletion
         return ResponseEntity.noContent().build();
     }
 
@@ -125,6 +131,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<SchoolDto.ProfileDto> getProfiles(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Retrieve the school's specialization profiles via the service layer
         return schoolService.getProfiles(schoolId);
     }
 
@@ -138,6 +145,7 @@ public class SchoolController {
     public ResponseEntity<SchoolDto.ProfileDto> addProfile(
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @Valid @RequestBody ProfileRequest req) {
+        // Create a new school profile and return the created DTO with 201 Created status
         return ResponseEntity.status(HttpStatus.CREATED).body(schoolService.addProfile(schoolId, req.getName()));
     }
 
@@ -150,7 +158,9 @@ public class SchoolController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProfile(
             @Parameter(description = "Profile ID") @PathVariable Long profileId) {
+        // Delegate the deletion of the school profile to the service layer
         schoolService.deleteProfile(profileId);
+        // Return 204 No Content to indicate successful deletion without response body
         return ResponseEntity.noContent().build();
     }
 
@@ -162,6 +172,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<SchoolScheduleEntryDto> getSchedule(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Fetch the daily schedule entries for the specified school
         return schoolService.getSchedule(schoolId);
     }
 
@@ -177,6 +188,7 @@ public class SchoolController {
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @Valid @RequestBody SchoolScheduleEntryRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate to the service layer to create the new schedule entry and verify school ownership
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(schoolService.addScheduleEntry(schoolId, req, principal));
     }
@@ -193,6 +205,7 @@ public class SchoolController {
             @Parameter(description = "Schedule entry ID") @PathVariable Long entryId,
             @Valid @RequestBody SchoolScheduleEntryRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the schedule update logic to the school service, passing the entry ID, request DTO, and the authenticated principal for authority checks
         return ResponseEntity.ok(schoolService.updateScheduleEntry(entryId, req, principal));
     }
 
@@ -207,7 +220,9 @@ public class SchoolController {
     public ResponseEntity<Void> deleteScheduleEntry(
             @Parameter(description = "Schedule entry ID") @PathVariable Long entryId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the deletion logic and authority check to the service layer
         schoolService.deleteScheduleEntry(entryId, principal);
+        // Return 204 No Content to indicate successful deletion
         return ResponseEntity.noContent().build();
     }
 
@@ -219,6 +234,7 @@ public class SchoolController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public SchoolTermConfigDto getTermConfig(
             @Parameter(description = "School ID") @PathVariable Long schoolId) {
+        // Retrieve the term configuration for the specified school
         return schoolService.getTermConfig(schoolId);
     }
 
@@ -234,6 +250,7 @@ public class SchoolController {
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @RequestBody SchoolTermConfigDto req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the term configuration update to the school service and return the updated DTO
         return ResponseEntity.ok(schoolService.updateTermConfig(schoolId, req, principal));
     }
 

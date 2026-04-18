@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface SchoolRepository extends JpaRepository<School, Long> {
+    // Retrieves the school managed by a specific director
     Optional<School> findByDirector_Id(Long directorId);
 }

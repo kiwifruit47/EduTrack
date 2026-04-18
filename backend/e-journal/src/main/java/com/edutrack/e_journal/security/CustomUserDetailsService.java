@@ -23,12 +23,15 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Retrieve the user from the database by their email address
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
 
+        // Map the domain User entity to a Spring Security UserDetails object
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPasswordHash())
+                // Convert the domain role into a Spring Security GrantedAuthority with the ROLE_ prefix
                 .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName().name())))
                 .build();
     }

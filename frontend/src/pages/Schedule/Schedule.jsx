@@ -16,6 +16,7 @@ import Layout from '../../components/Layout';
 import api from '../../api/axiosInstance';
 import useAuth from '../../hooks/useAuth';
 
+// Formats a time string by extracting only the HH:mm portion
 const fmtTime = t => (t ? t.slice(0, 5) : '');
 
 function TermTable({ entries, canEdit, onDelete, t }) {

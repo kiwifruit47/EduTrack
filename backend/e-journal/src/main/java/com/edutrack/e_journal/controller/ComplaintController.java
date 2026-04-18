@@ -35,6 +35,7 @@ public class ComplaintController {
     @PreAuthorize("hasAnyRole('ADMIN','HEADMASTER','TEACHER')")
     public List<ComplaintDto> getByClass(
             @Parameter(description = "Class ID") @PathVariable Long classId) {
+        // Retrieve all complaints associated with the specified school class
         return complaintService.getByClass(classId);
     }
 
@@ -43,6 +44,7 @@ public class ComplaintController {
     @GetMapping("/student/me")
     @PreAuthorize("hasRole('STUDENT')")
     public List<ComplaintDto> getMyComplaints(@AuthenticationPrincipal UserDetails principal) {
+        // Retrieve all complaints associated with the authenticated student profile
         return complaintService.getByCurrentStudent(principal);
     }
 
@@ -52,6 +54,7 @@ public class ComplaintController {
     @PreAuthorize("hasAnyRole('PARENT','ADMIN','HEADMASTER','TEACHER')")
     public List<ComplaintDto> getByStudent(
             @Parameter(description = "Student user ID") @PathVariable Long studentId) {
+        // Retrieve the list of complaint DTOs associated with the specified student
         return complaintService.getByStudent(studentId);
     }
 
@@ -63,6 +66,7 @@ public class ComplaintController {
     @PostMapping
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN','HEADMASTER')")
     public ResponseEntity<ComplaintDto> create(@Valid @RequestBody ComplaintRequest req) {
+        // Validate the complaint request DTO and delegate the creation logic to the service layer
         return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.create(req));
     }
 

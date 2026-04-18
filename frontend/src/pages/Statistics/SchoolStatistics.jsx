@@ -12,13 +12,19 @@ import api from '../../api/axiosInstance';
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 const gradeChipColor = avg => {
+  // Determine the MUI Chip color based on the student's average grade
   if (avg === null || avg === undefined) return 'default';
+  // High grades (5.5 - 6.0) use success (green)
   if (avg >= 5.5) return 'success';
+  // Good grades (4.5 - 5.0) use primary (blue)
   if (avg >= 4.5) return 'primary';
+  // Passing grades (3.5 - 4.0) use warning (orange)
   if (avg >= 3.5) return 'warning';
+  // Failing grades (below 3.5) use error (red)
   return 'error';
 };
 
+// Formats a numeric value as a rounded percentage string (e.g., 0.856 -> "86%")
 const fmtPct = n => `${n.toFixed(0)}%`;
 
 // ── Sub-components ─────────────────────────────────────────────────────────────

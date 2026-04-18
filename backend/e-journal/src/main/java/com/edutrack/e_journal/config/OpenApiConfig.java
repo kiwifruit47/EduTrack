@@ -23,7 +23,9 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI openAPI() {
+        // Configure the OpenAPI specification for Swagger UI documentation
         return new OpenAPI()
+                // Define the API metadata including title, version, and usage instructions
                 .info(new Info()
                         .title("EduTrack API")
                         .version("1.0.0")
@@ -44,9 +46,11 @@ public class OpenApiConfig {
                                 | `STUDENT` | Views own grades, absences, and complaints |
                                 | `PARENT` | Views their child's records |
                                 """)
+                        // Set the contact information for the API maintainers
                         .contact(new Contact()
                                 .name("EduTrack Development Team")
                                 .email("dev@edutrack.bg")))
+                // Apply global JWT Bearer authentication requirement to all endpoints
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 }

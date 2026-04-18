@@ -40,6 +40,7 @@ public class TeacherController {
     public List<TeacherDto> getBySchool(
             @Parameter(description = "School ID") @PathVariable Long schoolId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate to service to fetch teachers and verify the principal's authority over the school
         return teacherService.getBySchool(schoolId, principal);
     }
 
@@ -48,6 +49,7 @@ public class TeacherController {
     @GetMapping("/available")
     @PreAuthorize("hasRole('HEADMASTER')")
     public List<UserDto> getAvailable() {
+        // Retrieve the list of teachers not yet associated with a school
         return teacherService.getAvailable();
     }
 
@@ -61,7 +63,9 @@ public class TeacherController {
     public ResponseEntity<TeacherDto> createAndHire(
             @Valid @RequestBody CreateTeacherRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Handle the teacher creation and school assignment process
         return ResponseEntity.status(201)
+                // Delegate to the service layer to create the user and link them to the headmaster's school
                 .body(teacherService.createAndHire(req.getFirstName(), req.getLastName(),
                         req.getEmail(), req.getPassword(), principal));
     }
@@ -76,6 +80,7 @@ public class TeacherController {
     public ResponseEntity<UserDto> hire(
             @Parameter(description = "User ID of the teacher to hire") @PathVariable Long userId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the hiring logic to the teacher service, passing the target user ID and the authenticated headmaster
         return ResponseEntity.ok(teacherService.hire(userId, principal));
     }
 
@@ -90,7 +95,9 @@ public class TeacherController {
     public ResponseEntity<Void> fire(
             @Parameter(description = "Teacher user ID") @PathVariable Long teacherId,
             @AuthenticationPrincipal UserDetails principal) {
+        // Execute the termination logic via the service layer
         teacherService.fire(teacherId, principal);
+        // Return 204 No Content on successful removal
         return ResponseEntity.noContent().build();
     }
 
@@ -106,6 +113,7 @@ public class TeacherController {
             @Parameter(description = "Teacher user ID") @PathVariable Long teacherId,
             @RequestBody SalaryRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the salary update logic to the service layer and return the updated teacher profile
         return ResponseEntity.ok(teacherService.updateSalary(teacherId, req.getSalary(), principal));
     }
 
@@ -121,6 +129,7 @@ public class TeacherController {
             @Parameter(description = "Teacher user ID") @PathVariable Long teacherId,
             @RequestBody QualificationsRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        // Delegate the qualification update logic to the teacher service and return the updated profile
         return ResponseEntity.ok(teacherService.updateQualifications(teacherId, req.getSubjectIds(), principal));
     }
 
